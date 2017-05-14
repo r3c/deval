@@ -11,6 +11,21 @@ abstract class Block
 
 class ConcatBlock extends Block
 {
+	public static function create ($blocks)
+	{
+		switch (count ($blocks))
+		{
+			case 0:
+				return new VoidBlock ();
+
+			case 1:
+				return $blocks[0];
+
+			default:
+				return new self ($blocks);
+		}
+	}
+
 	public function __construct ($blocks)
 	{
 		$this->blocks = $blocks;
@@ -86,12 +101,64 @@ class ForBlock extends Block
 
 	public function inject ($variables)
 	{
-		throw new \Exception ('not implemented');
+		$body = $this->body->inject ($variables);
+		$empty = $this->empty !== null ? $this->empty->inject ($variables) : null;
+		$source = $this->source->inject ($variables);
+
+		if (!$source->evaluate ($result))
+			return new self ($source, $this->key, $this->value, $body, $empty);
+
+		$blocks = array ();
+
+		foreach ($result as $key => $value)
+			$blocks[] = $body->inject (array ($this->key => $key, $this->value => $value));
+
+		return ConcatBlock::create ($blocks);
 	}
 
 	public function render (&$variables)
 	{
-		throw new \Exception ('not implemented');
+		$output = new Output ();
+
+		// Write loop control
+		$output->append_code (State::loop_start() . ';');
+		$output->append_code ('for(' . $this->source->generate ($variables) . ' as ');
+
+		if ($this->key !== null)
+			$output->append_code ('$' . $this->key . '=>$' . $this->value);
+		else
+			$output->append_code ('$' . $this->value);
+
+		$output->append_code (')');
+
+		// Write body and merge inner variables into parent
+		$variables_inner = array ();
+
+		$output->append_code ('{');
+		$output->append ($this->body->render ($variables_inner));
+		$output->append_code (State::loop_step() . ';');
+		$output->append_code ('}');
+
+		if ($this->key !== null)
+			unset ($variables_inner[$this->key]);
+
+		unset ($variables_inner[$this->value]);
+
+		foreach (array_keys ($variables_inner) as $name)
+			$variables[$name] = true;
+
+		// Write empty block if any
+		if ($this->empty !== null)
+		{
+			$output->append_code ('if(' . State::loop_stop() . ')');
+			$output->append_code ('{');
+			$output->append ($this->empty->render ($variables));
+			$output->append_code ('}');
+		}
+		else
+			$output->append_code (State::loop_stop() . ';');
+
+		return $output;
 	}
 }
 
@@ -144,7 +211,8 @@ class IfBlock extends Block
 		{
 			list ($condition, $body) = $branch;
 
-			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($variables) . '){');
+			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($variables) . ')');
+			$output->append_code ('{');
 			$output->append ($body->render ($variables));
 			$output->append_code ('}');
 
@@ -153,7 +221,8 @@ class IfBlock extends Block
 
 		if ($this->fallback !== null)
 		{
-			$output->append_code ('else{');
+			$output->append_code ('else');
+			$output->append_code ('{');
 			$output->append ($this->fallback->render ($variables));
 			$output->append_code ('}');
 		}
@@ -208,14 +277,24 @@ class LetBlock extends Block
 		$output = new Output ();
 		$output->append_code ('{', true);
 
+		$variables_excludes = array ();
+
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
 			$output->append_code ('$' . $name . '=' . $value->generate ($variables) . ';');
+
+			$variables_exclude[$name] = true;
 		}
 
-		$output->append ($this->body->render ($variables));
+		$variables_inner = array ();
+
+		$output->append ($this->body->render ($variables_inner));
+
+		foreach (array_keys (array_diff_key ($variables_inner, $variables_exclude)) as $name)
+			$variables[$name] = true;
+
 		$output->append_code ('}');
 
 		return $output;

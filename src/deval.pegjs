@@ -7,17 +7,7 @@ Document
 Content
 	= blocks:Block*
 	{
-		switch (count ($blocks))
-		{
-			case 0:
-				return new \Deval\PlainBlock ('');
-
-			case 1:
-				return $blocks[0];
-
-			default:
-				return new \Deval\ConcatBlock ($blocks);
-		}
+		return \Deval\ConcatBlock::create ($blocks);
 	}
 
 // Block tree

@@ -56,26 +56,23 @@ class Output
 		if (count ($other->snippets) === 0)
 			return;
 
-		$snippets_collapse = array ();
-		$snippets_concat = array_merge ($this->snippets, $other->snippets);
+		$count = count ($this->snippets);
+		$last = $count > 0 && $this->snippets[$count - 1][1];
 
-		$count = 0;
-		$last = null;
-
-		foreach ($snippets_concat as $snippet)
+		foreach ($other->snippets as $snippet)
 		{
-			if ($count > 0 && $snippet[1] === $last)
-				$snippets_collapse[$count - 1][0] .= $snippet[0];
+			list ($output, $is_code) = $snippet;
+
+			if ($count > 0 && $is_code === $last)
+				$this->snippets[$count - 1][0] .= $output;
 			else
 			{
-				$snippets_collapse[] = $snippet;
+				$this->snippets[] = $snippet;
 
 				$count++;
-				$last = $snippet[1];
+				$last = $is_code;
 			}
 		}
-
-		$this->snippets = $snippets_collapse;
 
 		return $this;
 	}
@@ -114,6 +111,24 @@ class Output
 		}
 
 		return $output;
+	}
+}
+
+class State
+{
+	public static function loop_start ()
+	{
+		return '/* start loop */';
+	}
+
+	public static function loop_step ()
+	{
+		return '/* step loop */';
+	}
+
+	public static function loop_stop ()
+	{
+		return '/* stop loop */';
 	}
 }
 
