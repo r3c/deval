@@ -44,7 +44,7 @@ class ConstantExpression extends Expression
 
 	public function __toString ()
 	{
-		return (string)$this->value;
+		return var_export ($this->value, true);
 	}
 }
 
@@ -59,6 +59,22 @@ class InvokeExpression extends Expression
 	public function __toString ()
 	{
 		return $this->caller . '(' . implode (', ', array_map ('strval', $this->arguments)) . ')';
+	}
+}
+
+class MemberExpression extends Expression
+{
+	public function __construct ($source, $indices)
+	{
+		$this->indices = $indices;
+		$this->source = $source;
+	}
+
+	public function __toString ()
+	{
+		$indices = array_map (function ($i) { return '[' . $i . ']'; }, $this->indices);
+
+		return $this->source . implode ('', $indices);
 	}
 }
 

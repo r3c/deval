@@ -2,8 +2,8 @@ let fs = require('fs');
 let pegjs = require ('pegjs');
 let phppegjs = require ('php-pegjs');
 
-let input = process.argv[2];
-let output = process.argv[3];
+let input = 'src/deval.pegjs';
+let output = 'src/generated/parser.php';
 
 fs.readFile (input, 'utf8', function (err, data)
 {

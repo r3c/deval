@@ -9,9 +9,7 @@ $source = isset ($_GET['source']) ? $_GET['source'] : '';
 </form>
 <?php
 
-require 'language/deval.php';
-require 'block.php';
-require 'expression.php';
+require '../src/deval.php';
 
 if ($source !== '')
 {
