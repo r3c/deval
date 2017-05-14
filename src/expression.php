@@ -4,7 +4,16 @@ namespace Deval;
 
 abstract class Expression
 {
-	abstract function __toString ();
+	public abstract function __toString ();
+
+	public function evaluate (&$result)
+	{
+		return false;
+	}
+
+	public abstract function generate (&$variables);
+
+	public abstract function inject ($variables);
 }
 
 class ArrayExpression extends Expression
@@ -18,20 +27,73 @@ class ArrayExpression extends Expression
 	{
 		return '[' . implode (', ', array_map ('strval', $this->elements)) . ']';
 	}
+
+	public function generate (&$variables)
+	{
+		throw new \Exception ('not implemented');
+	}
+
+	public function inject ($variables)
+	{
+		throw new \Exception ('not implemented');
+	}
 }
 
 class BinaryExpression extends Expression
 {
 	public function __construct ($lhs, $rhs, $op)
 	{
+		static $functions;
+
+		if (!isset ($functions))
+		{
+			$functions = array
+			(
+				'+'	=> array
+				(
+					function ($lhs, $rhs) { return $lhs + $rhs; },
+					function ($lhs, $rhs) { return $lhs . '+' . $rhs; }
+				)
+			);
+		}
+
+		if (!isset ($functions[$op]))
+			throw new \Exception ('unknown operator "' . $op . '"');
+
+		list ($evaluate, $generate) = $functions[$op];
+
+		$this->f_evaluate = $evaluate;
+		$this->f_generate = $generate;
 		$this->lhs = $lhs;
-		$this->rhs = $rhs;
 		$this->op = $op;
+		$this->rhs = $rhs;
 	}
 
 	public function __toString ()
 	{
 		return '(' . $this->lhs . ' ' . $this->op . ' ' . $this->rhs . ')';
+	}
+
+	public function generate (&$variables)
+	{
+		$generate = $this->f_generate;
+
+		return $generate ($this->lhs->generate ($variables), $this->rhs->generate ($variables));
+	}
+
+	public function inject ($variables)
+	{
+		$lhs = $this->lhs->inject ($variables);
+		$rhs = $this->rhs->inject ($variables);
+
+		if ($lhs->evaluate ($result1) && $rhs->evaluate ($result2))
+		{
+			$evaluate = $this->f_evaluate;
+
+			return new ConstantExpression ($evaluate ($result1, $result2));
+		}
+
+		return new self ($lhs, $rhs, $this->op);
 	}
 }
 
@@ -46,6 +108,23 @@ class ConstantExpression extends Expression
 	{
 		return var_export ($this->value, true);
 	}
+
+	public function evaluate (&$result)
+	{
+		$result = $this->value;
+
+		return true;
+	}
+
+	public function generate (&$variables)
+	{
+		return var_export ($this->value, true);
+	}
+
+	public function inject ($variables)
+	{
+		return $this;
+	}
 }
 
 class InvokeExpression extends Expression
@@ -59,6 +138,16 @@ class InvokeExpression extends Expression
 	public function __toString ()
 	{
 		return $this->caller . '(' . implode (', ', array_map ('strval', $this->arguments)) . ')';
+	}
+
+	public function generate (&$variables)
+	{
+		throw new \Exception ('not implemented');
+	}
+
+	public function inject ($variables)
+	{
+		throw new \Exception ('not implemented');
 	}
 }
 
@@ -76,6 +165,16 @@ class MemberExpression extends Expression
 
 		return $this->source . implode ('', $indices);
 	}
+
+	public function generate (&$variables)
+	{
+		throw new \Exception ('not implemented');
+	}
+
+	public function inject ($variables)
+	{
+		throw new \Exception ('not implemented');
+	}
 }
 
 class UnaryExpression extends Expression
@@ -90,18 +189,46 @@ class UnaryExpression extends Expression
 	{
 		return '(' . $this->op . $this->value . ')';
 	}
+
+	public function generate (&$variables)
+	{
+		throw new \Exception ('not implemented');
+	}
+
+	public function inject ($variables)
+	{
+		throw new \Exception ('not implemented');
+	}
 }
 
 class SymbolExpression extends Expression
 {
 	public function __construct ($name)
 	{
+		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
+			throw new \Exception ('invalid symbol name "' . $name . '"');
+
 		$this->name = $name;
 	}
 
 	public function __toString ()
 	{
 		return $this->name;
+	}
+
+	public function generate (&$variables)
+	{
+		$variables[$this->name] = true;
+
+		return '$' . $this->name;
+	}
+
+	public function inject ($variables)
+	{
+		if (array_key_exists ($this->name, $variables))
+			return new ConstantExpression ($variables[$this->name]);
+
+		return $this;
 	}
 }
 

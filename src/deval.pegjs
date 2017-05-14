@@ -23,8 +23,21 @@ Content
 // Block tree
 
 Block
-	= "{{" _ command:Command _ "}}" { return $command; }
+	= BlockCommandBegin _ command:Command _ BlockCommandEnd { return $command; }
+	/ BlockEchoBegin _ expression:Expression _ BlockEchoEnd { return new \Deval\EchoBlock ($expression); }
 	/ plain:Plain { return new \Deval\PlainBlock ($plain); }
+
+BlockCommandBegin
+	= "{%"
+
+BlockCommandEnd
+	= "%}"
+
+BlockEchoBegin
+	= "{{"
+
+BlockEchoEnd
+	= "}}"
 
 _ "whitespace"
 	= [ \t\n\r]*
@@ -32,86 +45,78 @@ _ "whitespace"
 // Plain text tree
 
 Plain
-	= chars:CharRaw+ { return implode ('', $chars); }
+	= chars:PlainCharacter+ { return implode ('', $chars); }
 
-CharRaw
-	= brace:"{" char:CharSafe { return $brace . $char; }
-	/ CharSafe
+PlainCharacter
+	= brace:"{" char:PlainSafe { return $brace . $char; }
+	/ PlainSafe
 
-CharSafe
-	= [^\\{]
-	/ "\\" sequence:(
-		  "\\"
-		/ "{"
-	) { return $sequence; }
+PlainSafe
+	= [^\\{%]
+	/ "\\" sequence:("\\" / "{" / "%")
+	{
+		return $sequence;
+	}
 
 // Command tree
 
 Command "command block"
-	= command:CommandBuffer
-	/ command:CommandEcho
-	/ command:CommandFor
+	= command:CommandFor
 	/ command:CommandIf
 	/ command:CommandLet
 
-CommandBuffer "buffer command"
-	= "buffer" _ name:Symbol _ "}}" _ body:Content _ "{{" _ "end"
-	{
-		return new \Deval\BufferBlock ($name, $body);
-	}
-
-CommandEcho "echo command"
-	= "$" _ value:Expression
-	{
-		return new \Deval\EchoBlock ($value);
-	}
-
 CommandFor "for command"
-	= "for" _ key:(token:Symbol _ "," _ { return $token; })? value:Symbol _ "in" _ source:Expression _ "}}" body:Content empty:CommandForEmpty? "{{" _ "end"
+	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd body:Content empty:CommandForEmpty? BlockCommandBegin _ "end"
 	{
 		return new \Deval\ForBlock ($source, $key, $value, $body, $empty);
 	}
 
 CommandForEmpty
-	= "{{" _ "empty" _ "}}" body:Content
+	= BlockCommandBegin _ "empty" _ BlockCommandEnd body:Content
 	{
 		return $body;
 	}
 
+CommandForKey
+	= key:Symbol _ "," _
+	{
+		return $key;
+	}
+
 CommandIf "if command"
-	= "if" _ condition:Expression _ "}}" body:Content branches:CommandIfElseif* fallback:CommandIfElse? "{{" _ "end"
+	= "if" _ condition:Expression _ BlockCommandEnd body:Content branches:CommandIfElseif* fallback:CommandIfElse? BlockCommandBegin _ "end"
 	{
 		return new \Deval\IfBlock (array_merge (array (array ($condition, $body)), $branches), $fallback);
 	}
 
 CommandIfElseif
-	= "{{" _ "else" _ "if" _ condition:Expression _ "}}" body:Content
+	= BlockCommandBegin _ "else" _ "if" _ condition:Expression _ BlockCommandEnd body:Content
 	{
 		return array ($condition, $body);
 	}
 
 CommandIfElse
-	= "{{" _ "else" _ "}}" body:Content
+	= BlockCommandBegin _ "else" _ BlockCommandEnd body:Content
 	{
 		return $body;
 	}
 
 CommandLet "let command"
-	= "let" _ assignments:CommandLetAssignments _ "}}" _ body:Content _ "{{" _ "end"
+	= "let" _ assignments:CommandLetVariables _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
 	{
 		return new \Deval\LetBlock ($assignments, $body);
 	}
 
-CommandLetAssignments
-	= head:CommandLetAssignmentsVariable _ tail:("," _ token:CommandLetAssignmentsVariable { return $token; })*
-	{
-		return array_merge (array ($head), $tail);
-	}
-
-CommandLetAssignmentsVariable
+CommandLetAssignment
 	= name:Symbol _ "as" _ value:Expression
 	{
 		return array ($name, $value);
+	}
+
+CommandLetVariables
+	= head:CommandLetAssignment _ tail:("," _ token:CommandLetAssignment { return $token; })*
+	{
+		return array_merge (array ($head), $tail);
 	}
 
 Symbol "symbol"
@@ -156,14 +161,14 @@ ExpressionInvoke
 	/ ExpressionMember
 
 ExpressionMember
-	= source:ExpressionPrimary _ indices:ExpressionMemberIndex*
+	= source:ExpressionPrimary _ indices:ExpressionMemberIndex+
 	{
 		return new \Deval\MemberExpression ($source, $indices);
 	}
 	/ ExpressionPrimary
 
 ExpressionMemberIndex
-	= "[" _ index:Expression _ "]" { return $index ; }
+	= "[" _ index:Expression _ "]" _ { return $index ; }
 	/ "." index:Symbol { return new \Deval\ConstantExpression ($index); }
 
 ExpressionPrimary
