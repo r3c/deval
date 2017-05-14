@@ -11,6 +11,7 @@ $source = isset ($_GET['source']) ? $_GET['source'] : '';
 
 require 'language/deval.php';
 require 'block.php';
+require 'expression.php';
 
 if ($source !== '')
 {

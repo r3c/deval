@@ -1,7 +1,7 @@
 <?php
 
 require '../src/language/deval.php';
-require '../src/block.php';
+require '../src/expression.php';
 
 function assert_string ($source, $result)
 {

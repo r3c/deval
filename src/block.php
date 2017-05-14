@@ -17,7 +17,7 @@ class BufferBlock extends Block
 
 	public function __toString ()
 	{
-		return 'Buffer(' . $this->name . ', ' . $this->body . ')';
+		return 'buffer(' . $this->name . ', ' . $this->body . ')';
 	}
 }
 
@@ -30,7 +30,7 @@ class ConcatBlock extends Block
 
 	public function __toString ()
 	{
-		return '[' . implode (', ', array_map (function ($block) { return (string)$block; }, $this->blocks)) . ']';
+		return 'concat(' . implode (', ', array_map (function ($block) { return (string)$block; }, $this->blocks)) . ')';
 	}
 }
 
@@ -43,7 +43,7 @@ class EchoBlock extends Block
 
 	public function __toString ()
 	{
-		return 'Echo(' . $this->value . ')';
+		return 'echo(' . $this->value . ')';
 	}
 }
 
@@ -60,7 +60,7 @@ class ForBlock extends Block
 
 	public function __toString ()
 	{
-		return 'For(' . ($this->key !== null ? $this->key . ', ' . $this->value : $this->value) . ', ' . $this->source . ', ' . $this->body . ($this->empty !== null ? ', ' . $this->empty : '') . ')';
+		return 'for(' . ($this->key !== null ? $this->key . ', ' . $this->value : $this->value) . ', ' . $this->source . ', ' . $this->body . ($this->empty !== null ? ', ' . $this->empty : '') . ')';
 	}
 }
 
@@ -76,7 +76,7 @@ class IfBlock extends Block
 	{
 		$branches = array_map (function ($b) { return $b[0] . ' => ' . $b[1]; }, $this->branches);
 
-		return 'If([' . implode (', ', $branches) . ']' . ($this->fallback !== null ? ', ' . $this->fallback : '') . ')';
+		return 'if([' . implode (', ', $branches) . ']' . ($this->fallback !== null ? ', ' . $this->fallback : '') . ')';
 	}
 }
 
@@ -92,7 +92,7 @@ class LetBlock extends Block
 	{
 		$assignments = array_map (function ($a) { return $a[0] . ' = ' . $a[1]; }, $this->assignments);
 
-		return 'Let([' . implode (', ', $assignments) . '], ' . $this->body . ')';
+		return 'let([' . implode (', ', $assignments) . '], ' . $this->body . ')';
 	}
 }
 
@@ -105,7 +105,7 @@ class PlainBlock extends Block
 
 	public function __toString ()
 	{
-		return 'Plain(' . $this->text . ')';
+		return 'plain(' . $this->text . ')';
 	}
 }
 

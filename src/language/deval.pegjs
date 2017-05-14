@@ -101,42 +101,102 @@ command_if_else
 	}
 
 command_let "let command"
-	= "let" _ assignments:assignments _ "}}" _ body:content _ "{{" _ "end"
+	= "let" _ assignments:command_let_assignments _ "}}" _ body:content _ "{{" _ "end"
 	{
 		return new \Deval\LetBlock ($assignments, $body);
 	}
 
-symbol "symbol"
-	= $ ([_A-Za-z] [_0-9A-Za-z]*)
-
-assignments
-	= head:assignment tail:(_ "," _ token:assignment { return $token; })*
+command_let_assignments
+	= head:command_let_assignments_variable _ tail:("," _ token:command_let_assignments_variable { return $token; })*
 	{
 		return array_merge (array ($head), $tail);
 	}
 
-assignment
+command_let_assignments_variable
 	= name:symbol _ "as" _ value:expression
 	{
 		return array ($name, $value);
 	}
 
+symbol "symbol"
+	= $ ([_A-Za-z] [_0-9A-Za-z]*)
+
 // Expression tree
 
 expression
-	= value:additive
+	= value:expression_boolean_or
 
-additive
-	= lhs:multiplicative _ "+" _ rhs:additive { return $lhs + $rhs; }
-	/ multiplicative
+expression_boolean_or
+	= lhs:expression_boolean_and _ "||" _ rhs:expression_boolean_or { return new \Deval\BinaryExpression ($lhs, $rhs, '||'); }
+	/ expression_boolean_and
 
-multiplicative
-	= lhs:primary _ "*" _ rhs:multiplicative { return $lhs * $rhs; }
-	/ primary
+expression_boolean_and
+	= lhs:expression_math_additive _ "&&" _ rhs:expression_boolean_and { return new \Deval\BinaryExpression ($lhs, $rhs, '&&'); }
+	/ expression_math_additive
 
-primary
+expression_math_additive
+	= lhs:expression_math_multiplicative _ "+" _ rhs:expression_math_additive { return new \Deval\BinaryExpression ($lhs, $rhs, '+'); }
+	/ lhs:expression_math_multiplicative _ "-" _ rhs:expression_math_additive { return new \Deval\BinaryExpression ($lhs, $rhs, '-'); }
+	/ expression_math_multiplicative
+
+expression_math_multiplicative
+	= lhs:expression_unary _ "*" _ rhs:expression_math_multiplicative { return new \Deval\BinaryExpression ($lhs, $rhs, '*'); }
+	/ lhs:expression_unary _ "/" _ rhs:expression_math_multiplicative { return new \Deval\BinaryExpression ($lhs, $rhs, '/'); }
+	/ lhs:expression_unary _ "%" _ rhs:expression_math_multiplicative { return new \Deval\BinaryExpression ($lhs, $rhs, '%'); }
+	/ expression_unary
+
+expression_unary
+	= "~" _ value:expression_unary { return new \Deval\UnaryExpression ($value, '~'); }
+	/ "!" _ value:expression_unary { return new \Deval\UnaryExpression ($value, '!'); }
+	/ "+" _ value:expression_unary { return new \Deval\UnaryExpression ($value, '+'); }
+	/ "-" _ value:expression_unary { return new \Deval\UnaryExpression ($value, '-'); }
+	/ expression_invoke
+
+expression_invoke
+	= caller:expression_unit _ "(" head:expression _ tail:("," _ token:expression _ { return $token; })* ")"
+	{
+		return new \Deval\InvokeExpression ($caller, array_merge (array ($head), $tail));
+	}
+	/ expression_unit
+
+expression_unit
+	= "(" _ value:expression _ ")" { return $value; }
+	/ value:constant { return new \Deval\ConstantExpression ($value); }
+	/ value:construct { return new \Deval\ArrayExpression ($value); }
+	/ value:symbol { return new \Deval\SymbolExpression ($value); }
+
+constant
 	= integer
-	/ "(" additive:additive ")" { return $additive; }
+	/ string
+
+construct
+	= "[" _ head:expression _ tail:("," _ token:expression _ { return $token; })* "]"
+	{
+		return array_merge (array ($head), $tail);
+	}
 
 integer "integer"
-	= digits:$[0-9]+ { return intval($digits); }
+	= digits:$[0-9]+ { return intval ($digits); }
+
+string "string"
+	= '"' chars:string_char* '"' { return implode ('', $chars); }
+
+string_char
+	= [^\0-\x1F\x22\x5C]
+	/ "\\" sequence:(
+		  '"'
+		/ "\\"
+		/ "/"
+		/ "b" { return "\b"; }
+		/ "f" { return "\f"; }
+		/ "n" { return "\n"; }
+		/ "r" { return "\r"; }
+		/ "t" { return "\t"; }
+		/ "u" digits:$(hex hex hex hex) { return chr_unicode (hexdec ($digits)); }
+    )
+	{
+		return $sequence;
+	}
+
+hex
+	= [0-9a-f]i
