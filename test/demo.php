@@ -13,11 +13,11 @@ require '../src/deval.php';
 
 if ($source !== '')
 {
-	$parser = new PhpPegJs\Parser ();
+	$document = new Deval\Document ($source);
 
 	try
 	{
-		echo '<pre>' . (string)$parser->parse ($source) . '</pre>';
+		echo '<pre>' . (string)$document . '</pre>';
 	}
 	catch (PhpPegJs\SyntaxError $error)
 	{

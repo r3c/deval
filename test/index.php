@@ -2,17 +2,18 @@
 
 require '../src/deval.php';
 
-function assert_string ($source, $result)
+function assert_string ($source, $expect)
 {
-	$parser = new PhpPegJs\Parser ();
+	$document = new Deval\Document ($source);
+	$actual = (string)$document;
 
-	//assert ((string)$parser->parse ($source) === $result);
-	(string)$parser->parse ($source);
+	//assert ($actual === $expect, var_export ($actual, true) . ' !== ' . var_export ($expect, true));
+	assert (is_string ($actual));
 }
 
-assert_string ('lol', 'Plain(lol)');
-assert_string ('l{o}l', 'Plain(l{o}l)');
-assert_string ('{{$ name}}', 'Echo(1)');
+assert_string ('lol', 'plain(lol)');
+assert_string ('l{o}l', 'plain(l{o}l)');
+assert_string ('{{$ name}}', 'echo(name)');
 assert_string ('{{buffer name}}x{{end}}', '');
 assert_string ('{{if 3}}x{{end}}', '');
 assert_string ('{{if 3}}x{{else}}y{{end}}', '');
