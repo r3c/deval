@@ -14,7 +14,6 @@ function assert_string ($source, $expect)
 assert_string ('lol', 'plain(lol)');
 assert_string ('l{o}l', 'plain(l{o}l)');
 assert_string ('{{ name }}', 'echo(name)');
-assert_string ('{% buffer name %}x{% end %}', '');
 assert_string ('{% if 3 %}x{% end %}', '');
 assert_string ('{% if 3 %}x{% else %}y{% end %}', '');
 assert_string ('{% if 3 %}x{% else if 4 %}y{% end %}', '');

@@ -31,19 +31,19 @@ class Document
 		return (string)$this->root;
 	}
 
-	public function generate (&$requires)
-	{
-		$variables = array ();
-
-		$source = $this->root->generate ($variables)->source ();
-		$requires = array_keys ($variables);
-
-		return $source;
-	}
-
 	public function inject ($variables)
 	{
 		$this->root = $this->root->inject ($variables);
+	}
+
+	public function render (&$requires)
+	{
+		$variables = array ();
+
+		$source = $this->root->render ($variables)->source ();
+		$requires = array_keys ($variables);
+
+		return $source;
 	}
 }
 

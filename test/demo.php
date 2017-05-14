@@ -22,14 +22,14 @@ if ($source !== '')
 
 		echo '<pre>';
 		echo "original:\n";
-		echo '  - document = ' . htmlspecialchars ($document->generate ($requires)) . "\n";
+		echo '  - document = ' . htmlspecialchars ($document->render ($requires)) . "\n";
 		echo '  - requires = ' . htmlspecialchars (implode (', ', $requires)) . "\n";
 
 		$document->inject ($variables);
 		$requires = array ();
 
 		echo "injected:\n";
-		echo '  - document = ' . htmlspecialchars ($document->generate ($requires)) . "\n";
+		echo '  - document = ' . htmlspecialchars ($document->render ($requires)) . "\n";
 		echo '  - requires = ' . htmlspecialchars (implode (', ', $requires)) . "\n";
 		echo '</pre>';
 	}
