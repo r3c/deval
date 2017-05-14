@@ -40,10 +40,12 @@ class Document
 	{
 		$variables = array ();
 
-		$source = $this->root->render ($variables)->source ();
+		$output = new Output ();
+		$output->append_code (State::emit_create () . ';');
+		$output->append ($this->root->render ($variables));
 		$requires = array_keys ($variables);
 
-		return $source;
+		return $output->source ();
 	}
 }
 
@@ -116,19 +118,43 @@ class Output
 
 class State
 {
-	public static function loop_start ()
+	private static $name = '_deval';
+
+	private $loops = array ();
+
+	public static function emit_create ()
 	{
-		return '/* start loop */';
+		return '$' . self::$name . '=new \\' . get_class () . '()';
 	}
 
-	public static function loop_step ()
+	public static function emit_loop_start ()
 	{
-		return '/* step loop */';
+		return '$' . self::$name . '->loop_start()';
 	}
 
-	public static function loop_stop ()
+	public static function emit_loop_step ()
 	{
-		return '/* stop loop */';
+		return '$' . self::$name . '->loop_step()';
+	}
+
+	public static function emit_loop_stop ()
+	{
+		return '$' . self::$name . '->loop_stop()';
+	}
+
+	public function loop_start ()
+	{
+		$this->loops[] = 0;
+	}
+
+	public function loop_step ()
+	{
+		++$this->loops[count ($this->loops) - 1];
+	}
+
+	public function loop_stop ()
+	{
+		return array_pop ($this->loops);
 	}
 }
 

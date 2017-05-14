@@ -121,7 +121,7 @@ class ForBlock extends Block
 		$output = new Output ();
 
 		// Write loop control
-		$output->append_code (State::loop_start() . ';');
+		$output->append_code (State::emit_loop_start() . ';');
 		$output->append_code ('for(' . $this->source->generate ($variables) . ' as ');
 
 		if ($this->key !== null)
@@ -136,7 +136,7 @@ class ForBlock extends Block
 
 		$output->append_code ('{');
 		$output->append ($this->body->render ($variables_inner));
-		$output->append_code (State::loop_step() . ';');
+		$output->append_code (State::emit_loop_step() . ';');
 		$output->append_code ('}');
 
 		if ($this->key !== null)
@@ -150,13 +150,13 @@ class ForBlock extends Block
 		// Write empty block if any
 		if ($this->empty !== null)
 		{
-			$output->append_code ('if(' . State::loop_stop() . ')');
+			$output->append_code ('if(' . State::emit_loop_stop() . ')');
 			$output->append_code ('{');
 			$output->append ($this->empty->render ($variables));
 			$output->append_code ('}');
 		}
 		else
-			$output->append_code (State::loop_stop() . ';');
+			$output->append_code (State::emit_loop_stop() . ';');
 
 		return $output;
 	}
