@@ -72,7 +72,10 @@ class EchoBlock extends Block
 		$value = $this->value->inject ($variables);
 
 		if ($value->evaluate ($result))
+		{
+			// FIXME: verify $result can be converted to string
 			return new PlainBlock ((string)$result);
+		}
 
 		return new self ($value);
 	}
@@ -85,10 +88,10 @@ class EchoBlock extends Block
 
 class ForBlock extends Block
 {
-	public function __construct ($source, $key, $value, $body, $empty)
+	public function __construct ($source, $key, $value, $body, $fallback)
 	{
 		$this->body = $body;
-		$this->empty = $empty;
+		$this->fallback = $fallback;
 		$this->key = $key;
 		$this->source = $source;
 		$this->value = $value;
@@ -96,24 +99,58 @@ class ForBlock extends Block
 
 	public function __toString ()
 	{
-		return 'for(' . ($this->key !== null ? $this->key . ', ' . $this->value : $this->value) . ', ' . $this->source . ', ' . $this->body . ($this->empty !== null ? ', ' . $this->empty : '') . ')';
+		return 'for(' . ($this->key !== null ? $this->key . ', ' . $this->value : $this->value) . ', ' . $this->source . ', ' . $this->body . ($this->fallback !== null ? ', ' . $this->fallback : '') . ')';
 	}
 
 	public function inject ($variables)
 	{
-		$body = $this->body->inject ($variables);
-		$empty = $this->empty !== null ? $this->empty->inject ($variables) : null;
 		$source = $this->source->inject ($variables);
 
+		// Source can't be evaluated, rebuild block with injected children
 		if (!$source->evaluate ($result))
-			return new self ($source, $this->key, $this->value, $body, $empty);
+		{
+			// Inject all variables to fallback block
+			$fallback = $this->fallback !== null ? $this->fallback->inject ($variables) : null;
 
+			// Inject all variables but key (optional) and value to body block
+			if ($this->key !== null)
+				unset ($variables[$this->key]);
+
+			unset ($variables[$this->value]);
+
+			$body = $this->body->inject ($variables);
+
+			// Rebuild block
+			return new self ($source, $this->key, $this->value, $body, $fallback);
+		}
+
+		// Source was evaluated, unroll loop and generate result blocks
 		$blocks = array ();
 
+		// FIXME: verify $result is iterable
 		foreach ($result as $key => $value)
-			$blocks[] = $body->inject (array ($this->key => $key, $this->value => $value));
+		{
+			$variables_inner = $variables;
 
-		return ConcatBlock::create ($blocks);
+			// Inject all variables after overriding key (optional) and value
+			if ($this->key !== null)
+				$variables_inner[$this->key] = $key;
+
+			$variables_inner[$this->value] = $value;
+
+			$blocks[] = $this->body->inject ($variables_inner);
+		}
+
+		// Some blocks were generated, return them
+		if (count ($blocks) > 0)
+			return ConcatBlock::create ($blocks);
+
+		// No block was generated (empty source), generate fallback block if any
+		if ($this->fallback !== null)
+			return $this->fallback->inject ($variables);
+
+		// Otherwise generate empty block
+		return new VoidBlock ();
 	}
 
 	public function render (&$variables)
@@ -147,12 +184,12 @@ class ForBlock extends Block
 		foreach (array_keys ($variables_inner) as $name)
 			$variables[$name] = true;
 
-		// Write empty block if any
-		if ($this->empty !== null)
+		// Write fallback block if any
+		if ($this->fallback !== null)
 		{
 			$output->append_code ('if(' . State::emit_loop_stop() . ')');
 			$output->append_code ('{');
-			$output->append ($this->empty->render ($variables));
+			$output->append ($this->fallback->render ($variables));
 			$output->append_code ('}');
 		}
 		else
@@ -257,10 +294,17 @@ class LetBlock extends Block
 
 			$value = $value->inject ($variables);
 
+			// Assignment can be evaluated, move to known variables
 			if ($value->evaluate ($result))
 				$variables[$name] = $result;
+
+			// Assignment can't be computed yet, keep it and remove from outer scope
 			else
+			{
 				$assignments[] = array ($name, $value);
+
+				unset ($variables[$name]);
+			}
 		}
 
 		$body = $this->body->inject ($variables);

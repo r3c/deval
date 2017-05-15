@@ -56,9 +56,9 @@ Command "command block"
 	/ command:CommandLet
 
 CommandFor "for command"
-	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd body:Content empty:CommandForEmpty? BlockCommandBegin _ "end"
+	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd body:Content fallback:CommandForEmpty? BlockCommandBegin _ "end"
 	{
-		return new \Deval\ForBlock ($source, $key, $value, $body, $empty);
+		return new \Deval\ForBlock ($source, $key, $value, $body, $fallback);
 	}
 
 CommandForEmpty
