@@ -27,9 +27,25 @@ assert_render ('l{o}l', array (), 'l{o}l');
 // Variable
 assert_render ('{{ name }}', array ('name' => 'value'), 'value');
 
-// Expressions
+// Expressions (binary)
 assert_render ('{{ 1 + 1 }}', array (), '2');
 assert_render ('{{ x + 1 }}', array ('x' => '5'), '6');
+assert_render ('{{ 2 - 1 }}', array (), '1');
+assert_render ('{{ 2 * 2 }}', array (), '4');
+assert_render ('{{ 6 / 3 }}', array (), '2');
+assert_render ('{{ 4 % 3 }}', array (), '1');
+assert_render ('{{ 1 && 0 }}', array (), '');
+assert_render ('{{ 1 && 2 }}', array (), '1');
+assert_render ('{{ 0 || 0 }}', array (), '');
+assert_render ('{{ 1 || 0 }}', array (), '1');
+
+// Expressions (unary)
+assert_render ('{{ 5 + -3 }}', array (), '2');
+assert_render ('{{ 5 + +3 }}', array (), '8');
+assert_render ('{{ !2 }}', array (), '');
+assert_render ('{{ !0 }}', array (), '1');
+assert_render ('{{ ~0 }}', array (), '-1');
+assert_render ('{{ ~2 }}', array (), '-3');
 
 // If command
 assert_render ('{% if 3 %}x{% end %}', array (), 'x');
