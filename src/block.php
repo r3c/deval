@@ -4,7 +4,6 @@ namespace Deval;
 
 abstract class Block
 {
-	abstract function __toString ();
 	abstract function inject ($variables);
 	abstract function render (&$variables);
 }
@@ -31,11 +30,6 @@ class ConcatBlock extends Block
 		$this->blocks = $blocks;
 	}
 
-	public function __toString ()
-	{
-		return 'concat(' . implode (', ', array_map (function ($block) { return (string)$block; }, $this->blocks)) . ')';
-	}
-
 	public function inject ($variables)
 	{
 		return new self (array_map (function ($block) use (&$variables)
@@ -60,11 +54,6 @@ class EchoBlock extends Block
 	public function __construct ($value)
 	{
 		$this->value = $value;
-	}
-
-	public function __toString ()
-	{
-		return 'echo(' . $this->value . ')';
 	}
 
 	public function inject ($variables)
@@ -95,11 +84,6 @@ class ForBlock extends Block
 		$this->key = $key;
 		$this->source = $source;
 		$this->value = $value;
-	}
-
-	public function __toString ()
-	{
-		return 'for(' . ($this->key !== null ? $this->key . ', ' . $this->value : $this->value) . ', ' . $this->source . ', ' . $this->body . ($this->fallback !== null ? ', ' . $this->fallback : '') . ')';
 	}
 
 	public function inject ($variables)
@@ -207,13 +191,6 @@ class IfBlock extends Block
 		$this->fallback = $fallback;
 	}
 
-	public function __toString ()
-	{
-		$branches = array_map (function ($b) { return $b[0] . ' => ' . $b[1]; }, $this->branches);
-
-		return 'if([' . implode (', ', $branches) . ']' . ($this->fallback !== null ? ', ' . $this->fallback : '') . ')';
-	}
-
 	public function inject ($variables)
 	{
 		$branches = array ();
@@ -274,13 +251,6 @@ class LetBlock extends Block
 	{
 		$this->assignments = $assignments;
 		$this->body = $body;
-	}
-
-	public function __toString ()
-	{
-		$assignments = array_map (function ($a) { return $a[0] . ' = ' . $a[1]; }, $this->assignments);
-
-		return 'let([' . implode (', ', $assignments) . '], ' . $this->body . ')';
 	}
 
 	public function inject ($variables)
@@ -352,11 +322,6 @@ class PlainBlock extends Block
 		$this->text = $text;
 	}
 
-	public function __toString ()
-	{
-		return 'plain(' . $this->text . ')';
-	}
-
 	public function inject ($variables)
 	{
 		return $this;
@@ -370,11 +335,6 @@ class PlainBlock extends Block
 
 class VoidBlock extends Block
 {
-	public function __toString ()
-	{
-		return 'void()';
-	}
-
 	public function inject ($variables)
 	{
 		return $this;

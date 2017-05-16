@@ -4,8 +4,6 @@ namespace Deval;
 
 abstract class Expression
 {
-	public abstract function __toString ();
-
 	public function evaluate (&$result)
 	{
 		return false;
@@ -21,11 +19,6 @@ class ArrayExpression extends Expression
 	public function __construct ($elements)
 	{
 		$this->elements = $elements;
-	}
-
-	public function __toString ()
-	{
-		return '[' . implode (', ', array_map ('strval', $this->elements)) . ']';
 	}
 
 	public function generate (&$variables)
@@ -125,11 +118,6 @@ class BinaryExpression extends Expression
 		$this->rhs = $rhs;
 	}
 
-	public function __toString ()
-	{
-		return '(' . $this->lhs . ' ' . $this->op . ' ' . $this->rhs . ')';
-	}
-
 	public function generate (&$variables)
 	{
 		$generate = $this->f_generate;
@@ -158,11 +146,6 @@ class ConstantExpression extends Expression
 		$this->value = $value;
 	}
 
-	public function __toString ()
-	{
-		return var_export ($this->value, true);
-	}
-
 	public function evaluate (&$result)
 	{
 		$result = $this->value;
@@ -187,11 +170,6 @@ class InvokeExpression extends Expression
 	{
 		$this->arguments = $arguments;
 		$this->caller = $caller;
-	}
-
-	public function __toString ()
-	{
-		return $this->caller . '(' . implode (', ', array_map ('strval', $this->arguments)) . ')';
 	}
 
 	public function generate (&$variables)
@@ -244,13 +222,6 @@ class MemberExpression extends Expression
 	{
 		$this->indices = $indices;
 		$this->source = $source;
-	}
-
-	public function __toString ()
-	{
-		$indices = array_map (function ($i) { return '[' . $i . ']'; }, $this->indices);
-
-		return $this->source . implode ('', $indices);
 	}
 
 	public function generate (&$variables)
@@ -308,11 +279,6 @@ class UnaryExpression extends Expression
 		$this->value = $value;
 	}
 
-	public function __toString ()
-	{
-		return '(' . $this->op . $this->value . ')';
-	}
-
 	public function generate (&$variables)
 	{
 		$generate = $this->f_generate;
@@ -341,11 +307,6 @@ class SymbolExpression extends Expression
 			throw new \Exception ('invalid symbol name "' . $name . '"');
 
 		$this->name = $name;
-	}
-
-	public function __toString ()
-	{
-		return $this->name;
 	}
 
 	public function generate (&$variables)
