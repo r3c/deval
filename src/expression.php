@@ -2,6 +2,29 @@
 
 namespace Deval;
 
+// FIXME: move to utility namespae
+function _member (&$source, $indices)
+{
+	foreach ($indices as $index)
+	{
+		$array = (array)$source;
+
+		if (isset ($array[$index]))
+			$source =& $array[$index];
+		else
+		{
+			unset ($source);
+
+			break;
+		}
+	}
+
+	if (isset ($source))
+		return $source;
+
+	return null;
+}
+
 abstract class Expression
 {
 	public function evaluate (&$result)
@@ -226,12 +249,40 @@ class MemberExpression extends Expression
 
 	public function generate (&$variables)
 	{
-		throw new \Exception ('not implemented');
+		$indices = array ();
+
+		foreach ($this->indices as $index)
+			$indices[] = $index->generate ($variables);
+
+		// FIXME: hardcoded namespace
+		return '\Deval::_member(' . $this->source->generate ($variables) . ',array(' . implode (',', $indices) . '))';
 	}
 
 	public function inject ($variables)
 	{
-		throw new \Exception ('not implemented');
+		$indices = array ();
+		$ready = true;
+		$source = $this->source->inject ($variables);
+		$values = array();
+
+		foreach ($this->indices as $index)
+		{
+			$index = $index->inject ($variables);
+
+			if ($index->evaluate ($result))
+				$values[] = $result;
+			else
+				$ready = false;
+
+			$indices[] = $index;
+		}
+
+		// Resolve indices and pass final value if source and indices were evaluated
+		if ($ready && $source->evaluate ($result))
+			return new ConstantExpression (_member ($result, $values));
+
+		// Otherwise return injected source and indices
+		return new self ($source, $indices);
 	}
 }
 

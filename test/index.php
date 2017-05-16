@@ -49,6 +49,12 @@ assert_render ('{{ one() }}', array ('one' => 'one'), '1');
 assert_render ('{{ strlen("Hello, World!") }}', array ('strlen' => 'strlen'), '13');
 assert_render ('{{ implode(":", [1, 2, 3]) }}', array ('implode' => 'implode'), '1:2:3');
 
+// Expressions (member)
+assert_render ('{{ [1][0] }}', array (), '1');
+assert_render ('{{ a[0] }}', array ('a' => array (7)), '7');
+assert_render ('{{ [2, 9, 3][x] }}', array ('x' => 1), '9');
+assert_render ('{{ a[x][y] }}', array ('a' => array (0, 0, array (0, 5)), 'x' => 2, 'y' => 1), '5');
+
 // Expressions (unary)
 assert_render ('{{ 5 + -3 }}', array (), '2');
 assert_render ('{{ 5 + +3 }}', array (), '8');
