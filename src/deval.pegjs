@@ -144,7 +144,11 @@ ExpressionUnary
 	/ ExpressionInvoke
 
 ExpressionInvoke
-	= caller:ExpressionMember _ "(" head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
+	= caller:ExpressionMember _ "(" _ ")"
+	{
+		return new \Deval\InvokeExpression ($caller, array ());
+	}
+	/ caller:ExpressionMember _ "(" head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
 	{
 		return new \Deval\InvokeExpression ($caller, array_merge (array ($head), $tail));
 	}
@@ -168,7 +172,11 @@ ExpressionPrimary
 	/ value:Symbol { return new \Deval\SymbolExpression ($value); }
 
 Array
-	= "[" _ head:Expression _ tail:("," _ token:Expression _ { return $token; })* "]"
+	= "[" _ "]"
+	{
+		return array ();
+	}
+	/ "[" _ head:Expression _ tail:("," _ token:Expression _ { return $token; })* "]"
 	{
 		return array_merge (array ($head), $tail);
 	}

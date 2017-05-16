@@ -30,12 +30,36 @@ class ArrayExpression extends Expression
 
 	public function generate (&$variables)
 	{
-		throw new \Exception ('not implemented');
+		$fragments = array ();
+
+		foreach ($this->elements as $element)
+			$fragments[] = $element->generate ($variables);
+
+		return 'array(' . implode (',', $fragments) . ')';
 	}
 
 	public function inject ($variables)
 	{
-		throw new \Exception ('not implemented');
+		$ready = true;
+		$elements = array ();
+		$values = array ();
+
+		foreach ($this->elements as $element)
+		{
+			$element = $element->inject ($variables);
+
+			if ($element->evaluate ($result))
+				$values[] = $result;
+			else
+				$ready = false;
+
+			$elements[] = $element;
+		}
+
+		if ($ready)
+			return new ConstantExpression ($values);
+
+		return new self ($elements);
 	}
 }
 
@@ -116,14 +140,12 @@ class BinaryExpression extends Expression
 		$lhs = $this->lhs->inject ($variables);
 		$rhs = $this->rhs->inject ($variables);
 
-		if ($lhs->evaluate ($result1) && $rhs->evaluate ($result2))
-		{
-			$evaluate = $this->f_evaluate;
+		if (!$lhs->evaluate ($result1) || !$rhs->evaluate ($result2))
+			return new self ($lhs, $rhs, $this->op);
 
-			return new ConstantExpression ($evaluate ($result1, $result2));
-		}
+		$evaluate = $this->f_evaluate;
 
-		return new self ($lhs, $rhs, $this->op);
+		return new ConstantExpression ($evaluate ($result1, $result2));		
 	}
 }
 
@@ -267,14 +289,12 @@ class UnaryExpression extends Expression
 	{
 		$value = $this->value->inject ($variables);
 
-		if ($value->evaluate ($result))
-		{
-			$evaluate = $this->f_evaluate;
+		if (!$value->evaluate ($result))
+			return new self ($value, $this->op);
 
-			return new ConstantExpression ($evaluate ($result));
-		}
+		$evaluate = $this->f_evaluate;
 
-		return new self ($value, $this->op);
+		return new ConstantExpression ($evaluate ($result));
 	}
 }
 
