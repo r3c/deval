@@ -30,18 +30,18 @@ class ArrayExpression extends Expression
 
 	public function generate (&$variables)
 	{
-		$fragments = array ();
+		$elements = array ();
 
 		foreach ($this->elements as $element)
-			$fragments[] = $element->generate ($variables);
+			$elements[] = $element->generate ($variables);
 
-		return 'array(' . implode (',', $fragments) . ')';
+		return 'array(' . implode (',', $elements) . ')';
 	}
 
 	public function inject ($variables)
 	{
-		$ready = true;
 		$elements = array ();
+		$ready = true;
 		$values = array ();
 
 		foreach ($this->elements as $element)
@@ -56,9 +56,11 @@ class ArrayExpression extends Expression
 			$elements[] = $element;
 		}
 
+		// Return fully built array if all elements could be evaluated
 		if ($ready)
 			return new ConstantExpression ($values);
 
+		// Otherwise return array construct with injected elements
 		return new self ($elements);
 	}
 }
@@ -194,12 +196,45 @@ class InvokeExpression extends Expression
 
 	public function generate (&$variables)
 	{
-		throw new \Exception ('not implemented');
+		$arguments = array ();
+
+		foreach ($this->arguments as $argument)
+			$arguments[] = $argument->generate ($variables);
+
+		return $this->caller->generate ($variables) . '(' . implode (',', $arguments) . ')';
 	}
 
 	public function inject ($variables)
 	{
-		throw new \Exception ('not implemented');
+		$arguments = array ();
+		$caller = $this->caller->inject ($variables);
+		$ready = true;
+		$values = array ();
+
+		foreach ($this->arguments as $argument)
+		{
+			$argument = $argument->inject ($variables);
+
+			if ($argument->evaluate ($result))
+				$values[] = $result;
+			else
+				$ready = false;
+
+			$arguments[] = $argument;
+		}
+
+		// Invoke and pass return value if caller and arguments were evaluated
+		if ($ready && $caller->evaluate ($result))
+		{
+			// FIXME: replace by specific exception
+			if (!is_callable ($result))
+				throw new \Exception ('injected caller is not callable');
+
+			return new ConstantExpression (call_user_func_array ($result, $values));
+		}
+
+		// Otherwise return injected caller and arguments
+		return new self ($caller, $arguments);
 	}
 }
 

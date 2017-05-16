@@ -20,6 +20,11 @@ function assert_render ($source, $variables, $expect)
 	assert ($result === $expect, 'evaluation failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 }
 
+function one ()
+{
+	return 1;
+}
+
 // Plain text
 assert_render ('lol', array (), 'lol');
 assert_render ('l{o}l', array (), 'l{o}l');
@@ -38,6 +43,11 @@ assert_render ('{{ 1 && 0 }}', array (), '');
 assert_render ('{{ 1 && 2 }}', array (), '1');
 assert_render ('{{ 0 || 0 }}', array (), '');
 assert_render ('{{ 1 || 0 }}', array (), '1');
+
+// Expressions (invoke)
+assert_render ('{{ one() }}', array ('one' => 'one'), '1');
+assert_render ('{{ strlen("Hello, World!") }}', array ('strlen' => 'strlen'), '13');
+assert_render ('{{ implode(":", [1, 2, 3]) }}', array ('implode' => 'implode'), '1:2:3');
 
 // Expressions (unary)
 assert_render ('{{ 5 + -3 }}', array (), '2');
