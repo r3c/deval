@@ -1,12 +1,14 @@
 <?php
 
+$executes = isset ($_GET['executes']) ? (array)json_decode ($_GET['executes'], true) : array ();
+$injects = isset ($_GET['injects']) ? (array)json_decode ($_GET['injects'], true) : array ();
 $template = isset ($_GET['template']) ? $_GET['template'] : '';
-$variables = isset ($_GET['variables']) ? (array)json_decode ($_GET['variables'], true) : array ();
 
 ?>
 <form method="GET">
 	<textarea name="template" rows="8" style="width: 100%;"><?php echo htmlspecialchars ($template); ?></textarea>
-	<input name="variables" style="width: 100%;" value="<?php echo htmlspecialchars (json_encode ((object)$variables)); ?>" />
+	<input name="injects" style="width: 100%;" value="<?php echo htmlspecialchars (json_encode ((object)$injects)); ?>" />
+	<input name="executes" style="width: 100%;" value="<?php echo htmlspecialchars (json_encode ((object)$executes)); ?>" />
 	<input type="submit" value="OK" />
 </form>
 <?php
@@ -25,12 +27,19 @@ if ($template !== '')
 		echo '  - source = ' . htmlspecialchars ($compiler->compile ($variables)) . "\n";
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
 
-		$compiler->inject ($variables);
+		$compiler->inject ($injects);
 		$variables = array ();
 
 		echo "injected:\n";
 		echo '  - source = ' . htmlspecialchars ($compiler->compile ($variables)) . "\n";
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
+
+		ob_start ();
+		$compiler->execute ($executes);
+		$output = ob_get_clean ();
+
+		echo "executed:\n";
+		echo '  - output = ' . $output . "\n";
 		echo '</pre>';
 	}
 	catch (PhpPegJs\SyntaxError $error)

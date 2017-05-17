@@ -66,7 +66,7 @@ class Compiler
 		$names = array_diff ($requires, array_keys ($variables));
 
 		if (count ($names) > 0)
-			throw new \Exception ('missing variables for execution: ' . implode (', ' . $names));
+			throw new \Exception ('missing variables for execution: ' . implode (', ', $names));
 
 		extract ($variables);
 		eval ('?>' . $source);
