@@ -142,6 +142,33 @@ class State
 		return '$' . self::$name . '->loop_stop()';
 	}
 
+	public static function emit_member ($arguments)
+	{
+		return '\\' . get_class () . '::member(' . implode (',', $arguments) . ')';
+	}
+
+	public static function member (&$source, $indices)
+	{
+		foreach ($indices as $index)
+		{
+			$array = (array)$source;
+
+			if (isset ($array[$index]))
+				$source =& $array[$index];
+			else
+			{
+				unset ($source);
+
+				break;
+			}
+		}
+
+		if (isset ($source))
+			return $source;
+
+		return null;
+	}
+
 	public function loop_start ()
 	{
 		$this->loops[] = 0;

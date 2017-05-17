@@ -2,29 +2,6 @@
 
 namespace Deval;
 
-// FIXME: move to utility namespae
-function _member (&$source, $indices)
-{
-	foreach ($indices as $index)
-	{
-		$array = (array)$source;
-
-		if (isset ($array[$index]))
-			$source =& $array[$index];
-		else
-		{
-			unset ($source);
-
-			break;
-		}
-	}
-
-	if (isset ($source))
-		return $source;
-
-	return null;
-}
-
 abstract class Expression
 {
 	public function evaluate (&$result)
@@ -254,8 +231,7 @@ class MemberExpression extends Expression
 		foreach ($this->indices as $index)
 			$indices[] = $index->generate ($variables);
 
-		// FIXME: hardcoded namespace
-		return '\Deval::_member(' . $this->source->generate ($variables) . ',array(' . implode (',', $indices) . '))';
+		return State::emit_member (array ($this->source->generate ($variables), 'array(' . implode (',', $indices) . ')'));
 	}
 
 	public function inject ($variables)
@@ -279,7 +255,7 @@ class MemberExpression extends Expression
 
 		// Resolve indices and pass final value if source and indices were evaluated
 		if ($ready && $source->evaluate ($result))
-			return new ConstantExpression (_member ($result, $values));
+			return new ConstantExpression (State::member ($result, $values));
 
 		// Otherwise return injected source and indices
 		return new self ($source, $indices);
