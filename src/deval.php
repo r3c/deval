@@ -58,6 +58,20 @@ class Compiler
 		return $output->source ();
 	}
 
+	public function execute ($variables = array ())
+	{
+		$requires = array ();
+		$source = $this->compile ($requires);
+
+		$names = array_diff ($requires, array_keys ($variables));
+
+		if (count ($names) > 0)
+			throw new \Exception ('missing variables for execution: ' . implode (', ' . $names));
+
+		extract ($variables);
+		eval ('?>' . $source);
+	}
+
 	public function inject ($variables)
 	{
 		$this->root = $this->root->inject ($variables);

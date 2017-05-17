@@ -7,14 +7,8 @@ function assert_render ($source, $variables, $expect)
 	$compiler = new Deval\Compiler ($source);
 	$compiler->inject ($variables);
 
-	$requires = array ();
-	$source = $compiler->compile ($requires);
-
-	assert (count ($requires) === 0, 'rendering failed: ' . var_export ($requires, true));
-
 	ob_start ();
-	eval ('?>' . $source);
-
+	$compiler->execute ();
 	$result = ob_get_clean ();
 
 	assert ($result === $expect, 'evaluation failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
