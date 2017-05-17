@@ -4,8 +4,8 @@ namespace Deval;
 
 abstract class Block
 {
+	abstract function compile (&$variables);
 	abstract function inject ($variables);
-	abstract function render (&$variables);
 }
 
 class ConcatBlock extends Block
@@ -30,22 +30,25 @@ class ConcatBlock extends Block
 		$this->blocks = $blocks;
 	}
 
+	public function compile (&$variables)
+	{
+		if (count ($this->blocks) < 1)
+			return new Output ();
+
+		$output = $this->blocks[0]->compile ($variables);
+
+		for ($i = 1; $i < count ($this->blocks); ++$i)
+			$output->append ($this->blocks[$i]->compile ($variables));
+
+		return $output;
+	}
+
 	public function inject ($variables)
 	{
 		return new self (array_map (function ($block) use (&$variables)
 		{
 			return $block->inject ($variables);
 		}, $this->blocks));
-	}
-
-	public function render (&$variables)
-	{
-		$render = $this->blocks[0]->render ($variables);
-
-		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$render->append ($this->blocks[$i]->render ($variables));
-
-		return $render;
 	}
 }
 
@@ -54,6 +57,11 @@ class EchoBlock extends Block
 	public function __construct ($value)
 	{
 		$this->value = $value;
+	}
+
+	public function compile (&$variables)
+	{
+		return (new Output ())->append_code ('echo ' . $this->value->generate ($variables) . ';');
 	}
 
 	public function inject ($variables)
@@ -68,22 +76,67 @@ class EchoBlock extends Block
 
 		return new self ($value);
 	}
-
-	public function render (&$variables)
-	{
-		return (new Output ())->append_code ('echo ' . $this->value->generate ($variables) . ';');
-	}
 }
 
 class ForBlock extends Block
 {
 	public function __construct ($source, $key, $value, $body, $fallback)
 	{
+		if ($key !== null)
+			Compiler::assert_symbol ($key);
+
+		Compiler::assert_symbol ($value);
+
 		$this->body = $body;
 		$this->fallback = $fallback;
 		$this->key = $key;
 		$this->source = $source;
 		$this->value = $value;
+	}
+
+	public function compile (&$variables)
+	{
+		$output = new Output ();
+
+		// Write loop control
+		$output->append_code (State::emit_loop_start() . ';');
+		$output->append_code ('foreach(' . $this->source->generate ($variables) . ' as ');
+
+		if ($this->key !== null)
+			$output->append_code ('$' . $this->key . '=>$' . $this->value);
+		else
+			$output->append_code ('$' . $this->value);
+
+		$output->append_code (')');
+
+		// Write body and merge inner variables into parent
+		$variables_inner = array ();
+
+		$output->append_code ('{');
+		$output->append ($this->body->compile ($variables_inner));
+		$output->append_code (State::emit_loop_step() . ';');
+		$output->append_code ('}');
+
+		if ($this->key !== null)
+			unset ($variables_inner[$this->key]);
+
+		unset ($variables_inner[$this->value]);
+
+		foreach (array_keys ($variables_inner) as $name)
+			$variables[$name] = true;
+
+		// Write fallback block if any
+		if ($this->fallback !== null)
+		{
+			$output->append_code ('if(' . State::emit_loop_stop() . ')');
+			$output->append_code ('{');
+			$output->append ($this->fallback->compile ($variables));
+			$output->append_code ('}');
+		}
+		else
+			$output->append_code (State::emit_loop_stop() . ';');
+
+		return $output;
 	}
 
 	public function inject ($variables)
@@ -136,51 +189,6 @@ class ForBlock extends Block
 		// Otherwise generate empty block
 		return new VoidBlock ();
 	}
-
-	public function render (&$variables)
-	{
-		$output = new Output ();
-
-		// Write loop control
-		$output->append_code (State::emit_loop_start() . ';');
-		$output->append_code ('for(' . $this->source->generate ($variables) . ' as ');
-
-		if ($this->key !== null)
-			$output->append_code ('$' . $this->key . '=>$' . $this->value);
-		else
-			$output->append_code ('$' . $this->value);
-
-		$output->append_code (')');
-
-		// Write body and merge inner variables into parent
-		$variables_inner = array ();
-
-		$output->append_code ('{');
-		$output->append ($this->body->render ($variables_inner));
-		$output->append_code (State::emit_loop_step() . ';');
-		$output->append_code ('}');
-
-		if ($this->key !== null)
-			unset ($variables_inner[$this->key]);
-
-		unset ($variables_inner[$this->value]);
-
-		foreach (array_keys ($variables_inner) as $name)
-			$variables[$name] = true;
-
-		// Write fallback block if any
-		if ($this->fallback !== null)
-		{
-			$output->append_code ('if(' . State::emit_loop_stop() . ')');
-			$output->append_code ('{');
-			$output->append ($this->fallback->render ($variables));
-			$output->append_code ('}');
-		}
-		else
-			$output->append_code (State::emit_loop_stop() . ';');
-
-		return $output;
-	}
 }
 
 class IfBlock extends Block
@@ -189,6 +197,34 @@ class IfBlock extends Block
 	{
 		$this->branches = $branches;
 		$this->fallback = $fallback;
+	}
+
+	public function compile (&$variables)
+	{
+		$output = new Output ();
+		$first = true;
+
+		foreach ($this->branches as $branch)
+		{
+			list ($condition, $body) = $branch;
+
+			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($variables) . ')');
+			$output->append_code ('{');
+			$output->append ($body->compile ($variables));
+			$output->append_code ('}');
+
+			$first = false;
+		}
+
+		if ($this->fallback !== null)
+		{
+			$output->append_code ('else');
+			$output->append_code ('{');
+			$output->append ($this->fallback->compile ($variables));
+			$output->append_code ('}');
+		}
+
+		return $output;
 	}
 
 	public function inject ($variables)
@@ -215,42 +251,45 @@ class IfBlock extends Block
 
 		return new self ($branches, $fallback);
 	}
-
-	public function render (&$variables)
-	{
-		$output = new Output ();
-		$first = true;
-
-		foreach ($this->branches as $branch)
-		{
-			list ($condition, $body) = $branch;
-
-			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($variables) . ')');
-			$output->append_code ('{');
-			$output->append ($body->render ($variables));
-			$output->append_code ('}');
-
-			$first = false;
-		}
-
-		if ($this->fallback !== null)
-		{
-			$output->append_code ('else');
-			$output->append_code ('{');
-			$output->append ($this->fallback->render ($variables));
-			$output->append_code ('}');
-		}
-
-		return $output;
-	}
 }
 
 class LetBlock extends Block
 {
 	public function __construct ($assignments, $body)
 	{
+		foreach ($assignments as $assignment)
+			Compiler::assert_symbol ($assignment[0]);
+
 		$this->assignments = $assignments;
 		$this->body = $body;
+	}
+
+	public function compile (&$variables)
+	{
+		$output = new Output ();
+		$output->append_code ('{', true);
+
+		$variables_excludes = array ();
+
+		foreach ($this->assignments as $assignment)
+		{
+			list ($name, $value) = $assignment;
+
+			$output->append_code ('$' . $name . '=' . $value->generate ($variables) . ';');
+
+			$variables_exclude[$name] = true;
+		}
+
+		$variables_inner = array ();
+
+		$output->append ($this->body->compile ($variables_inner));
+
+		foreach (array_keys (array_diff_key ($variables_inner, $variables_exclude)) as $name)
+			$variables[$name] = true;
+
+		$output->append_code ('}');
+
+		return $output;
 	}
 
 	public function inject ($variables)
@@ -278,40 +317,12 @@ class LetBlock extends Block
 		}
 
 		$body = $this->body->inject ($variables);
-		$body->render ($requires);
+		$body->compile ($requires);
 
 		if (count ($assignments) === 0 || count ($requires) === 0)
 			return $body;
 
 		return new self ($assignments, $body);
-	}
-
-	public function render (&$variables)
-	{
-		$output = new Output ();
-		$output->append_code ('{', true);
-
-		$variables_excludes = array ();
-
-		foreach ($this->assignments as $assignment)
-		{
-			list ($name, $value) = $assignment;
-
-			$output->append_code ('$' . $name . '=' . $value->generate ($variables) . ';');
-
-			$variables_exclude[$name] = true;
-		}
-
-		$variables_inner = array ();
-
-		$output->append ($this->body->render ($variables_inner));
-
-		foreach (array_keys (array_diff_key ($variables_inner, $variables_exclude)) as $name)
-			$variables[$name] = true;
-
-		$output->append_code ('}');
-
-		return $output;
 	}
 }
 
@@ -322,27 +333,27 @@ class PlainBlock extends Block
 		$this->text = $text;
 	}
 
+	public function compile (&$variables)
+	{
+		return (new Output ())->append_text ($this->text);
+	}
+
 	public function inject ($variables)
 	{
 		return $this;
-	}
-
-	public function render (&$variables)
-	{
-		return (new Output ())->append_text ($this->text);
 	}
 }
 
 class VoidBlock extends Block
 {
+	public function compile (&$variables)
+	{
+		return new Output ();
+	}
+
 	public function inject ($variables)
 	{
 		return $this;
-	}
-
-	public function render (&$variables)
-	{
-		return new Output ();
 	}
 }
 

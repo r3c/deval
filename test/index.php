@@ -4,16 +4,16 @@ require '../src/deval.php';
 
 function assert_render ($source, $variables, $expect)
 {
-	$document = new Deval\Document ($source);
-	$document->inject ($variables);
+	$compiler = new Deval\Compiler ($source);
+	$compiler->inject ($variables);
 
 	$requires = array ();
-	$render = $document->render ($requires);
+	$source = $compiler->compile ($requires);
 
 	assert (count ($requires) === 0, 'rendering failed: ' . var_export ($requires, true));
 
 	ob_start ();
-	eval ('?>' . $render);
+	eval ('?>' . $source);
 
 	$result = ob_get_clean ();
 
@@ -73,7 +73,7 @@ assert_render ('{% if 0 %}x{% else if 1 %}y{% else %}z{% end %}', array (), 'y')
 assert_render ('{% if 0 %}x{% else if 0 %}y{% else %}z{% end %}', array (), 'z');
 
 // For command
-assert_render ('{% for k in [1, 2, 3] %}{{ k }}{% end %}', array (), '123');
+assert_render ('{% for v in [1, 2, 3] %}{{ v }}{% end %}', array (), '123');
 assert_render ('{% for k, v in [1, 2, 3] %}{{ k }}:{{ v }}{% end %}', array (), '0:11:22:3');
 assert_render ('{% for k, v in [1] %}x{% empty %}y{% end %}', array (), 'x');
 assert_render ('{% for k, v in [] %}x{% empty %}y{% end %}', array (), 'y');

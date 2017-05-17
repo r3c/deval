@@ -2,9 +2,15 @@
 
 namespace Deval;
 
-class Document
+class Compiler
 {
 	private $root;
+
+	public static function assert_symbol ($name)
+	{
+		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
+			throw new \Exception ('invalid symbol name "' . $name . '"');
+	}
 
 	public function __construct ($source)
 	{
@@ -26,26 +32,21 @@ class Document
 		$this->root = $parser->parse ($source);
 	}
 
-	public function __toString ()
-	{
-		return (string)$this->root;
-	}
-
-	public function inject ($variables)
-	{
-		$this->root = $this->root->inject ($variables);
-	}
-
-	public function render (&$requires)
+	public function compile (&$requires)
 	{
 		$variables = array ();
 
 		$output = new Output ();
 		$output->append_code (State::emit_create () . ';');
-		$output->append ($this->root->render ($variables));
+		$output->append ($this->root->compile ($variables));
 		$requires = array_keys ($variables);
 
 		return $output->source ();
+	}
+
+	public function inject ($variables)
+	{
+		$this->root = $this->root->inject ($variables);
 	}
 }
 

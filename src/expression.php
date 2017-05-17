@@ -330,8 +330,7 @@ class SymbolExpression extends Expression
 {
 	public function __construct ($name)
 	{
-		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
-			throw new \Exception ('invalid symbol name "' . $name . '"');
+		Compiler::assert_symbol ($name);
 
 		$this->name = $name;
 	}
