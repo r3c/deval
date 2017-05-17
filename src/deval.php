@@ -20,9 +20,23 @@ class Compiler
 		{
 			$path = dirname (__FILE__);
 
-			require $path . '/generated/parser.php';
 			require $path . '/block.php';
+			require $path . '/blocks/concat.php';
+			require $path . '/blocks/echo.php';
+			require $path . '/blocks/for.php';
+			require $path . '/blocks/if.php';
+			require $path . '/blocks/let.php';
+			require $path . '/blocks/plain.php';
+			require $path . '/blocks/void.php';
 			require $path . '/expression.php';
+			require $path . '/expressions/array.php';
+			require $path . '/expressions/binary.php';
+			require $path . '/expressions/constant.php';
+			require $path . '/expressions/invoke.php';
+			require $path . '/expressions/member.php';
+			require $path . '/expressions/symbol.php';
+			require $path . '/expressions/unary.php';
+			require $path . '/parser.php';
 
 			$setup = true;
 		}
