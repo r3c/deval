@@ -6,7 +6,7 @@ class SymbolExpression extends Expression
 {
 	public function __construct ($name)
 	{
-		Compiler::assert_symbol ($name);
+		State::assert_symbol ($name);
 
 		$this->name = $name;
 	}

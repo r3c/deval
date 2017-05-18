@@ -34,12 +34,8 @@ if ($template !== '')
 		echo '  - source = ' . htmlspecialchars ($compiler->compile ($variables)) . "\n";
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
 
-		ob_start ();
-		$compiler->execute ($executes);
-		$output = ob_get_clean ();
-
 		echo "executed:\n";
-		echo '  - output = ' . $output . "\n";
+		echo '  - output = ' . Deval\Executor::code ($compiler->compile (), $executes) . "\n";
 		echo '</pre>';
 	}
 	catch (PhpPegJs\SyntaxError $error)

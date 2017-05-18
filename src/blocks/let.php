@@ -7,7 +7,7 @@ class LetBlock extends Block
 	public function __construct ($assignments, $body)
 	{
 		foreach ($assignments as $assignment)
-			Compiler::assert_symbol ($assignment[0]);
+			State::assert_symbol ($assignment[0]);
 
 		$this->assignments = $assignments;
 		$this->body = $body;

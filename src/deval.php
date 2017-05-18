@@ -6,35 +6,6 @@ class Compiler
 {
 	private $root;
 
-	public static function assert_symbol ($name)
-	{
-		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
-			throw new \Exception ('invalid symbol name "' . $name . '"');
-	}
-
-	public static function export ($input)
-	{
-		if (is_array ($input))
-		{
-			$out = '';
-
-			if (array_reduce (array_keys ($input), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($input))
-			{
-				foreach ($input as $key => $value)
-					$out .= ($out !== '' ? ',' : '') . self::export ($key) . '=>' . self::export ($value);
-			}
-			else
-			{
-				foreach ($input as $value)
-					$out .= ($out !== '' ? ',' : '') . self::export ($value);
-			}
-
-			return 'array(' . $out . ')';
-		}
-
-		return var_export ($input, true);
-	}
-
 	public function __construct ($source)
 	{
 		static $setup;
@@ -82,13 +53,21 @@ class Compiler
 		return $output->source ();
 	}
 
-	public function execute ($_deval_input = array ())
+	public function inject ($variables)
+	{
+		$this->root = $this->root->inject ($variables);
+	}
+}
+
+class Executor
+{
+	public static function code ($_deval_code, $_deval_input = array ())
 	{
 		ob_start ();
 
 		try
 		{
-			eval ('?>' . $this->compile ());
+			eval ('?>' . $_deval_code);
 		}
 		catch (\Exception $exception)
 		{
@@ -100,9 +79,22 @@ class Compiler
 		return ob_get_clean ();
 	}
 
-	public function inject ($variables)
+	public static function path ($_deval_path, $_deval_input = array ())
 	{
-		$this->root = $this->root->inject ($variables);
+		ob_start ();
+
+		try
+		{
+			require $_deval_path;
+		}
+		catch (\Exception $exception)
+		{
+			ob_end_clean ();
+
+			throw $exception;
+		}
+
+		return ob_get_clean ();
 	}
 }
 
@@ -180,10 +172,16 @@ class State
 
 	private $loops = array ();
 
+	public static function assert_symbol ($name)
+	{
+		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
+			throw new \Exception ('invalid symbol name "' . $name . '"');
+	}
+
 	public static function emit_create ($keys)
 	{
 		return
-			'$' . self::$state_name . '=new \\' . get_class () . '(array_diff(' . Compiler::export ($keys) . ',array_keys($' . self::$input_name . ')));' .
+			'$' . self::$state_name . '=new \\' . get_class () . '(array_diff(' . self::export ($keys) . ',array_keys($' . self::$input_name . ')));' .
 			'extract($' . self::$input_name . ');';
 	}
 
@@ -205,6 +203,29 @@ class State
 	public static function emit_member ($arguments)
 	{
 		return '\\' . get_class () . '::member(' . implode (',', $arguments) . ')';
+	}
+
+	public static function export ($input)
+	{
+		if (is_array ($input))
+		{
+			$out = '';
+
+			if (array_reduce (array_keys ($input), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($input))
+			{
+				foreach ($input as $key => $value)
+					$out .= ($out !== '' ? ',' : '') . self::export ($key) . '=>' . self::export ($value);
+			}
+			else
+			{
+				foreach ($input as $value)
+					$out .= ($out !== '' ? ',' : '') . self::export ($value);
+			}
+
+			return 'array(' . $out . ')';
+		}
+
+		return var_export ($input, true);
 	}
 
 	public static function member (&$source, $indices)

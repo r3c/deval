@@ -7,9 +7,9 @@ class ForBlock extends Block
 	public function __construct ($source, $key, $value, $body, $fallback)
 	{
 		if ($key !== null)
-			Compiler::assert_symbol ($key);
+			State::assert_symbol ($key);
 
-		Compiler::assert_symbol ($value);
+		State::assert_symbol ($value);
 
 		$this->body = $body;
 		$this->fallback = $fallback;
