@@ -12,6 +12,29 @@ class Compiler
 			throw new \Exception ('invalid symbol name "' . $name . '"');
 	}
 
+	public static function export ($input)
+	{
+		if (is_array ($input))
+		{
+			$out = '';
+
+			if (array_reduce (array_keys ($input), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($input))
+			{
+				foreach ($input as $key => $value)
+					$out .= ($out !== '' ? ',' : '') . self::export ($key) . '=>' . self::export ($value);
+			}
+			else
+			{
+				foreach ($input as $value)
+					$out .= ($out !== '' ? ',' : '') . self::export ($value);
+			}
+
+			return 'array(' . $out . ')';
+		}
+
+		return var_export ($input, true);
+	}
+
 	public function __construct ($source)
 	{
 		static $setup;
@@ -46,30 +69,35 @@ class Compiler
 		$this->root = $parser->parse ($source);
 	}
 
-	public function compile (&$requires)
+	public function compile (&$names = null)
 	{
 		$variables = array ();
+		$source = $this->root->compile ($variables);
+		$names = array_keys ($variables);
 
 		$output = new Output ();
-		$output->append_code (State::emit_create () . ';');
-		$output->append ($this->root->compile ($variables));
-		$requires = array_keys ($variables);
+		$output->append_code (State::emit_create ($names));
+		$output->append ($source);
 
 		return $output->source ();
 	}
 
-	public function execute ($variables = array ())
+	public function execute ($_deval_input = array ())
 	{
-		$requires = array ();
-		$source = $this->compile ($requires);
+		ob_start ();
 
-		$names = array_diff ($requires, array_keys ($variables));
+		try
+		{
+			eval ('?>' . $this->compile ());
+		}
+		catch (\Exception $exception)
+		{
+			ob_end_clean ();
 
-		if (count ($names) > 0)
-			throw new \Exception ('missing variables for execution: ' . implode (', ', $names));
+			throw $exception;
+		}
 
-		extract ($variables);
-		eval ('?>' . $source);
+		return ob_get_clean ();
 	}
 
 	public function inject ($variables)
@@ -147,28 +175,31 @@ class Output
 
 class State
 {
-	private static $name = '_deval';
+	private static $input_name = '_deval_input';
+	private static $state_name = '_deval_state';
 
 	private $loops = array ();
 
-	public static function emit_create ()
+	public static function emit_create ($keys)
 	{
-		return '$' . self::$name . '=new \\' . get_class () . '()';
+		return
+			'$' . self::$state_name . '=new \\' . get_class () . '(array_diff(' . Compiler::export ($keys) . ',array_keys($' . self::$input_name . ')));' .
+			'extract($' . self::$input_name . ');';
 	}
 
 	public static function emit_loop_start ()
 	{
-		return '$' . self::$name . '->loop_start()';
+		return '$' . self::$state_name . '->loop_start()';
 	}
 
 	public static function emit_loop_step ()
 	{
-		return '$' . self::$name . '->loop_step()';
+		return '$' . self::$state_name . '->loop_step()';
 	}
 
 	public static function emit_loop_stop ()
 	{
-		return '$' . self::$name . '->loop_stop()';
+		return '$' . self::$state_name . '->loop_stop()';
 	}
 
 	public static function emit_member ($arguments)
@@ -196,6 +227,12 @@ class State
 			return $source;
 
 		return null;
+	}
+
+	public function __construct ($keys)
+	{
+		if (count ($keys) > 0)
+			throw new \Exception ('undefined runtime variables: ' . implode (', ', $keys));
 	}
 
 	public function loop_start ()

@@ -7,11 +7,9 @@ function assert_render ($source, $variables, $expect)
 	$compiler = new Deval\Compiler ($source);
 	$compiler->inject ($variables);
 
-	ob_start ();
-	$compiler->execute ();
-	$result = ob_get_clean ();
+	$result = $compiler->execute ();
 
-	assert ($result === $expect, 'evaluation failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
+	assert ($result === $expect, 'execution failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 }
 
 function one ()

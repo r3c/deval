@@ -18,7 +18,7 @@ class ConstantExpression extends Expression
 
 	public function generate (&$variables)
 	{
-		return var_export ($this->value, true);
+		return Compiler::export ($this->value);
 	}
 
 	public function inject ($variables)
