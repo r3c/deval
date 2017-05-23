@@ -144,7 +144,7 @@ class CacheRenderer
 		$this->variables = $variables;
 	}
 
-	public function render ($path, $variables)
+	public function render ($path, $variables = array ())
 	{
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->variables)) . '.php';
 
