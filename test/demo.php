@@ -35,7 +35,7 @@ if ($template !== '')
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
 
 		echo "executed:\n";
-		echo '  - output = ' . Deval\Executor::code ($compiler->compile (), $executes) . "\n";
+		echo '  - output = ' . Deval\Evaluator::code ($compiler->compile (), $executes) . "\n";
 		echo '</pre>';
 	}
 	catch (PhpPegJs\SyntaxError $error)

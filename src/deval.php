@@ -92,9 +92,9 @@ class Compiler
 	}
 }
 
-class Executor
+class Evaluator
 {
-	public static function code ($_deval_code, $_deval_input = array ())
+	public static function code ($_deval_code, $_deval_input)
 	{
 		ob_start ();
 
@@ -112,7 +112,7 @@ class Executor
 		return ob_get_clean ();
 	}
 
-	public static function path ($_deval_path, $_deval_input = array ())
+	public static function path ($_deval_path, $_deval_input)
 	{
 		ob_start ();
 
@@ -128,6 +128,30 @@ class Executor
 		}
 
 		return ob_get_clean ();
+	}
+}
+
+class CacheRenderer
+{
+	public function __construct ($directory, $variables)
+	{
+		$this->directory = $directory;
+		$this->variables = $variables;
+	}
+
+	public function render ($path, $variables)
+	{
+		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->variables)) . '.php';
+
+		if (!file_exists ($cache))
+		{
+			$compiler = new Compiler (Compiler::parse_file ($path));
+			$compiler->inject ($this->variables);
+
+			file_put_contents ($cache, $compiler->compile ());
+		}
+
+		Evaluator::path ($cache, $variables);
 	}
 }
 

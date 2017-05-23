@@ -7,7 +7,7 @@ function assert_render ($source, $variables, $expect)
 	$compiler = new Deval\Compiler (Deval\Compiler::parse_code ($source));
 	$compiler->inject ($variables);
 
-	$result = Deval\Executor::code ($compiler->compile ());
+	$result = Deval\Evaluator::code ($compiler->compile (), array ());
 
 	assert ($result === $expect, 'execution failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 }
@@ -81,32 +81,7 @@ assert_render ('{% let a = x %}{{ a }}{% end %}', array ('x' => 'test'), 'test')
 assert_render ('{% let a = x, b = a %}{{ b }}{% end %}', array ('x' => 'test'), 'test');
 
 // Renderer
-class FileRenderer
-{
-	public function __construct ($directory, $variables)
-	{
-		$this->directory = $directory;
-		$this->variables = $variables;
-	}
-
-	public function render ($path, $variables)
-	{
-		$cache = $this->directory . DIRECTORY_SEPARATOR . basename ($path, '.php') . '_' . md5 (serialize ($this->variables)) . '.php';
-
-		if (!file_exists ($cache))
-		{
-			$block = Deval\Compiler::parse_file ($this->directory . DIRECTORY_SEPARATOR . $path);
-			$compiler = new Deval\Compiler ($block);
-			$compiler->inject ($this->variables);
-
-			file_put_contents ($cache, $compiler->compile ());
-		}
-
-		Deval\Executor::path ($cache, $variables);
-	}
-}
-
-$renderer = new FileRenderer ('template', array ('x' => 1, 'y' => 2));
-$renderer->render ('simple.deval', array ('z' => 3));
+$renderer = new Deval\CacheRenderer ('template', array ('x' => 1, 'y' => 2));
+$renderer->render ('template/simple.deval', array ('z' => 3));
 
 ?>
