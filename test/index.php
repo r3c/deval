@@ -4,7 +4,7 @@ require '../src/deval.php';
 
 function assert_render ($source, $variables, $expect)
 {
-	$compiler = new Deval\Compiler ($source);
+	$compiler = new Deval\Compiler (Deval\Compiler::parse_code ($source));
 	$compiler->inject ($variables);
 
 	$result = Deval\Executor::code ($compiler->compile ());
@@ -64,6 +64,10 @@ assert_render ('{% if 1 %}x{% else if 0 %}y{% else %}z{% end %}', array (), 'x')
 assert_render ('{% if 0 %}x{% else if 1 %}y{% else %}z{% end %}', array (), 'y');
 assert_render ('{% if 0 %}x{% else if 0 %}y{% else %}z{% end %}', array (), 'z');
 
+// Include command
+assert_render ('{% include template/include_inner.deval %}', array ('inner_x' => 'x', 'inner_y' => 'y'), 'xy');
+assert_render ('{% include template/include_outer.deval %}', array ('outer_x' => 'x', 'outer_y' => 'y'), 'xy');
+
 // For command
 assert_render ('{% for v in [1, 2, 3] %}{{ v }}{% end %}', array (), '123');
 assert_render ('{% for k, v in [1, 2, 3] %}{{ k }}:{{ v }}{% end %}', array (), '0:11:22:3');
@@ -71,10 +75,10 @@ assert_render ('{% for k, v in [1] %}x{% empty %}y{% end %}', array (), 'x');
 assert_render ('{% for k, v in [] %}x{% empty %}y{% end %}', array (), 'y');
 
 // Let command
-assert_render ('{% let a as 5 %}{{ a }}{% end %}', array (), '5');
-assert_render ('{% let a as 5, b as 7 %}{{ a }}{{ b }}{% end %}', array (), '57');
-assert_render ('{% let a as x %}{{ a }}{% end %}', array ('x' => 'test'), 'test');
-assert_render ('{% let a as x, b as a %}{{ b }}{% end %}', array ('x' => 'test'), 'test');
+assert_render ('{% let a = 5 %}{{ a }}{% end %}', array (), '5');
+assert_render ('{% let a = 5, b = 7 %}{{ a }}{{ b }}{% end %}', array (), '57');
+assert_render ('{% let a = x %}{{ a }}{% end %}', array ('x' => 'test'), 'test');
+assert_render ('{% let a = x, b = a %}{{ b }}{% end %}', array ('x' => 'test'), 'test');
 
 // Renderer
 class FileRenderer
@@ -87,11 +91,12 @@ class FileRenderer
 
 	public function render ($path, $variables)
 	{
-		$cache = $this->directory . '/' . basename ($path, '.php') . '_' . md5 (serialize ($this->variables)) . '.php';
+		$cache = $this->directory . DIRECTORY_SEPARATOR . basename ($path, '.php') . '_' . md5 (serialize ($this->variables)) . '.php';
 
 		if (!file_exists ($cache))
 		{
-			$compiler = new Deval\Compiler (file_get_contents ($this->directory . '/' . $path));
+			$block = Deval\Compiler::parse_file ($this->directory . DIRECTORY_SEPARATOR . $path);
+			$compiler = new Deval\Compiler ($block);
 			$compiler->inject ($this->variables);
 
 			file_put_contents ($cache, $compiler->compile ());

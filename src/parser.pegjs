@@ -51,9 +51,10 @@ PlainSafe
 // Command tree
 
 Command "command block"
-	= command:CommandFor
-	/ command:CommandIf
-	/ command:CommandLet
+	= CommandFor
+	/ CommandIf
+	/ CommandInclude
+	/ CommandLet
 
 CommandFor "for command"
 	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd body:Content fallback:CommandForEmpty? BlockCommandBegin _ "end"
@@ -91,22 +92,41 @@ CommandIfElse
 		return $body;
 	}
 
+CommandInclude "include command"
+	= "include" _ path:Path _ assignments:Assignments?
+	{
+		return new \Deval\LetBlock ($assignments !== null ? $assignments : array (), \Deval\Compiler::parse_file ($path));
+	}
+
 CommandLet "let command"
-	= "let" _ assignments:CommandLetVariables _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
+	= "let" _ assignments:Assignments _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
 	{
 		return new \Deval\LetBlock ($assignments, $body);
 	}
 
-CommandLetAssignment
-	= name:Symbol _ "as" _ value:Expression
+Assignments "assignments"
+	= head:AssignmentsPair _ tail:("," _ token:AssignmentsPair { return $token; })*
+	{
+		return array_merge (array ($head), $tail);
+	}
+
+AssignmentsPair "assignment"
+	= name:Symbol _ "=" _ value:Expression
 	{
 		return array ($name, $value);
 	}
 
-CommandLetVariables
-	= head:CommandLetAssignment _ tail:("," _ token:CommandLetAssignment { return $token; })*
+Path "path"
+	= chars:PathChar+ { return implode ('', $chars); }
+
+PathChar
+	= [!-~]
+	/ "\\" sequence:(
+		  "\\"
+		/ "u" digits:$(Hex Hex Hex Hex) { return chr_unicode (hexdec ($digits)); }
+    )
 	{
-		return array_merge (array ($head), $tail);
+		return $sequence;
 	}
 
 Symbol "symbol"

@@ -18,7 +18,7 @@ class LetBlock extends Block
 		$output = new Output ();
 		$output->append_code ('{', true);
 
-		$variables_excludes = array ();
+		$variables_exclude = array ();
 
 		foreach ($this->assignments as $assignment)
 		{

@@ -4,9 +4,9 @@ namespace Deval;
 
 class Compiler
 {
-	private $root;
+	private static $bases = array ();
 
-	public function __construct ($source)
+	public static function parse_code ($source)
 	{
 		static $setup;
 
@@ -37,7 +37,40 @@ class Compiler
 
 		$parser = new \PhpPegJs\Parser ();
 
-		$this->root = $parser->parse ($source);
+		return $parser->parse ($source);
+	}
+
+	public static function parse_file ($path)
+	{
+		$base = count (self::$bases) > 0 ? self::$bases[count (self::$bases) - 1] : '.';
+		$path = strlen ($path) > 0 && $path[0] === DIRECTORY_SEPARATOR ? $path : $base . DIRECTORY_SEPARATOR . $path;
+
+		if (!file_exists ($path))
+			throw new \Exception ('cannot include missing file "' . $path . '"');
+
+		array_push (self::$bases, dirname ($path));
+
+		try
+		{
+			$block = self::parse_code (file_get_contents ($path));
+		}
+		catch (\Exception $exception)
+		{
+			array_pop (self::$bases);
+
+			throw $exception;
+		}
+
+		array_pop (self::$bases);
+
+		return $block;
+	}
+
+	private $root;
+
+	public function __construct ($root)
+	{
+		$this->root = $root;
 	}
 
 	public function compile (&$names = null)
