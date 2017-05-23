@@ -95,7 +95,7 @@ CommandIfElse
 CommandInclude "include command"
 	= "include" _ path:Path _ assignments:Assignments?
 	{
-		return new \Deval\LetBlock ($assignments !== null ? $assignments : array (), \Deval\Compiler::parse_file ($path));
+		return new \Deval\LetBlock ($assignments !== null ? $assignments : array (), \Deval\Block::parse_file ($path));
 	}
 
 CommandLet "let command"

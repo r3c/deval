@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class Compiler
+abstract class Block
 {
 	private static $bases = array ();
 
@@ -14,7 +14,6 @@ class Compiler
 		{
 			$path = dirname (__FILE__);
 
-			require $path . '/block.php';
 			require $path . '/blocks/concat.php';
 			require $path . '/blocks/echo.php';
 			require $path . '/blocks/for.php';
@@ -66,17 +65,23 @@ class Compiler
 		return $block;
 	}
 
-	private $root;
+	abstract function compile (&$variables);
+	abstract function inject ($variables);
+}
 
-	public function __construct ($root)
+class Compiler
+{
+	private $block;
+
+	public function __construct ($block)
 	{
-		$this->root = $root;
+		$this->block = $block;
 	}
 
 	public function compile (&$names = null)
 	{
 		$variables = array ();
-		$source = $this->root->compile ($variables);
+		$source = $this->block->compile ($variables);
 		$names = array_keys ($variables);
 
 		$output = new Output ();
@@ -88,7 +93,7 @@ class Compiler
 
 	public function inject ($variables)
 	{
-		$this->root = $this->root->inject ($variables);
+		$this->block = $this->block->inject ($variables);
 	}
 }
 
@@ -145,7 +150,7 @@ class CacheRenderer
 
 		if (!file_exists ($cache))
 		{
-			$compiler = new Compiler (Compiler::parse_file ($path));
+			$compiler = new Compiler (Block::parse_file ($path));
 			$compiler->inject ($this->variables);
 
 			file_put_contents ($cache, $compiler->compile ());

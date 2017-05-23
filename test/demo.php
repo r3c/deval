@@ -19,7 +19,7 @@ if ($template !== '')
 {
 	try
 	{
-		$compiler = new Deval\Compiler (Deval\Compiler::parse_code ($template));
+		$compiler = new Deval\Compiler (Deval\Block::parse_code ($template));
 		$variables = array ();
 
 		echo '<pre>';

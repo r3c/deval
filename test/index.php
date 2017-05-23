@@ -4,7 +4,7 @@ require '../src/deval.php';
 
 function assert_render ($source, $variables, $expect)
 {
-	$compiler = new Deval\Compiler (Deval\Compiler::parse_code ($source));
+	$compiler = new Deval\Compiler (Deval\Block::parse_code ($source));
 	$compiler->inject ($variables);
 
 	$result = Deval\Evaluator::code ($compiler->compile (), array ());
