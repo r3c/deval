@@ -24,24 +24,24 @@ class ConcatBlock extends Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
 		if (count ($this->blocks) < 1)
 			return new Output ();
 
-		$output = $this->blocks[0]->compile ($trim, $variables);
+		$output = $this->blocks[0]->compile ($trim, $volatiles);
 
 		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$output->append ($this->blocks[$i]->compile ($trim, $variables));
+			$output->append ($this->blocks[$i]->compile ($trim, $volatiles));
 
 		return $output;
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		return new self (array_map (function ($block) use ($variables)
+		return new self (array_map (function ($block) use ($constants)
 		{
-			return $block->inject ($variables);
+			return $block->inject ($constants);
 		}, $this->blocks));
 	}
 

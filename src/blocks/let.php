@@ -13,35 +13,35 @@ class LetBlock extends Block
 		$this->body = $body;
 	}
 
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
 		$output = new Output ();
 		$output->append_code ('{', true);
 
-		$variables_exclude = array ();
+		$volatiles_exclude = array ();
 
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
-			$output->append_code ('$' . $name . '=' . $value->generate ($variables) . ';');
+			$output->append_code ('$' . $name . '=' . $value->generate ($volatiles) . ';');
 
-			$variables_exclude[$name] = true;
+			$volatiles_exclude[$name] = true;
 		}
 
-		$variables_inner = array ();
+		$volatiles_inner = array ();
 
-		$output->append ($this->body->compile ($trim, $variables_inner));
+		$output->append ($this->body->compile ($trim, $volatiles_inner));
 
-		foreach (array_keys (array_diff_key ($variables_inner, $variables_exclude)) as $name)
-			$variables[$name] = true;
+		foreach (array_keys (array_diff_key ($volatiles_inner, $volatiles_exclude)) as $name)
+			$volatiles[$name] = true;
 
 		$output->append_code ('}');
 
 		return $output;
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		$assignments = array ();
 		$requires = array ();
@@ -50,22 +50,22 @@ class LetBlock extends Block
 		{
 			list ($name, $value) = $assignment;
 
-			$value = $value->inject ($variables);
+			$value = $value->inject ($constants);
 
-			// Assignment can be evaluated, move to known variables
+			// Assignment can be evaluated, move to known constants
 			if ($value->evaluate ($result))
-				$variables[$name] = $result;
+				$constants[$name] = $result;
 
 			// Assignment can't be computed yet, keep it and remove from outer scope
 			else
 			{
 				$assignments[] = array ($name, $value);
 
-				unset ($variables[$name]);
+				unset ($constants[$name]);
 			}
 		}
 
-		$body = $this->body->inject ($variables);
+		$body = $this->body->inject ($constants);
 		$body->compile (function ($s) { return ''; }, $requires);
 
 		if (count ($assignments) === 0 || count ($requires) === 0)

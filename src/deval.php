@@ -96,48 +96,48 @@ class BasicRenderer
 {
 	public $source;
 
-	public function __construct ($source, $variables = array (), $style = null)
+	public function __construct ($source, $constants = array (), $style = null)
 	{
 		Loader::load ();
 
 		$compiler = new Compiler (Block::parse_code ($source));
-		$compiler->inject ($variables);
+		$compiler->inject ($constants);
 
 		$this->source = $compiler->compile ($style);
 	}
 
-	public function render ($variables = array ())
+	public function render ($volatiles = array ())
 	{
-		return Evaluator::code ($this->source, $variables);
+		return Evaluator::code ($this->source, $volatiles);
 	}
 }
 
 class CacheRenderer
 {
+	private $constants;
 	private $directory;
-	private $variables;
 
-	public function __construct ($directory, $variables = array ())
+	public function __construct ($directory, $constants = array ())
 	{
+		$this->constants = $constants;
 		$this->directory = $directory;
-		$this->variables = $variables;
 	}
 
-	public function render ($path, $variables = array (), $style = null, $invalidate = false)
+	public function render ($path, $volatiles = array (), $style = null, $invalidate = false)
 	{
-		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->variables)) . '.php';
+		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->constants)) . '.php';
 
 		if (!file_exists ($cache) || $invalidate)
 		{
 			Loader::load ();
 
 			$compiler = new Compiler (Block::parse_file ($path));
-			$compiler->inject ($this->variables);
+			$compiler->inject ($this->constants);
 
 			file_put_contents ($cache, $compiler->compile ($style));
 		}
 
-		return Evaluator::path ($cache, $variables);
+		return Evaluator::path ($cache, $volatiles);
 	}
 }
 
@@ -293,10 +293,10 @@ class State
 		return null;
 	}
 
-	public function __construct ($keys)
+	public function __construct ($names)
 	{
-		if (count ($keys) > 0)
-			throw new RuntimeException ('undefined runtime variables: ' . implode (', ', $keys));
+		if (count ($names) > 0)
+			throw new RuntimeException ('undefined symbols: ' . implode (', ', $names));
 	}
 
 	public function loop_start ()

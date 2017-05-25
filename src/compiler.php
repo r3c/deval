@@ -31,20 +31,19 @@ class Compiler
 		else
 			$trim = function ($s) { return $s; };
 
-		$variables = array ();
-		$source = $this->block->compile ($trim, $variables);
-		$names = array_keys ($variables);
+		$volatiles = array ();
+		$source = $this->block->compile ($trim, $volatiles);
 
 		$output = new Output ();
-		$output->append_code (State::emit_create ($names));
+		$output->append_code (State::emit_create (array_keys ($volatiles)));
 		$output->append ($source);
 
 		return $output->source ();
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		$this->block = $this->block->inject ($variables);
+		$this->block = $this->block->inject ($constants);
 	}
 }
 

@@ -51,8 +51,8 @@ abstract class Block
 		}
 	}
 
-	abstract function compile ($trim, &$variables);
-	abstract function inject ($variables);
+	abstract function compile ($trim, &$volatiles);
+	abstract function inject ($constants);
 	abstract function resolve ($blocks);
 }
 

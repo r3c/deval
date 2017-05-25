@@ -9,12 +9,12 @@ class LabelBlock extends Block
 		$this->name = $name;
 	}
 
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
 		throw new \Exception ('cannot compile label block');
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		throw new \Exception ('cannot inject label block');
 	}

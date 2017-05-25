@@ -14,17 +14,17 @@ class ArrayExpression extends Expression
 		return '[' . implode (', ', array_map (function ($e) { return (string)$e; }, $this->elements)) . ']';
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
 		$elements = array ();
 
 		foreach ($this->elements as $element)
-			$elements[] = $element->generate ($variables);
+			$elements[] = $element->generate ($volatiles);
 
 		return 'array(' . implode (',', $elements) . ')';
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		$elements = array ();
 		$ready = true;
@@ -32,7 +32,7 @@ class ArrayExpression extends Expression
 
 		foreach ($this->elements as $element)
 		{
-			$element = $element->inject ($variables);
+			$element = $element->inject ($constants);
 
 			if ($element->evaluate ($result))
 				$values[] = $result;

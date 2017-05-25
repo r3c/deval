@@ -21,12 +21,12 @@ class ConstantExpression extends Expression
 		return true;
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
 		return State::export ($this->value);
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		return $this;
 	}

@@ -10,7 +10,7 @@ class IfBlock extends Block
 		$this->fallback = $fallback;
 	}
 
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
 		$output = new Output ();
 		$first = true;
@@ -19,9 +19,9 @@ class IfBlock extends Block
 		{
 			list ($condition, $body) = $branch;
 
-			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($variables) . ')');
+			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($volatiles) . ')');
 			$output->append_code ('{');
-			$output->append ($body->compile ($trim, $variables));
+			$output->append ($body->compile ($trim, $volatiles));
 			$output->append_code ('}');
 
 			$first = false;
@@ -31,14 +31,14 @@ class IfBlock extends Block
 		{
 			$output->append_code ('else');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($trim, $variables));
+			$output->append ($this->fallback->compile ($trim, $volatiles));
 			$output->append_code ('}');
 		}
 
 		return $output;
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		$branches = array ();
 
@@ -46,8 +46,8 @@ class IfBlock extends Block
 		{
 			list ($condition, $body) = $branch;
 
-			$body = $body->inject ($variables);
-			$condition = $condition->inject ($variables);
+			$body = $body->inject ($constants);
+			$condition = $condition->inject ($constants);
 
 			if (!$condition->evaluate ($result))
 				$branches[] = array ($condition, $body);
@@ -55,7 +55,7 @@ class IfBlock extends Block
 				return $body;
 		}
 
-		$fallback = $this->fallback !== null ? $this->fallback->inject ($variables) : null;
+		$fallback = $this->fallback !== null ? $this->fallback->inject ($constants) : null;
 
 		if (count ($branches) === 0)
 			return $fallback !== null ? $fallback : new VoidBlock ();

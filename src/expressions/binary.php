@@ -67,17 +67,17 @@ class BinaryExpression extends Expression
 		return $this->lhs . ' ' . $this->op . ' ' . $this->rhs;
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
 		$generate = $this->f_generate;
 
-		return $generate ($this->lhs->generate ($variables), $this->rhs->generate ($variables));
+		return $generate ($this->lhs->generate ($volatiles), $this->rhs->generate ($volatiles));
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		$lhs = $this->lhs->inject ($variables);
-		$rhs = $this->rhs->inject ($variables);
+		$lhs = $this->lhs->inject ($constants);
+		$rhs = $this->rhs->inject ($constants);
 
 		if (!$lhs->evaluate ($result1) || !$rhs->evaluate ($result2))
 			return new self ($lhs, $rhs, $this->op);

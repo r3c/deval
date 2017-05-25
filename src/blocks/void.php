@@ -4,12 +4,12 @@ namespace Deval;
 
 class VoidBlock extends Block
 {
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
 		return new Output ();
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		return $this;
 	}

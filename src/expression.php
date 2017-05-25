@@ -11,9 +11,9 @@ abstract class Expression
 
 	public abstract function __toString ();
 
-	public abstract function generate (&$variables);
+	public abstract function generate (&$volatiles);
 
-	public abstract function inject ($variables);
+	public abstract function inject ($constants);
 }
 
 ?>

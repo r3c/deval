@@ -18,13 +18,13 @@ class ForBlock extends Block
 		$this->value = $value;
 	}
 
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
 		$output = new Output ();
 
 		// Write loop control
 		$output->append_code (State::emit_loop_start() . ';');
-		$output->append_code ('foreach(' . $this->source->generate ($variables) . ' as ');
+		$output->append_code ('foreach(' . $this->source->generate ($volatiles) . ' as ');
 
 		if ($this->key !== null)
 			$output->append_code ('$' . $this->key . '=>$' . $this->value);
@@ -33,28 +33,28 @@ class ForBlock extends Block
 
 		$output->append_code (')');
 
-		// Write body and merge inner variables into parent
-		$variables_inner = array ();
+		// Write body and merge inner volatiles into parent
+		$volatiles_inner = array ();
 
 		$output->append_code ('{');
-		$output->append ($this->body->compile ($trim, $variables_inner));
+		$output->append ($this->body->compile ($trim, $volatiles_inner));
 		$output->append_code (State::emit_loop_step() . ';');
 		$output->append_code ('}');
 
 		if ($this->key !== null)
-			unset ($variables_inner[$this->key]);
+			unset ($volatiles_inner[$this->key]);
 
-		unset ($variables_inner[$this->value]);
+		unset ($volatiles_inner[$this->value]);
 
-		foreach (array_keys ($variables_inner) as $name)
-			$variables[$name] = true;
+		foreach (array_keys ($volatiles_inner) as $name)
+			$volatiles[$name] = true;
 
 		// Write fallback block if any
 		if ($this->fallback !== null)
 		{
 			$output->append_code ('if(' . State::emit_loop_stop() . ')');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($trim, $variables));
+			$output->append ($this->fallback->compile ($trim, $volatiles));
 			$output->append_code ('}');
 		}
 		else
@@ -63,23 +63,23 @@ class ForBlock extends Block
 		return $output;
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		$source = $this->source->inject ($variables);
+		$source = $this->source->inject ($constants);
 
 		// Source can't be evaluated, rebuild block with injected children
 		if (!$source->evaluate ($result))
 		{
-			// Inject all variables to fallback block
-			$fallback = $this->fallback !== null ? $this->fallback->inject ($variables) : null;
+			// Inject all constants to fallback block
+			$fallback = $this->fallback !== null ? $this->fallback->inject ($constants) : null;
 
-			// Inject all variables but key (optional) and value to body block
+			// Inject all constants but key (optional) and value to body block
 			if ($this->key !== null)
-				unset ($variables[$this->key]);
+				unset ($constants[$this->key]);
 
-			unset ($variables[$this->value]);
+			unset ($constants[$this->value]);
 
-			$body = $this->body->inject ($variables);
+			$body = $this->body->inject ($constants);
 
 			// Rebuild block
 			return new self ($source, $this->key, $this->value, $body, $fallback);
@@ -91,15 +91,15 @@ class ForBlock extends Block
 		// FIXME: verify $result is iterable
 		foreach ($result as $key => $value)
 		{
-			$variables_inner = $variables;
+			$constants_inner = $constants;
 
-			// Inject all variables after overriding key (optional) and value
+			// Inject all constants after overriding key (optional) and value
 			if ($this->key !== null)
-				$variables_inner[$this->key] = $key;
+				$constants_inner[$this->key] = $key;
 
-			$variables_inner[$this->value] = $value;
+			$constants_inner[$this->value] = $value;
 
-			$blocks[] = $this->body->inject ($variables_inner);
+			$blocks[] = $this->body->inject ($constants_inner);
 		}
 
 		// Some blocks were generated, return them
@@ -108,7 +108,7 @@ class ForBlock extends Block
 
 		// No block was generated (empty source), generate fallback block if any
 		if ($this->fallback !== null)
-			return $this->fallback->inject ($variables);
+			return $this->fallback->inject ($constants);
 
 		// Otherwise generate empty block
 		return new VoidBlock ();

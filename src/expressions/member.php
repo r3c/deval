@@ -15,26 +15,26 @@ class MemberExpression extends Expression
 		return $this->source . implode ('', array_map (function ($i) { return '[' . $i . ']'; }, $this->indices));
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
 		$indices = array ();
 
 		foreach ($this->indices as $index)
-			$indices[] = $index->generate ($variables);
+			$indices[] = $index->generate ($volatiles);
 
-		return State::emit_member (array ($this->source->generate ($variables), 'array(' . implode (',', $indices) . ')'));
+		return State::emit_member (array ($this->source->generate ($volatiles), 'array(' . implode (',', $indices) . ')'));
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		$indices = array ();
 		$ready = true;
-		$source = $this->source->inject ($variables);
+		$source = $this->source->inject ($constants);
 		$values = array();
 
 		foreach ($this->indices as $index)
 		{
-			$index = $index->inject ($variables);
+			$index = $index->inject ($constants);
 
 			if ($index->evaluate ($result))
 				$values[] = $result;

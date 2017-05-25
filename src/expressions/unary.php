@@ -51,16 +51,16 @@ class UnaryExpression extends Expression
 		return $this->op . $this->value;
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
 		$generate = $this->f_generate;
 
-		return $generate ($this->value->generate ($variables));
+		return $generate ($this->value->generate ($volatiles));
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		$value = $this->value->inject ($variables);
+		$value = $this->value->inject ($constants);
 
 		if (!$value->evaluate ($result))
 			return new self ($value, $this->op);

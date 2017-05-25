@@ -15,26 +15,26 @@ class InvokeExpression extends Expression
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
 		$arguments = array ();
 
 		foreach ($this->arguments as $argument)
-			$arguments[] = $argument->generate ($variables);
+			$arguments[] = $argument->generate ($volatiles);
 
-		return $this->caller->generate ($variables) . '(' . implode (',', $arguments) . ')';
+		return $this->caller->generate ($volatiles) . '(' . implode (',', $arguments) . ')';
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
 		$arguments = array ();
-		$caller = $this->caller->inject ($variables);
+		$caller = $this->caller->inject ($constants);
 		$ready = true;
 		$values = array ();
 
 		foreach ($this->arguments as $argument)
 		{
-			$argument = $argument->inject ($variables);
+			$argument = $argument->inject ($constants);
 
 			if ($argument->evaluate ($result))
 				$values[] = $result;

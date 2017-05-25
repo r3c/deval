@@ -2,10 +2,9 @@
 
 require '../src/deval.php';
 
-function assert_evaluate ($source, $variables, $expect)
+function assert_evaluate ($source, $constants, $expect)
 {
-	$renderer = new Deval\BasicRenderer ($source, $variables, 'collapse');
-
+	$renderer = new Deval\BasicRenderer ($source, $constants, 'collapse');
 	$result = $renderer->render ();
 
 	assert ($result === $expect, 'execution failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
@@ -17,20 +16,19 @@ function assert_render ($directory, $path, $variables, $expect)
 	{
 		foreach (combinations ($i, count ($variables)) as $combination)
 		{
-			$dynamics = array ();
-			$statics = array ();
-			$j = 0;
+			$constants = array ();
+			$volatiles = array ();
 
-			foreach ($variables as $key => $value)
+			foreach (array_keys ($variables) as $j => $key)
 			{
-				if ($combination[$j++])
-					$dynamics[$key] = $value;
+				if ($combination[$j])
+					$constants[$key] = $variables[$key];
 				else
-					$statics[$key] = $value;
+					$volatiles[$key] = $variables[$key];
 			}
 
-			$renderer = new Deval\CacheRenderer ('template', $statics);
-			$result = $renderer->render ('template/' . $path, $dynamics, 'collapse', true);
+			$renderer = new Deval\CacheRenderer ('template', $constants);
+			$result = $renderer->render ('template/' . $path, $volatiles, 'collapse', true);
 
 			assert ($result === $expect, 'rendering failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}

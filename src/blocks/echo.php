@@ -9,14 +9,14 @@ class EchoBlock extends Block
 		$this->value = $value;
 	}
 
-	public function compile ($trim, &$variables)
+	public function compile ($trim, &$volatiles)
 	{
-		return (new Output ())->append_code ('echo ' . $this->value->generate ($variables) . ';');
+		return (new Output ())->append_code ('echo ' . $this->value->generate ($volatiles) . ';');
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		$value = $this->value->inject ($variables);
+		$value = $this->value->inject ($constants);
 
 		if ($value->evaluate ($result))
 		{

@@ -16,17 +16,17 @@ class SymbolExpression extends Expression
 		return $this->name;
 	}
 
-	public function generate (&$variables)
+	public function generate (&$volatiles)
 	{
-		$variables[$this->name] = true;
+		$volatiles[$this->name] = true;
 
 		return '$' . $this->name;
 	}
 
-	public function inject ($variables)
+	public function inject ($constants)
 	{
-		if (array_key_exists ($this->name, $variables))
-			return new ConstantExpression ($variables[$this->name]);
+		if (array_key_exists ($this->name, $constants))
+			return new ConstantExpression ($constants[$this->name]);
 
 		return $this;
 	}
