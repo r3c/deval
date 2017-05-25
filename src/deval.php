@@ -159,12 +159,12 @@ class Output
 	}
 }
 
-abstract class Renderer
+interface Renderer
 {
-	abstract function render ($volatiles = array ());
+	public function render ($volatiles = array ());
 }
 
-class CachedRenderer extends Renderer
+class CachedRenderer implements Renderer
 {
 	private $constants;
 	private $directory;
@@ -199,7 +199,7 @@ class CachedRenderer extends Renderer
 	}
 }
 
-class FileRenderer extends Renderer
+class FileRenderer implements Renderer
 {
 	public $source;
 
@@ -219,7 +219,7 @@ class FileRenderer extends Renderer
 	}
 }
 
-class StringRenderer extends Renderer
+class StringRenderer implements Renderer
 {
 	public $source;
 
