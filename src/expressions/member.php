@@ -10,6 +10,11 @@ class MemberExpression extends Expression
 		$this->source = $source;
 	}
 
+	public function __toString ()
+	{
+		return $this->source . implode ('', array_map (function ($i) { return '[' . $i . ']'; }, $this->indices));
+	}
+
 	public function generate (&$variables)
 	{
 		$indices = array ();

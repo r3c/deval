@@ -9,6 +9,8 @@ abstract class Expression
 		return false;
 	}
 
+	public abstract function __toString ();
+
 	public abstract function generate (&$variables);
 
 	public abstract function inject ($variables);

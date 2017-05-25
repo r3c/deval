@@ -9,6 +9,11 @@ class ConstantExpression extends Expression
 		$this->value = $value;
 	}
 
+	public function __toString ()
+	{
+		return var_export ($this->value, true);
+	}
+
 	public function evaluate (&$result)
 	{
 		$result = $this->value;

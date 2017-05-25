@@ -17,12 +17,13 @@ require '../src/deval.php';
 
 if ($template !== '')
 {
+	echo '<pre>';
+
 	try
 	{
 		$compiler = new Deval\Compiler (Deval\Block::parse_code ($template));
 		$variables = array ();
 
-		echo '<pre>';
 		echo "original:\n";
 		echo '  - source = ' . htmlspecialchars ($compiler->compile ($variables)) . "\n";
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
@@ -36,12 +37,17 @@ if ($template !== '')
 
 		echo "executed:\n";
 		echo '  - output = ' . Deval\Evaluator::code ($compiler->compile (), $executes) . "\n";
-		echo '</pre>';
 	}
-	catch (PhpPegJs\SyntaxError $error)
+	catch (Deval\CompileException $exception)
 	{
-		echo 'Syntax error: ' . $error->getMessage ();
+		echo $exception->getMessage ();
 	}
+	catch (Deval\RuntimeException $exception)
+	{
+		echo $exception->getMessage ();
+	}
+
+	echo '</pre>';
 }
 
 ?>

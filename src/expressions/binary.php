@@ -51,7 +51,7 @@ class BinaryExpression extends Expression
 		}
 
 		if (!isset ($functions[$op]))
-			throw new \Exception ('unknown operator "' . $op . '"');
+			throw new \Exception ('undefined binary operator');
 
 		list ($evaluate, $generate) = $functions[$op];
 
@@ -60,6 +60,11 @@ class BinaryExpression extends Expression
 		$this->lhs = $lhs;
 		$this->op = $op;
 		$this->rhs = $rhs;
+	}
+
+	public function __toString ()
+	{
+		return $this->lhs . ' ' . $this->op . ' ' . $this->rhs;
 	}
 
 	public function generate (&$variables)

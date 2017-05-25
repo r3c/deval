@@ -10,6 +10,11 @@ class InvokeExpression extends Expression
 		$this->caller = $caller;
 	}
 
+	public function __toString ()
+	{
+		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
+	}
+
 	public function generate (&$variables)
 	{
 		$arguments = array ();
@@ -42,9 +47,8 @@ class InvokeExpression extends Expression
 		// Invoke and pass return value if caller and arguments were evaluated
 		if ($ready && $caller->evaluate ($result))
 		{
-			// FIXME: replace by specific exception
 			if (!is_callable ($result))
-				throw new \Exception ('injected caller is not callable');
+				throw new RuntimeException ('function caller is not a callable variable: ' . $caller);
 
 			return new ConstantExpression (call_user_func_array ($result, $values));
 		}

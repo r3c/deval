@@ -9,6 +9,11 @@ class ArrayExpression extends Expression
 		$this->elements = $elements;
 	}
 
+	public function __toString ()
+	{
+		return '[' . implode (', ', array_map (function ($e) { return (string)$e; }, $this->elements)) . ']';
+	}
+
 	public function generate (&$variables)
 	{
 		$elements = array ();

@@ -36,7 +36,7 @@ class UnaryExpression extends Expression
 		}
 
 		if (!isset ($functions[$op]))
-			throw new \Exception ('unknown operator "' . $op . '"');
+			throw new \Exception ('undefined unary operator');
 
 		list ($evaluate, $generate) = $functions[$op];
 
@@ -44,6 +44,11 @@ class UnaryExpression extends Expression
 		$this->f_generate = $generate;
 		$this->op = $op;
 		$this->value = $value;
+	}
+
+	public function __toString ()
+	{
+		return $this->op . $this->value;
 	}
 
 	public function generate (&$variables)

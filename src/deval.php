@@ -2,11 +2,58 @@
 
 namespace Deval;
 
+class CompileException extends \Exception
+{
+	public function __construct ($context, $message)
+	{
+		parent::__construct ('compile error in ' . $context . ' ' . $message);
+	}
+}
+
+class RuntimeException extends \Exception
+{
+	public function __construct ($message)
+	{
+		parent::__construct ('runtime error: ' . $message);
+	}
+}
+
 abstract class Block
 {
 	private static $bases = array ();
 
 	public static function parse_code ($source)
+	{
+		return self::parse ('source code', $source);
+	}
+
+	public static function parse_file ($path)
+	{
+		$base = count (self::$bases) > 0 ? self::$bases[count (self::$bases) - 1] : '.';
+		$path = strlen ($path) > 0 && $path[0] === DIRECTORY_SEPARATOR ? $path : $base . DIRECTORY_SEPARATOR . $path;
+
+		if (!file_exists ($path))
+			throw new CompileException ($path, 'source file doesn\'t exist');
+
+		array_push (self::$bases, dirname ($path));
+
+		try
+		{
+			$block = self::parse ($path, file_get_contents ($path));
+		}
+		catch (\Exception $exception)
+		{
+			array_pop (self::$bases);
+
+			throw $exception;
+		}
+
+		array_pop (self::$bases);
+
+		return $block;
+	}
+
+	private static function parse ($context, $source)
 	{
 		static $setup;
 
@@ -36,33 +83,14 @@ abstract class Block
 
 		$parser = new \PhpPegJs\Parser ();
 
-		return $parser->parse ($source);
-	}
-
-	public static function parse_file ($path)
-	{
-		$base = count (self::$bases) > 0 ? self::$bases[count (self::$bases) - 1] : '.';
-		$path = strlen ($path) > 0 && $path[0] === DIRECTORY_SEPARATOR ? $path : $base . DIRECTORY_SEPARATOR . $path;
-
-		if (!file_exists ($path))
-			throw new \Exception ('cannot include missing file "' . $path . '"');
-
-		array_push (self::$bases, dirname ($path));
-
 		try
 		{
-			$block = self::parse_code (file_get_contents ($path));
+			return $parser->parse ($source);
 		}
-		catch (\Exception $exception)
+		catch (\PhpPegJs\SyntaxError $exception)
 		{
-			array_pop (self::$bases);
-
-			throw $exception;
+			throw new CompileException ($context, 'at line ' . $exception->grammarLine . ', character ' . $exception->grammarColumn . ': ' . $exception->getMessage ());
 		}
-
-		array_pop (self::$bases);
-
-		return $block;
 	}
 
 	abstract function compile (&$variables);
@@ -237,7 +265,7 @@ class State
 	public static function assert_symbol ($name)
 	{
 		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
-			throw new \Exception ('invalid symbol name "' . $name . '"');
+			throw new \Exception ('invalid symbol name');
 	}
 
 	public static function emit_create ($keys)
@@ -315,7 +343,7 @@ class State
 	public function __construct ($keys)
 	{
 		if (count ($keys) > 0)
-			throw new \Exception ('undefined runtime variables: ' . implode (', ', $keys));
+			throw new RuntimeException ('undefined runtime variables: ' . implode (', ', $keys));
 	}
 
 	public function loop_start ()

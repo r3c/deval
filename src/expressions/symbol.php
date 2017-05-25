@@ -11,6 +11,11 @@ class SymbolExpression extends Expression
 		$this->name = $name;
 	}
 
+	public function __toString ()
+	{
+		return $this->name;
+	}
+
 	public function generate (&$variables)
 	{
 		$variables[$this->name] = true;
