@@ -18,6 +18,11 @@ class PlainBlock extends Block
 	{
 		return $this;
 	}
+
+	public function resolve ($blocks)
+	{
+		return $this;
+	}
 }
 
 ?>

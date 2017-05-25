@@ -39,9 +39,17 @@ class ConcatBlock extends Block
 
 	public function inject ($variables)
 	{
-		return new self (array_map (function ($block) use (&$variables)
+		return new self (array_map (function ($block) use ($variables)
 		{
 			return $block->inject ($variables);
+		}, $this->blocks));
+	}
+
+	public function resolve ($blocks)
+	{
+		return new self (array_map (function ($block) use ($blocks)
+		{
+			return $block->resolve ($blocks);
 		}, $this->blocks));
 	}
 }

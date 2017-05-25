@@ -113,6 +113,14 @@ class ForBlock extends Block
 		// Otherwise generate empty block
 		return new VoidBlock ();
 	}
+
+	public function resolve ($blocks)
+	{
+		$body = $this->body->resolve ($blocks);
+		$fallback = $this->fallback !== null ? $this->fallback->resolve ($blocks) : null;
+
+		return new self ($this->source, $this->key, $this->value, $body, $fallback);
+	}
 }
 
 ?>

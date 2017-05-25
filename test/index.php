@@ -98,6 +98,12 @@ assert_evaluate ('{{ !0 }}', array (), '1');
 assert_evaluate ('{{ ~0 }}', array (), '-1');
 assert_evaluate ('{{ ~2 }}', array (), '-3');
 
+// For command
+assert_evaluate ('{% for v in [1, 2, 3] %}{{ v }}{% end %}', array (), '123');
+assert_evaluate ('{% for k, v in [1, 2, 3] %}{{ k }}:{{ v }}{% end %}', array (), '0:11:22:3');
+assert_evaluate ('{% for k, v in [1] %}x{% empty %}y{% end %}', array (), 'x');
+assert_evaluate ('{% for k, v in [] %}x{% empty %}y{% end %}', array (), 'y');
+
 // If command
 assert_evaluate ('{% if 3 %}x{% end %}', array (), 'x');
 assert_evaluate ('{% if 3 %}x{% else %}y{% end %}', array (), 'x');
@@ -107,15 +113,13 @@ assert_evaluate ('{% if 1 %}x{% else if 0 %}y{% else %}z{% end %}', array (), 'x
 assert_evaluate ('{% if 0 %}x{% else if 1 %}y{% else %}z{% end %}', array (), 'y');
 assert_evaluate ('{% if 0 %}x{% else if 0 %}y{% else %}z{% end %}', array (), 'z');
 
+// Import command
+assert_evaluate ('{% import template/import_inner.deval %}{% block first %}1{% block second %}2{% end %}', array ('a' => 'A', 'b' => 'B', 'c' => 'C'), 'A1B2C');
+assert_evaluate ('{% import template/import_outer.deval %}{% end %}', array ('first' => 'x', 'second' => 'y'), '1x2y3');
+
 // Include command
 assert_evaluate ('{% include template/include_inner.deval %}', array ('inner_x' => 'x', 'inner_y' => 'y'), 'xy');
 assert_evaluate ('{% include template/include_outer.deval %}', array ('outer_x' => 'x', 'outer_y' => 'y'), 'xy');
-
-// For command
-assert_evaluate ('{% for v in [1, 2, 3] %}{{ v }}{% end %}', array (), '123');
-assert_evaluate ('{% for k, v in [1, 2, 3] %}{{ k }}:{{ v }}{% end %}', array (), '0:11:22:3');
-assert_evaluate ('{% for k, v in [1] %}x{% empty %}y{% end %}', array (), 'x');
-assert_evaluate ('{% for k, v in [] %}x{% empty %}y{% end %}', array (), 'y');
 
 // Let command
 assert_evaluate ('{% let a = 5 %}{{ a }}{% end %}', array (), '5');

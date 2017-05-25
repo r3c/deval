@@ -73,6 +73,11 @@ class LetBlock extends Block
 
 		return new self ($assignments, $body);
 	}
+
+	public function resolve ($blocks)
+	{
+		return new self ($this->assignments, $this->body->resolve ($blocks));
+	}
 }
 
 ?>

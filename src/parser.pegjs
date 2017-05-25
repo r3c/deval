@@ -53,8 +53,25 @@ PlainSafe
 Command "command block"
 	= CommandFor
 	/ CommandIf
+	/ CommandImport
 	/ CommandInclude
+	/ CommandLabel
 	/ CommandLet
+
+CommandImport "import command"
+	= "import" _ path:Path _ BlockCommandEnd _ blocks:CommandImportBlock* BlockCommandBegin _ "end"
+	{
+		$bodies = array_map (function ($b) { return $b[1]; }, $blocks);
+		$names = array_map (function ($b) { return $b[0]; }, $blocks);
+
+		return \Deval\Block::parse_file ($path, array_combine ($names, $bodies));
+	}
+
+CommandImportBlock
+	= BlockCommandBegin _ "block" _ name:Symbol _ BlockCommandEnd body:Content
+	{
+		return array ($name, $body);
+	}
 
 CommandFor "for command"
 	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd body:Content fallback:CommandForEmpty? BlockCommandBegin _ "end"
@@ -96,6 +113,12 @@ CommandInclude "include command"
 	= "include" _ path:Path
 	{
 		return \Deval\Block::parse_file ($path);
+	}
+
+CommandLabel
+	= "label" _ name:Symbol
+	{
+		return new \Deval\LabelBlock ($name);
 	}
 
 CommandLet "let command"

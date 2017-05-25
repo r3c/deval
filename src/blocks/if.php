@@ -62,6 +62,16 @@ class IfBlock extends Block
 
 		return new self ($branches, $fallback);
 	}
+
+	public function resolve ($blocks)
+	{
+		$fallback = $this->fallback !== null ? $this->fallback->resolve ($blocks) : null;
+
+		return new self (array_map (function ($branch) use ($blocks)
+		{
+			return array ($branch[0], $branch[1]->resolve ($blocks));
+		}, $this->branches), $fallback);
+	}
 }
 
 ?>

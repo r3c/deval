@@ -13,6 +13,11 @@ class VoidBlock extends Block
 	{
 		return $this;
 	}
+
+	public function resolve ($blocks)
+	{
+		return $this;
+	}
 }
 
 ?>

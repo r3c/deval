@@ -26,6 +26,11 @@ class EchoBlock extends Block
 
 		return new self ($value);
 	}
+
+	public function resolve ($blocks)
+	{
+		return $this;
+	}
 }
 
 ?>
