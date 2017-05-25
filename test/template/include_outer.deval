@@ -1,1 +1,1 @@
-{% include include_inner.deval inner_x = outer_x, inner_y = outer_y %}
+{%let inner_x = outer_x, inner_y = outer_y %}{% include include_inner.deval %}{% end %}

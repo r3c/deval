@@ -49,10 +49,10 @@ function combinations ($k, $n, $candidates = array ())
 		return array ();
 	else if ($k === $n)
 		return array (array_merge ($candidates, array_fill (0, $n, true)));
-	else if ($k > 0)
-		return array_merge (combinations ($k - 1, $n - 1, array_merge ($candidates, array (true))), combinations ($k, $n - 1, array_merge ($candidates, array (false))));
-	else
+	else if ($k === 0)
 		return array (array_merge ($candidates, array_fill (0, $n, false)));
+	else
+		return array_merge (combinations ($k - 1, $n - 1, array_merge ($candidates, array (true))), combinations ($k, $n - 1, array_merge ($candidates, array (false))));
 }
 
 function one ()

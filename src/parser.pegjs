@@ -93,24 +93,24 @@ CommandIfElse
 	}
 
 CommandInclude "include command"
-	= "include" _ path:Path _ assignments:Assignments?
+	= "include" _ path:Path
 	{
-		return new \Deval\LetBlock ($assignments !== null ? $assignments : array (), \Deval\Block::parse_file ($path));
+		return \Deval\Block::parse_file ($path);
 	}
 
 CommandLet "let command"
-	= "let" _ assignments:Assignments _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
+	= "let" _ assignments:CommandLetAssignments _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
 	{
 		return new \Deval\LetBlock ($assignments, $body);
 	}
 
-Assignments "assignments"
-	= head:AssignmentsPair _ tail:("," _ token:AssignmentsPair { return $token; })*
+CommandLetAssignments "assignments"
+	= head:CommandLetAssignmentsPair _ tail:("," _ token:CommandLetAssignmentsPair { return $token; })*
 	{
 		return array_merge (array ($head), $tail);
 	}
 
-AssignmentsPair "assignment"
+CommandLetAssignmentsPair "assignment"
 	= name:Symbol _ "=" _ value:Expression
 	{
 		return array ($name, $value);
