@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class LabelBlock extends Block
+class LabelBlock implements Block
 {
 	public function __construct ($name)
 	{

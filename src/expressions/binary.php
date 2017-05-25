@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class BinaryExpression extends Expression
+class BinaryExpression implements Expression
 {
 	public function __construct ($lhs, $rhs, $op)
 	{
@@ -65,6 +65,11 @@ class BinaryExpression extends Expression
 	public function __toString ()
 	{
 		return $this->lhs . ' ' . $this->op . ' ' . $this->rhs;
+	}
+
+	public function evaluate (&$result)
+	{
+		return false;
 	}
 
 	public function generate (&$volatiles)

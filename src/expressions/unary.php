@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class UnaryExpression extends Expression
+class UnaryExpression implements Expression
 {
 	public function __construct ($value, $op)
 	{
@@ -49,6 +49,11 @@ class UnaryExpression extends Expression
 	public function __toString ()
 	{
 		return $this->op . $this->value;
+	}
+
+	public function evaluate (&$result)
+	{
+		return false;
 	}
 
 	public function generate (&$volatiles)

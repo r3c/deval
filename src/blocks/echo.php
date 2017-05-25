@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class EchoBlock extends Block
+class EchoBlock implements Block
 {
 	public function __construct ($value)
 	{

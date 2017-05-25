@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class VoidBlock extends Block
+class VoidBlock implements Block
 {
 	public function compile ($trim, &$volatiles)
 	{

@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class ConstantExpression extends Expression
+class ConstantExpression implements Expression
 {
 	public function __construct ($value)
 	{

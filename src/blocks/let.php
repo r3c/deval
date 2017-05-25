@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class LetBlock extends Block
+class LetBlock implements Block
 {
 	public function __construct ($assignments, $body)
 	{

@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class SymbolExpression extends Expression
+class SymbolExpression implements Expression
 {
 	public function __construct ($name)
 	{
@@ -14,6 +14,11 @@ class SymbolExpression extends Expression
 	public function __toString ()
 	{
 		return $this->name;
+	}
+
+	public function evaluate (&$result)
+	{
+		return false;
 	}
 
 	public function generate (&$volatiles)

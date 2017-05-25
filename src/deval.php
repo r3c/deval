@@ -189,7 +189,7 @@ class CachedRenderer implements Renderer
 		{
 			Loader::load ();
 
-			$compiler = new Compiler (Block::parse_file ($this->path));
+			$compiler = new Compiler (Compiler::parse_file ($this->path));
 			$compiler->inject ($this->constants);
 
 			file_put_contents ($cache, $compiler->compile ($this->style));
@@ -207,7 +207,7 @@ class FileRenderer implements Renderer
 	{
 		Loader::load ();
 
-		$compiler = new Compiler (Block::parse_file ($path));
+		$compiler = new Compiler (Compiler::parse_file ($path));
 		$compiler->inject ($constants);
 
 		$this->source = $compiler->compile ($style);
@@ -227,7 +227,7 @@ class StringRenderer implements Renderer
 	{
 		Loader::load ();
 
-		$compiler = new Compiler (Block::parse_code ($source));
+		$compiler = new Compiler (Compiler::parse_code ($source));
 		$compiler->inject ($constants);
 
 		$this->source = $compiler->compile ($style);

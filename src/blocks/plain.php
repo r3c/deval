@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class PlainBlock extends Block
+class PlainBlock implements Block
 {
 	public function __construct ($text)
 	{

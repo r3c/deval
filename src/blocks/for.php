@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class ForBlock extends Block
+class ForBlock implements Block
 {
 	public function __construct ($source, $key, $value, $body, $fallback)
 	{

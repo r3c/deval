@@ -2,18 +2,12 @@
 
 namespace Deval;
 
-abstract class Expression
+interface Expression
 {
-	public function evaluate (&$result)
-	{
-		return false;
-	}
-
-	public abstract function __toString ();
-
-	public abstract function generate (&$volatiles);
-
-	public abstract function inject ($constants);
+	public function evaluate (&$result);
+	public function __toString ();
+	public function generate (&$volatiles);
+	public function inject ($constants);
 }
 
 ?>

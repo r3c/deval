@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class IfBlock extends Block
+class IfBlock implements Block
 {
 	public function __construct ($branches, $fallback)
 	{

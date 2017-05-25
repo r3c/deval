@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class InvokeExpression extends Expression
+class InvokeExpression implements Expression
 {
 	public function __construct ($caller, $arguments)
 	{
@@ -13,6 +13,11 @@ class InvokeExpression extends Expression
 	public function __toString ()
 	{
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
+	}
+
+	public function evaluate (&$result)
+	{
+		return false;
 	}
 
 	public function generate (&$volatiles)

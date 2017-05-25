@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class ArrayExpression extends Expression
+class ArrayExpression implements Expression
 {
 	public function __construct ($elements)
 	{
@@ -12,6 +12,11 @@ class ArrayExpression extends Expression
 	public function __toString ()
 	{
 		return '[' . implode (', ', array_map (function ($e) { return (string)$e; }, $this->elements)) . ']';
+	}
+
+	public function evaluate (&$result)
+	{
+		return false;
 	}
 
 	public function generate (&$volatiles)

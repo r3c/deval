@@ -64,7 +64,7 @@ CommandImport "import command"
 		$bodies = array_map (function ($b) { return $b[1]; }, $blocks);
 		$names = array_map (function ($b) { return $b[0]; }, $blocks);
 
-		return \Deval\Block::parse_file ($path, array_combine ($names, $bodies));
+		return \Deval\Compiler::parse_file ($path, array_combine ($names, $bodies));
 	}
 
 CommandImportBlock
@@ -112,7 +112,7 @@ CommandIfElse
 CommandInclude "include command"
 	= "include" _ path:Path
 	{
-		return \Deval\Block::parse_file ($path);
+		return \Deval\Compiler::parse_file ($path);
 	}
 
 CommandLabel

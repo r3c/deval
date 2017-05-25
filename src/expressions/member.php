@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class MemberExpression extends Expression
+class MemberExpression implements Expression
 {
 	public function __construct ($source, $indices)
 	{
@@ -13,6 +13,11 @@ class MemberExpression extends Expression
 	public function __toString ()
 	{
 		return $this->source . implode ('', array_map (function ($i) { return '[' . $i . ']'; }, $this->indices));
+	}
+
+	public function evaluate (&$result)
+	{
+		return false;
 	}
 
 	public function generate (&$volatiles)

@@ -2,7 +2,7 @@
 
 namespace Deval;
 
-class ConcatBlock extends Block
+class ConcatBlock implements Block
 {
 	public static function create ($blocks)
 	{
