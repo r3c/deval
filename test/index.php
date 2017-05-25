@@ -4,10 +4,9 @@ require '../src/deval.php';
 
 function assert_evaluate ($source, $variables, $expect)
 {
-	$compiler = new Deval\Compiler (Deval\Block::parse_code ($source));
-	$compiler->inject ($variables);
+	$renderer = new Deval\BasicRenderer ($source, $variables, 'collapse');
 
-	$result = Deval\Evaluator::code ($compiler->compile ('collapse'), array ());
+	$result = $renderer->render ();
 
 	assert ($result === $expect, 'execution failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 }
@@ -30,8 +29,8 @@ function assert_render ($directory, $path, $variables, $expect)
 					$statics[$key] = $value;
 			}
 
-			$renderer = new Deval\CacheRenderer ('template', $statics, 'collapse');
-			$result = $renderer->render ('template/' . $path, $dynamics, true);
+			$renderer = new Deval\CacheRenderer ('template', $statics);
+			$result = $renderer->render ('template/' . $path, $dynamics, 'collapse', true);
 
 			assert ($result === $expect, 'rendering failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}

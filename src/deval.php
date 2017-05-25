@@ -6,7 +6,7 @@ class CompileException extends \Exception
 {
 	public function __construct ($context, $message)
 	{
-		parent::__construct ('compile error in ' . $context . ' ' . $message);
+		parent::__construct ('compile error in ' . $context . ': ' . $message);
 	}
 }
 
@@ -18,130 +18,38 @@ class RuntimeException extends \Exception
 	}
 }
 
-abstract class Block
+class Loader
 {
-	private static $bases = array ();
-
-	public static function parse_code ($source, $blocks = array ())
-	{
-		return self::parse ('source code', $source, $blocks);
-	}
-
-	public static function parse_file ($path, $blocks = array ())
-	{
-		$base = count (self::$bases) > 0 ? self::$bases[count (self::$bases) - 1] : '.';
-		$path = strlen ($path) > 0 && $path[0] === DIRECTORY_SEPARATOR ? $path : $base . DIRECTORY_SEPARATOR . $path;
-
-		if (!file_exists ($path))
-			throw new CompileException ($path, 'source file doesn\'t exist');
-
-		array_push (self::$bases, dirname ($path));
-
-		try
-		{
-			$block = self::parse ($path, file_get_contents ($path), $blocks);
-		}
-		catch (\Exception $exception)
-		{
-			array_pop (self::$bases);
-
-			throw $exception;
-		}
-
-		array_pop (self::$bases);
-
-		return $block;
-	}
-
-	private static function parse ($context, $source, $blocks)
+	public static function load ()
 	{
 		static $setup;
 
-		if (!isset ($setup))
-		{
-			$path = dirname (__FILE__);
+		if (isset ($setup))
+			return;
 
-			require $path . '/blocks/concat.php';
-			require $path . '/blocks/echo.php';
-			require $path . '/blocks/for.php';
-			require $path . '/blocks/if.php';
-			require $path . '/blocks/label.php';
-			require $path . '/blocks/let.php';
-			require $path . '/blocks/plain.php';
-			require $path . '/blocks/void.php';
-			require $path . '/expression.php';
-			require $path . '/expressions/array.php';
-			require $path . '/expressions/binary.php';
-			require $path . '/expressions/constant.php';
-			require $path . '/expressions/invoke.php';
-			require $path . '/expressions/member.php';
-			require $path . '/expressions/symbol.php';
-			require $path . '/expressions/unary.php';
-			require $path . '/parser.php';
+		$path = dirname (__FILE__);
 
-			$setup = true;
-		}
+		require $path . '/block.php';
+		require $path . '/blocks/concat.php';
+		require $path . '/blocks/echo.php';
+		require $path . '/blocks/for.php';
+		require $path . '/blocks/if.php';
+		require $path . '/blocks/label.php';
+		require $path . '/blocks/let.php';
+		require $path . '/blocks/plain.php';
+		require $path . '/blocks/void.php';
+		require $path . '/compiler.php';
+		require $path . '/expression.php';
+		require $path . '/expressions/array.php';
+		require $path . '/expressions/binary.php';
+		require $path . '/expressions/constant.php';
+		require $path . '/expressions/invoke.php';
+		require $path . '/expressions/member.php';
+		require $path . '/expressions/symbol.php';
+		require $path . '/expressions/unary.php';
+		require $path . '/parser.php';
 
-		$parser = new \PhpPegJs\Parser ();
-
-		try
-		{
-			return $parser->parse ($source)->resolve ($blocks);
-		}
-		catch (\PhpPegJs\SyntaxError $exception)
-		{
-			throw new CompileException ($context, 'at line ' . $exception->grammarLine . ', character ' . $exception->grammarColumn . ': ' . $exception->getMessage ());
-		}
-	}
-
-	abstract function compile ($trim, &$variables);
-	abstract function inject ($variables);
-	abstract function resolve ($blocks);
-}
-
-class Compiler
-{
-	private $block;
-
-	public function __construct ($block)
-	{
-		$this->block = $block;
-	}
-
-	public function compile ($style = null, &$names = null)
-	{
-		static $trims;
-
-		if (!isset ($trims))
-		{
-			$trims = array
-			(
-				'collapse'	=> function ($s) { return preg_replace ('/\\s+/', ' ', $s); },
-				'html'		=> function ($s) { return preg_replace (array ('/(^|>)\\s+/m', '/\\s+(<|$)/m'), array ('$1 ', ' $1'), $s); }
-			);
-		}
-
-		if (is_string ($style) && isset ($trims[$style]))
-			$trim = $trims[$style];
-		else if (is_callable ($style))
-			$trim = $style;
-		else
-			$trim = function ($s) { return $s; };
-
-		$variables = array ();
-		$source = $this->block->compile ($trim, $variables);
-		$names = array_keys ($variables);
-
-		$output = new Output ();
-		$output->append_code (State::emit_create ($names));
-		$output->append ($source);
-
-		return $output->source ();
-	}
-
-	public function inject ($variables)
-	{
-		$this->block = $this->block->inject ($variables);
+		$setup = true;
 	}
 }
 
@@ -184,29 +92,49 @@ class Evaluator
 	}
 }
 
+class BasicRenderer
+{
+	public $source;
+
+	public function __construct ($source, $variables = array (), $style = null)
+	{
+		Loader::load ();
+
+		$compiler = new Compiler (Block::parse_code ($source));
+		$compiler->inject ($variables);
+
+		$this->source = $compiler->compile ($style);
+	}
+
+	public function render ($variables = array ())
+	{
+		return Evaluator::code ($this->source, $variables);
+	}
+}
+
 class CacheRenderer
 {
 	private $directory;
-	private $style;
 	private $variables;
 
-	public function __construct ($directory, $variables, $style = null)
+	public function __construct ($directory, $variables = array ())
 	{
 		$this->directory = $directory;
-		$this->style = $style;
 		$this->variables = $variables;
 	}
 
-	public function render ($path, $variables = array (), $invalidate = false)
+	public function render ($path, $variables = array (), $style = null, $invalidate = false)
 	{
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->variables)) . '.php';
 
 		if (!file_exists ($cache) || $invalidate)
 		{
+			Loader::load ();
+
 			$compiler = new Compiler (Block::parse_file ($path));
 			$compiler->inject ($this->variables);
 
-			file_put_contents ($cache, $compiler->compile ($this->style));
+			file_put_contents ($cache, $compiler->compile ($style));
 		}
 
 		return Evaluator::path ($cache, $variables);
