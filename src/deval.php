@@ -18,6 +18,45 @@ class RuntimeException extends \Exception
 	}
 }
 
+class Evaluator
+{
+	public static function code ($_deval_code, $_deval_input)
+	{
+		ob_start ();
+
+		try
+		{
+			eval ('?>' . $_deval_code);
+		}
+		catch (\Exception $exception) // Replace by "finally" once PHP < 5.5 compatibility can be dropped
+		{
+			ob_end_clean ();
+
+			throw $exception;
+		}
+
+		return ob_get_clean ();
+	}
+
+	public static function path ($_deval_path, $_deval_input)
+	{
+		ob_start ();
+
+		try
+		{
+			require $_deval_path;
+		}
+		catch (\Exception $exception) // Replace by "finally" once PHP < 5.5 compatibility can be dropped
+		{
+			ob_end_clean ();
+
+			throw $exception;
+		}
+
+		return ob_get_clean ();
+	}
+}
+
 class Loader
 {
 	public static function load ()
@@ -50,94 +89,6 @@ class Loader
 		require $path . '/parser.php';
 
 		$setup = true;
-	}
-}
-
-class Evaluator
-{
-	public static function code ($_deval_code, $_deval_input)
-	{
-		ob_start ();
-
-		try
-		{
-			eval ('?>' . $_deval_code);
-		}
-		catch (\Exception $exception)
-		{
-			ob_end_clean ();
-
-			throw $exception;
-		}
-
-		return ob_get_clean ();
-	}
-
-	public static function path ($_deval_path, $_deval_input)
-	{
-		ob_start ();
-
-		try
-		{
-			require $_deval_path;
-		}
-		catch (\Exception $exception)
-		{
-			ob_end_clean ();
-
-			throw $exception;
-		}
-
-		return ob_get_clean ();
-	}
-}
-
-class BasicRenderer
-{
-	public $source;
-
-	public function __construct ($source, $constants = array (), $style = null)
-	{
-		Loader::load ();
-
-		$compiler = new Compiler (Block::parse_code ($source));
-		$compiler->inject ($constants);
-
-		$this->source = $compiler->compile ($style);
-	}
-
-	public function render ($volatiles = array ())
-	{
-		return Evaluator::code ($this->source, $volatiles);
-	}
-}
-
-class CacheRenderer
-{
-	private $constants;
-	private $directory;
-
-	public function __construct ($directory, $constants = array ())
-	{
-		$this->constants = $constants;
-		$this->directory = $directory;
-	}
-
-	public function render ($path, $volatiles = array (), $style = null, $invalidate = false)
-	{
-		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->constants)) . '.php';
-
-		if (!file_exists ($cache) || $invalidate)
-		{
-			Loader::load ();
-
-			$compiler = new Compiler (Block::parse_file ($path));
-			$compiler->inject ($this->constants);
-
-			file_put_contents ($cache, $compiler->compile ($style));
-		}
-
-		return Evaluator::path ($cache, $volatiles);
 	}
 }
 
@@ -205,6 +156,86 @@ class Output
 		}
 
 		return $output;
+	}
+}
+
+abstract class Renderer
+{
+	abstract function render ($volatiles = array ());
+}
+
+class CachedRenderer extends Renderer
+{
+	private $constants;
+	private $directory;
+	private $invalidate;
+	private $path;
+	private $style;
+
+	public function __construct ($path, $directory, $constants = array (), $style = null, $invalidate = false)
+	{
+		$this->constants = $constants;
+		$this->directory = $directory;
+		$this->invalidate = $invalidate;
+		$this->path = $path;
+		$this->style = $style;
+	}
+
+	public function render ($volatiles = array ())
+	{
+		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($this->path), PATHINFO_FILENAME) . '_' . md5 ($this->path . ':' . serialize ($this->constants)) . '.php';
+
+		if (!file_exists ($cache) || $this->invalidate)
+		{
+			Loader::load ();
+
+			$compiler = new Compiler (Block::parse_file ($this->path));
+			$compiler->inject ($this->constants);
+
+			file_put_contents ($cache, $compiler->compile ($this->style));
+		}
+
+		return Evaluator::path ($cache, $volatiles);
+	}
+}
+
+class FileRenderer extends Renderer
+{
+	public $source;
+
+	public function __construct ($path, $constants = array (), $style = null)
+	{
+		Loader::load ();
+
+		$compiler = new Compiler (Block::parse_file ($path));
+		$compiler->inject ($constants);
+
+		$this->source = $compiler->compile ($style);
+	}
+
+	public function render ($volatiles = array ())
+	{
+		return Evaluator::code ($this->source, $volatiles);
+	}
+}
+
+class StringRenderer extends Renderer
+{
+	public $source;
+
+	public function __construct ($source, $constants = array (), $style = null)
+	{
+		Loader::load ();
+
+		$compiler = new Compiler (Block::parse_code ($source));
+		$compiler->inject ($constants);
+
+		$this->source = $compiler->compile ($style);
+	}
+
+	public function render ($volatiles = array ())
+	{
+		return Evaluator::code ($this->source, $volatiles);
 	}
 }
 

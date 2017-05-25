@@ -123,9 +123,9 @@ if ($template !== '')
 {
 	try
 	{
-		$renderer = new Deval\BasicRenderer ($template);
+		$renderer = new Deval\StringRenderer ($template);
 		$output1 = $renderer->source;
-		$renderer = new Deval\BasicRenderer ($template, $constants);
+		$renderer = new Deval\StringRenderer ($template, $constants);
 		$output2 = $renderer->source;
 		$output3 = $renderer->render ($volatiles);
 

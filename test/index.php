@@ -4,7 +4,7 @@ require '../src/deval.php';
 
 function assert_evaluate ($source, $constants, $expect)
 {
-	$renderer = new Deval\BasicRenderer ($source, $constants, 'collapse');
+	$renderer = new Deval\StringRenderer ($source, $constants, 'collapse');
 	$result = $renderer->render ();
 
 	assert ($result === $expect, 'execution failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
@@ -27,8 +27,8 @@ function assert_render ($directory, $path, $variables, $expect)
 					$volatiles[$key] = $variables[$key];
 			}
 
-			$renderer = new Deval\CacheRenderer ('template', $constants);
-			$result = $renderer->render ('template/' . $path, $volatiles, 'collapse', true);
+			$renderer = new Deval\CachedRenderer ('template/' . $path, 'template', $constants, 'collapse', true);
+			$result = $renderer->render ($volatiles);
 
 			assert ($result === $expect, 'rendering failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}
