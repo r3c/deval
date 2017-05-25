@@ -9,9 +9,9 @@ class PlainBlock extends Block
 		$this->text = $text;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
-		return (new Output ())->append_text ($this->text);
+		return (new Output ())->append_text ($trim ($this->text));
 	}
 
 	public function inject ($variables)

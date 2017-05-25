@@ -4,7 +4,7 @@ namespace Deval;
 
 class VoidBlock extends Block
 {
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		return new Output ();
 	}

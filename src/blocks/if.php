@@ -10,7 +10,7 @@ class IfBlock extends Block
 		$this->fallback = $fallback;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		$output = new Output ();
 		$first = true;
@@ -21,7 +21,7 @@ class IfBlock extends Block
 
 			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($variables) . ')');
 			$output->append_code ('{');
-			$output->append ($body->compile ($variables));
+			$output->append ($body->compile ($trim, $variables));
 			$output->append_code ('}');
 
 			$first = false;
@@ -31,7 +31,7 @@ class IfBlock extends Block
 		{
 			$output->append_code ('else');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($variables));
+			$output->append ($this->fallback->compile ($trim, $variables));
 			$output->append_code ('}');
 		}
 

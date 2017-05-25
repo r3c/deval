@@ -24,15 +24,15 @@ class ConcatBlock extends Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		if (count ($this->blocks) < 1)
 			return new Output ();
 
-		$output = $this->blocks[0]->compile ($variables);
+		$output = $this->blocks[0]->compile ($trim, $variables);
 
 		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$output->append ($this->blocks[$i]->compile ($variables));
+			$output->append ($this->blocks[$i]->compile ($trim, $variables));
 
 		return $output;
 	}

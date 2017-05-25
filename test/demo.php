@@ -25,14 +25,14 @@ if ($template !== '')
 		$variables = array ();
 
 		echo "original:\n";
-		echo '  - source = ' . htmlspecialchars ($compiler->compile ($variables)) . "\n";
+		echo '  - source = ' . htmlspecialchars ($compiler->compile (null, $variables)) . "\n";
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
 
 		$compiler->inject ($injects);
 		$variables = array ();
 
 		echo "injected:\n";
-		echo '  - source = ' . htmlspecialchars ($compiler->compile ($variables)) . "\n";
+		echo '  - source = ' . htmlspecialchars ($compiler->compile (null, $variables)) . "\n";
 		echo '  - variables = ' . htmlspecialchars (implode (', ', $variables)) . "\n";
 
 		echo "executed:\n";

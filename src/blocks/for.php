@@ -18,7 +18,7 @@ class ForBlock extends Block
 		$this->value = $value;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		$output = new Output ();
 
@@ -37,7 +37,7 @@ class ForBlock extends Block
 		$variables_inner = array ();
 
 		$output->append_code ('{');
-		$output->append ($this->body->compile ($variables_inner));
+		$output->append ($this->body->compile ($trim, $variables_inner));
 		$output->append_code (State::emit_loop_step() . ';');
 		$output->append_code ('}');
 
@@ -54,7 +54,7 @@ class ForBlock extends Block
 		{
 			$output->append_code ('if(' . State::emit_loop_stop() . ')');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($variables));
+			$output->append ($this->fallback->compile ($trim, $variables));
 			$output->append_code ('}');
 		}
 		else

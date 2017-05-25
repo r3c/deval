@@ -9,7 +9,7 @@ class EchoBlock extends Block
 		$this->value = $value;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		return (new Output ())->append_code ('echo ' . $this->value->generate ($variables) . ';');
 	}

@@ -94,7 +94,7 @@ abstract class Block
 		}
 	}
 
-	abstract function compile (&$variables);
+	abstract function compile ($trim, &$variables);
 	abstract function inject ($variables);
 	abstract function resolve ($blocks);
 }
@@ -108,10 +108,28 @@ class Compiler
 		$this->block = $block;
 	}
 
-	public function compile (&$names = null)
+	public function compile ($style = null, &$names = null)
 	{
+		static $trims;
+
+		if (!isset ($trims))
+		{
+			$trims = array
+			(
+				'collapse'	=> function ($s) { return preg_replace ('/\\s+/', ' ', $s); },
+				'html'		=> function ($s) { return preg_replace (array ('/(^|>)\\s+/m', '/\\s+(<|$)/m'), array ('$1 ', ' $1'), $s); }
+			);
+		}
+
+		if (is_string ($style) && isset ($trims[$style]))
+			$trim = $trims[$style];
+		else if (is_callable ($style))
+			$trim = $style;
+		else
+			$trim = function ($s) { return $s; };
+
 		$variables = array ();
-		$source = $this->block->compile ($variables);
+		$source = $this->block->compile ($trim, $variables);
 		$names = array_keys ($variables);
 
 		$output = new Output ();
@@ -168,25 +186,30 @@ class Evaluator
 
 class CacheRenderer
 {
-	public function __construct ($directory, $variables)
+	private $directory;
+	private $style;
+	private $variables;
+
+	public function __construct ($directory, $variables, $style = null)
 	{
 		$this->directory = $directory;
+		$this->style = $style;
 		$this->variables = $variables;
 	}
 
-	public function render ($path, $variables = array ())
+	public function render ($path, $variables = array (), $invalidate = false)
 	{
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($path), PATHINFO_FILENAME) . '_' . md5 ($path . ':' . serialize ($this->variables)) . '.php';
 
-		if (!file_exists ($cache))
+		if (!file_exists ($cache) || $invalidate)
 		{
 			$compiler = new Compiler (Block::parse_file ($path));
 			$compiler->inject ($this->variables);
 
-			file_put_contents ($cache, $compiler->compile ());
+			file_put_contents ($cache, $compiler->compile ($this->style));
 		}
 
-		Evaluator::path ($cache, $variables);
+		return Evaluator::path ($cache, $variables);
 	}
 }
 

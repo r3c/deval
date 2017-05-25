@@ -13,7 +13,7 @@ class LetBlock extends Block
 		$this->body = $body;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		$output = new Output ();
 		$output->append_code ('{', true);
@@ -31,7 +31,7 @@ class LetBlock extends Block
 
 		$variables_inner = array ();
 
-		$output->append ($this->body->compile ($variables_inner));
+		$output->append ($this->body->compile ($trim, $variables_inner));
 
 		foreach (array_keys (array_diff_key ($variables_inner, $variables_exclude)) as $name)
 			$variables[$name] = true;
@@ -66,7 +66,7 @@ class LetBlock extends Block
 		}
 
 		$body = $this->body->inject ($variables);
-		$body->compile ($requires);
+		$body->compile (function ($s) { return ''; }, $requires);
 
 		if (count ($assignments) === 0 || count ($requires) === 0)
 			return $body;

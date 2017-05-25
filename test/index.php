@@ -7,16 +7,13 @@ function assert_evaluate ($source, $variables, $expect)
 	$compiler = new Deval\Compiler (Deval\Block::parse_code ($source));
 	$compiler->inject ($variables);
 
-	$result = Deval\Evaluator::code ($compiler->compile (), array ());
+	$result = Deval\Evaluator::code ($compiler->compile ('collapse'), array ());
 
 	assert ($result === $expect, 'execution failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 }
 
-function assert_render ($directory, $path, $variables)
+function assert_render ($directory, $path, $variables, $expect)
 {
-	$renderer = new Deval\CacheRenderer ($directory, $variables);
-	$expect = $renderer->render ($directory . DIRECTORY_SEPARATOR . $path);
-
 	for ($i = count ($variables); $i-- > 0; )
 	{
 		foreach (combinations ($i, count ($variables)) as $combination)
@@ -33,8 +30,8 @@ function assert_render ($directory, $path, $variables)
 					$statics[$key] = $value;
 			}
 
-			$renderer = new Deval\CacheRenderer ('template', $statics);
-			$result = $renderer->render ('template/' . $path, $dynamics);
+			$renderer = new Deval\CacheRenderer ('template', $statics, 'collapse');
+			$result = $renderer->render ('template/' . $path, $dynamics, true);
 
 			assert ($result === $expect, 'rendering failed: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}
@@ -128,6 +125,6 @@ assert_evaluate ('{% let a = x %}{{ a }}{% end %}', array ('x' => 'test'), 'test
 assert_evaluate ('{% let a = x, b = a %}{{ b }}{% end %}', array ('x' => 'test'), 'test');
 
 // Renderer
-assert_render ('template', 'simple.deval', array ('x' => 1, 'y' => 2, 'z' => 3));
+assert_render ('template', 'simple.deval', array ('x' => 1, 'y' => 2, 'z' => 3), '1 2 3');
 
 ?>

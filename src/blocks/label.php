@@ -9,7 +9,7 @@ class LabelBlock extends Block
 		$this->name = $name;
 	}
 
-	public function compile (&$variables)
+	public function compile ($trim, &$variables)
 	{
 		throw new \Exception ('cannot compile label block');
 	}
