@@ -296,7 +296,7 @@ class State
 	public function __construct ($names)
 	{
 		if (count ($names) > 0)
-			throw new RuntimeException ('undefined symbols: ' . implode (', ', $names));
+			throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $names));
 	}
 
 	public function loop_start ()
