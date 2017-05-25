@@ -221,10 +221,10 @@ class State
 			throw new \Exception ('invalid symbol name');
 	}
 
-	public static function emit_create ($keys)
+	public static function emit_create ($names)
 	{
 		return
-			'$' . self::$state_name . '=new \\' . get_class () . '(array_diff(' . self::export ($keys) . ',array_keys($' . self::$input_name . ')));' .
+			'$' . self::$state_name . '=new \\' . get_class () . '(' . self::export ($names) . ',$' . self::$input_name . ');' .
 			'extract($' . self::$input_name . ');';
 	}
 
@@ -271,7 +271,7 @@ class State
 		return var_export ($input, true);
 	}
 
-	public static function member (&$source, $indices)
+	public static function member ($source, $indices)
 	{
 		foreach ($indices as $index)
 		{
@@ -293,10 +293,12 @@ class State
 		return null;
 	}
 
-	public function __construct ($names)
+	public function __construct ($required, &$provided)
 	{
-		if (count ($names) > 0)
-			throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $names));
+		$undefined = array_diff ($required, array_keys ($provided));
+
+		if (count ($undefined) > 0)
+			throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $undefined));
 	}
 
 	public function loop_start ()

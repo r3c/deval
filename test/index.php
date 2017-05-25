@@ -122,6 +122,7 @@ assert_evaluate ('{% let a = x %}{{ a }}{% end %}', array ('x' => 'test'), 'test
 assert_evaluate ('{% let a = x, b = a %}{{ b }}{% end %}', array ('x' => 'test'), 'test');
 
 // Renderer
-assert_render ('template', 'simple.deval', array ('x' => 1, 'y' => 2, 'z' => 3), '1 2 3');
+assert_render ('template', 'member.deval', array ('x' => 0), '1337');
+assert_render ('template', 'symbol.deval', array ('x' => 1, 'y' => 2, 'z' => 3), '1 2 3');
 
 ?>
