@@ -18,6 +18,16 @@ class RuntimeException extends \Exception
 	}
 }
 
+class Builtin
+{
+	public static function internal ()
+	{
+		$functions = get_defined_functions ();
+
+		return array_combine ($functions['internal'], $functions['internal']);
+	}
+}
+
 class Evaluator
 {
 	public static function code ($_deval_code, $_deval_input)

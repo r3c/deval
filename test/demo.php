@@ -52,14 +52,17 @@
 				padding:	0;
 			}
 
-			input,
-			textarea {
-				box-sizing:	border-box;
-				width:		100%;
+			form .field {
 				margin:		0 0 8px 0;
 			}
 
-			input[type="submit"] {
+			form input,
+			form textarea {
+				box-sizing:	border-box;
+				width:		100%;
+			}
+
+			form input[type="submit"] {
 				width:			100px;
 				padding:		4px 8px;
 				margin:			4px 4px 4px 0;
@@ -72,8 +75,9 @@
 				color:			#404040;
 			}
 
-			input[type="text"],
-			textarea {
+			form input[type="text"],
+			form select,
+			form textarea {
 				padding:		2px 4px;
 				border-color:	#8CA0AE #C0C0C0 #C0C0C0 #8CA0AE;
 				border-radius:	3px;
@@ -98,20 +102,34 @@
 	<body>
 <?php
 
+$builtin = isset ($_GET['builtin']) ? (string)$_GET['builtin'] : '';
 $constants = isset ($_GET['constants']) ? (array)json_decode ($_GET['constants'], true) : array ('greeting' => 'Hello');
-$template = isset ($_GET['template']) ? $_GET['template'] : '{{ greeting }}, {{ subject }}!';
+$template = isset ($_GET['template']) ? (string)$_GET['template'] : '{{ greeting }}, {{ subject }}!';
 $volatiles = isset ($_GET['volatiles']) ? (array)json_decode ($_GET['volatiles'], true) : array ('subject' => 'World');
 
 ?>
 		<div class="window">
 			<h1>Input template</h1>
 			<form class="body" method="GET">
-				<label for="template">Deval template source code:</label>
-				<textarea name="template" rows="8"><?php echo htmlspecialchars ($template); ?></textarea>
-				<label for="constants">Constant key/value pairs (as a JSON object):</label>
-				<input type="text" name="constants" value="<?php echo htmlspecialchars (json_encode ((object)$constants)); ?>" />
-				<label for="volatiles">Volatile key/value pairs (as a JSON object):</label>
-				<input type="text" name="volatiles" value="<?php echo htmlspecialchars (json_encode ((object)$volatiles)); ?>" />
+				<div class="field">
+					<label for="template">Deval template source code:</label>
+					<textarea name="template" rows="8"><?php echo htmlspecialchars ($template); ?></textarea>
+				</div>
+				<div class="field">
+					<label for="constants">Constant key/value pairs (as a JSON object):</label>
+					<input type="text" name="constants" value="<?php echo htmlspecialchars (json_encode ((object)$constants)); ?>" />
+				</div>
+				<div class="field">
+					<label for="volatiles">Volatile key/value pairs (as a JSON object):</label>
+					<input type="text" name="volatiles" value="<?php echo htmlspecialchars (json_encode ((object)$volatiles)); ?>" />
+				</div>
+				<div class="field">
+					<label for="builtin">Inject additional builtin functions:</label>
+					<select name="builtin">
+						<option value="">None</option>
+						<option value="internal"<?php if ($builtin === 'internal') echo ' selected'; ?>>Internal PHP functions</option>
+					</select>
+				</div>
 				<input type="submit" value="OK" />
 			</form>
 		</div>
@@ -121,11 +139,24 @@ require '../src/deval.php';
 
 if ($template !== '')
 {
+	switch ($builtin)
+	{
+		case 'internal':
+			$functions = Deval\Builtin::internal ();
+
+			break;
+
+		default:
+			$functions = array ();
+
+			break;
+	}
+
 	try
 	{
 		$renderer = new Deval\StringRenderer ($template);
 		$output1 = $renderer->source;
-		$renderer = new Deval\StringRenderer ($template, $constants);
+		$renderer = new Deval\StringRenderer ($template, $functions + $constants);
 		$output2 = $renderer->source;
 		$output3 = $renderer->render ($volatiles);
 
