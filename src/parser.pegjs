@@ -187,15 +187,24 @@ ExpressionUnary
 	/ ExpressionInvoke
 
 ExpressionInvoke
-	= caller:ExpressionMember _ "(" _ ")"
+	= caller:ExpressionMember _ arguments_list:ExpressionInvokeArguments+
 	{
-		return new \Deval\InvokeExpression ($caller, array ());
-	}
-	/ caller:ExpressionMember _ "(" head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
-	{
-		return new \Deval\InvokeExpression ($caller, array_merge (array ($head), $tail));
+		foreach ($arguments_list as $arguments)
+			$caller = new \Deval\InvokeExpression ($caller, $arguments);
+
+		return $caller;
 	}
 	/ ExpressionMember
+
+ExpressionInvokeArguments
+	= "(" _ ")"
+	{
+		return array ();
+	}
+	/ "(" head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
+	{
+		return array_merge (array ($head), $tail);
+	}
 
 ExpressionMember
 	= source:ExpressionPrimary _ indices:ExpressionMemberIndex+

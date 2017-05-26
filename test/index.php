@@ -53,11 +53,6 @@ function combinations ($k, $n, $candidates = array ())
 		return array_merge (combinations ($k - 1, $n - 1, array_merge ($candidates, array (true))), combinations ($k, $n - 1, array_merge ($candidates, array (false))));
 }
 
-function one ()
-{
-	return 1;
-}
-
 // Plain text
 assert_evaluate ('lol', array (), 'lol');
 assert_evaluate ('l{o}l', array (), 'l{o}l');
@@ -78,9 +73,10 @@ assert_evaluate ('{{ 0 || 0 }}', array (), '');
 assert_evaluate ('{{ 1 || 0 }}', array (), '1');
 
 // Expressions (invoke)
-assert_evaluate ('{{ one() }}', array ('one' => 'one'), '1');
+assert_evaluate ('{{ one() }}', array ('one' => function () { return 1; }), '1');
 assert_evaluate ('{{ strlen("Hello, World!") }}', array ('strlen' => 'strlen'), '13');
 assert_evaluate ('{{ implode(":", [1, 2, 3]) }}', array ('implode' => 'implode'), '1:2:3');
+assert_evaluate ('{{ two()() }}', array ('two' => function () { return function () { return 2; }; }), '2');
 
 // Expressions (member)
 assert_evaluate ('{{ [1][0] }}', array (), '1');
