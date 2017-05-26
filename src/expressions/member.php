@@ -4,15 +4,15 @@ namespace Deval;
 
 class MemberExpression implements Expression
 {
-	public function __construct ($source, $indices)
+	public function __construct ($source, $index)
 	{
-		$this->indices = $indices;
+		$this->index = $index;
 		$this->source = $source;
 	}
 
 	public function __toString ()
 	{
-		return $this->source . implode ('', array_map (function ($i) { return '[' . $i . ']'; }, $this->indices));
+		return $this->source . '[' . $this->index . ']';
 	}
 
 	public function evaluate (&$result)
@@ -22,39 +22,20 @@ class MemberExpression implements Expression
 
 	public function generate (&$volatiles)
 	{
-		$indices = array ();
-
-		foreach ($this->indices as $index)
-			$indices[] = $index->generate ($volatiles);
-
-		return State::emit_member (array ($this->source->generate ($volatiles), 'array(' . implode (',', $indices) . ')'));
+		return State::emit_member ($this->source->generate ($volatiles), $this->index->generate ($volatiles));
 	}
 
 	public function inject ($constants)
 	{
-		$indices = array ();
-		$ready = true;
+		$index = $this->index->inject ($constants);
 		$source = $this->source->inject ($constants);
-		$values = array();
 
-		foreach ($this->indices as $index)
-		{
-			$index = $index->inject ($constants);
+		// Resolve to constant value if both source and index were evaluated
+		if ($index->evaluate ($index_result) && $source->evaluate ($source_result))
+			return new ConstantExpression (State::member ($source_result, $index_result));
 
-			if ($index->evaluate ($result))
-				$values[] = $result;
-			else
-				$ready = false;
-
-			$indices[] = $index;
-		}
-
-		// Resolve indices and pass final value if source and indices were evaluated
-		if ($ready && $source->evaluate ($result))
-			return new ConstantExpression (State::member ($result, $values));
-
-		// Otherwise return injected source and indices
-		return new self ($source, $indices);
+		// Otherwise return injected source and index
+		return new self ($source, $index);
 	}
 }
 

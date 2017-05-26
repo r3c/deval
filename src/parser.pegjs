@@ -189,10 +189,12 @@ ExpressionUnary
 ExpressionInvoke
 	= caller:ExpressionMember _ arguments_list:ExpressionInvokeArguments+
 	{
-		foreach ($arguments_list as $arguments)
-			$caller = new \Deval\InvokeExpression ($caller, $arguments);
+		$expression = $caller;
 
-		return $caller;
+		foreach ($arguments_list as $arguments)
+			$expression = new \Deval\InvokeExpression ($expression, $arguments);
+
+		return $expression;
 	}
 	/ ExpressionMember
 
@@ -209,7 +211,12 @@ ExpressionInvokeArguments
 ExpressionMember
 	= source:ExpressionPrimary _ indices:ExpressionMemberIndex+
 	{
-		return new \Deval\MemberExpression ($source, $indices);
+		$expression = $source;
+
+		foreach ($indices as $index)
+			$expression = new \Deval\MemberExpression ($expression, $index);
+
+		return $expression;
 	}
 	/ ExpressionPrimary
 

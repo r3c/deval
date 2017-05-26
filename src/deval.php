@@ -303,9 +303,9 @@ class State
 		return '$' . self::$state_name . '->loop_stop()';
 	}
 
-	public static function emit_member ($arguments)
+	public static function emit_member ($source, $index)
 	{
-		return '\\' . get_class () . '::member(' . implode (',', $arguments) . ')';
+		return '\\' . get_class () . '::member(' . $source . ',' . $index . ')';
 	}
 
 	public static function export ($input)
@@ -331,24 +331,12 @@ class State
 		return var_export ($input, true);
 	}
 
-	public static function member ($source, $indices)
+	public static function member ($source, $index)
 	{
-		foreach ($indices as $index)
-		{
-			$array = (array)$source;
+		$array = (array)$source;
 
-			if (isset ($array[$index]))
-				$source =& $array[$index];
-			else
-			{
-				unset ($source);
-
-				break;
-			}
-		}
-
-		if (isset ($source))
-			return $source;
+		if (isset ($array[$index]))
+			return $array[$index];
 
 		return null;
 	}
