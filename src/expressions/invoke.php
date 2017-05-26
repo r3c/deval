@@ -27,7 +27,16 @@ class InvokeExpression implements Expression
 		foreach ($this->arguments as $argument)
 			$arguments[] = $argument->generate ($volatiles);
 
-		return $this->caller->generate ($volatiles) . '(' . implode (',', $arguments) . ')';
+		/*
+		** PHP hack: function name must be written as a literal symbol when
+		** constant and only in that case e.g. "func()" vs "$f = 'func'; $f()".
+		*/
+		if ($this->caller->evaluate ($result))
+			self::check_callable ($this->caller, $result);
+		else
+			$result = $this->caller->generate ($volatiles);
+
+		return $result . '(' . implode (',', $arguments) . ')';
 	}
 
 	public function inject ($constants)
@@ -52,14 +61,19 @@ class InvokeExpression implements Expression
 		// Invoke and pass return value if caller and arguments were evaluated
 		if ($ready && $caller->evaluate ($result))
 		{
-			if (!is_callable ($result))
-				throw new RuntimeException ('function caller is not a callable variable: ' . $caller);
+			self::check_callable ($caller, $result);
 
 			return new ConstantExpression (call_user_func_array ($result, $values));
 		}
 
 		// Otherwise return injected caller and arguments
 		return new self ($caller, $arguments);
+	}
+
+	private static function check_callable ($caller, $value)
+	{
+		if (!is_callable ($value))
+			throw new RuntimeException ('function caller is not a callable variable: ' . $caller);
 	}
 }
 
