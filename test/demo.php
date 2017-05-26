@@ -139,37 +139,34 @@ require '../src/deval.php';
 
 if ($template !== '')
 {
-	switch ($builtin)
-	{
-		case 'internal':
-			$functions = Deval\Builtin::internal ();
-
-			break;
-
-		default:
-			$functions = array ();
-
-			break;
-	}
-
 	try
 	{
 		$renderer = new Deval\StringRenderer ($template);
-		$output1 = $renderer->source;
-		$renderer = new Deval\StringRenderer ($template, $functions + $constants);
-		$output2 = $renderer->source;
-		$output3 = $renderer->render ($volatiles);
+		$source1 = $renderer->source ();
+
+		switch ($builtin)
+		{
+			case 'internal':
+				$renderer->inject (Deval\Builtin::internal ());
+
+				break;
+		}
+
+		$renderer->inject ($constants);
+		$source2 = $renderer->source ();
+
+		$output = $renderer->render ($volatiles);
 
 ?>
 		<div class="window">
 			<h1>Output code</h1>
 			<div class="body">
 				<p>Generated code before injection:</p>
-				<pre><?php echo htmlspecialchars ($output1); ?></pre>
+				<pre><?php echo htmlspecialchars ($source1); ?></pre>
 				<p>Generated code after injecting constants:</p>
-				<pre><?php echo htmlspecialchars ($output2); ?></pre>
+				<pre><?php echo htmlspecialchars ($source2); ?></pre>
 				<p>Execution result with injected volatiles:</p>
-				<pre><?php echo htmlspecialchars ($output3); ?></pre>
+				<pre><?php echo htmlspecialchars ($output); ?></pre>
 			</div>
 		</div>
 <?php

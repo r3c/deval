@@ -171,7 +171,8 @@ class Output
 
 interface Renderer
 {
-	public function render ($volatiles = array ());
+	public function inject ($constants);
+	public function render ($volatiles = array (), $style = null);
 }
 
 class CachedRenderer implements Renderer
@@ -180,18 +181,21 @@ class CachedRenderer implements Renderer
 	private $directory;
 	private $invalidate;
 	private $path;
-	private $style;
 
-	public function __construct ($path, $directory, $constants = array (), $style = null, $invalidate = false)
+	public function __construct ($path, $directory, $invalidate = false)
 	{
-		$this->constants = $constants;
+		$this->constants = null;
 		$this->directory = $directory;
 		$this->invalidate = $invalidate;
 		$this->path = $path;
-		$this->style = $style;
 	}
 
-	public function render ($volatiles = array ())
+	public function inject ($constants)
+	{
+		$this->constants = $constants;
+	}
+
+	public function render ($volatiles = array (), $style = null)
 	{
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($this->path), PATHINFO_FILENAME) . '_' . md5 ($this->path . ':' . serialize ($this->constants)) . '.php';
 
@@ -200,52 +204,59 @@ class CachedRenderer implements Renderer
 			Loader::load ();
 
 			$compiler = new Compiler (Compiler::parse_file ($this->path));
-			$compiler->inject ($this->constants);
 
-			file_put_contents ($cache, $compiler->compile ($this->style));
+			if ($this->constants !== null)
+				$compiler->inject ($this->constants);
+
+			file_put_contents ($cache, $compiler->compile ($style));
 		}
 
 		return Evaluator::path ($cache, $volatiles);
 	}
 }
 
-class FileRenderer implements Renderer
+class DirectRenderer implements Renderer
 {
-	public $source;
+	private $compiler;
 
-	public function __construct ($path, $constants = array (), $style = null)
+	protected function __construct ($compiler)
 	{
-		Loader::load ();
-
-		$compiler = new Compiler (Compiler::parse_file ($path));
-		$compiler->inject ($constants);
-
-		$this->source = $compiler->compile ($style);
+		$this->compiler = $compiler;
 	}
 
-	public function render ($volatiles = array ())
+	public function inject ($constants)
 	{
-		return Evaluator::code ($this->source, $volatiles);
+		$this->compiler->inject ($constants);
+	}
+
+	public function render ($volatiles = array (), $style = null)
+	{
+		return Evaluator::code ($this->compiler->compile ($style), $volatiles);
+	}
+
+	public function source ($style = null)
+	{
+		return $this->compiler->compile ($style);
 	}
 }
 
-class StringRenderer implements Renderer
+class FileRenderer extends DirectRenderer
 {
-	public $source;
-
-	public function __construct ($source, $constants = array (), $style = null)
+	public function __construct ($path)
 	{
 		Loader::load ();
 
-		$compiler = new Compiler (Compiler::parse_code ($source));
-		$compiler->inject ($constants);
-
-		$this->source = $compiler->compile ($style);
+		parent::__construct (new Compiler (Compiler::parse_file ($path)));
 	}
+}
 
-	public function render ($volatiles = array ())
+class StringRenderer extends DirectRenderer
+{
+	public function __construct ($source)
 	{
-		return Evaluator::code ($this->source, $volatiles);
+		Loader::load ();
+
+		parent::__construct (new Compiler (Compiler::parse_code ($source)));
 	}
 }
 
