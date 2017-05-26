@@ -20,7 +20,15 @@ class RuntimeException extends \Exception
 
 class Builtin
 {
-	public static function internal ()
+	public static function deval ()
+	{
+		return array
+		(
+			'php'	=> function ($name) { return $name; }
+		);
+	}
+
+	public static function php ()
 	{
 		$functions = get_defined_functions ();
 

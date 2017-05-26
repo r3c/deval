@@ -127,7 +127,8 @@ $volatiles = isset ($_GET['volatiles']) ? (array)json_decode ($_GET['volatiles']
 					<label for="builtin">Inject additional builtin functions:</label>
 					<select name="builtin">
 						<option value="">None</option>
-						<option value="internal"<?php if ($builtin === 'internal') echo ' selected'; ?>>Internal PHP functions</option>
+						<option value="deval"<?php if ($builtin === 'deval') echo ' selected'; ?>>Deval functions</option>
+						<option value="php"<?php if ($builtin === 'php') echo ' selected'; ?>>PHP functions</option>
 					</select>
 				</div>
 				<input type="submit" value="OK" />
@@ -146,8 +147,13 @@ if ($template !== '')
 
 		switch ($builtin)
 		{
-			case 'internal':
-				$renderer->inject (Deval\Builtin::internal ());
+			case 'deval':
+				$renderer->inject (Deval\Builtin::deval ());
+
+				break;
+
+			case 'php':
+				$renderer->inject (Deval\Builtin::php ());
 
 				break;
 		}
