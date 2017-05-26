@@ -84,19 +84,19 @@ function render_code ($source, $pairs, $expect)
 /*
 ** Run tests on file-based renderers using given template path and set of
 ** (constants, volatiles) variable pairs.
-** $directory:	caching directory
 ** $path:		template file path
+** $directory:	caching directory
 ** $pairs:		(constants, volatiles) variable pairs
 ** $expect:		expected rendered string
 */
-function render_file ($directory, $path, $pairs, $expect)
+function render_file ($path, $directory, $pairs, $expect)
 {
 	render (function () use ($directory, $path)
 	{
 		return array
 		(
-			new Deval\CachedRenderer ($directory . DIRECTORY_SEPARATOR . $path, $directory, 'collapse', true),
-			new Deval\FileRenderer ($directory . DIRECTORY_SEPARATOR . $path, 'collapse')
+			new Deval\CachedRenderer ($path, $directory, 'collapse', true),
+			new Deval\FileRenderer ($path, 'collapse')
 		);
 	}, $pairs, $expect);
 }

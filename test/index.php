@@ -77,7 +77,7 @@ render_code ('{% let a = x, b = a %}{{ b }}{% end %}', make_combinations (array 
 render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations (array ('b' => '1', 'x' => '2')), '12');
 
 // Renderer
-render_file ('template', 'member.deval', make_combinations (array ('x' => 0)), '1337');
-render_file ('template', 'symbol.deval', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), '1 2 3');
+render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');
+render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), '1 2 3');
 
 ?>
