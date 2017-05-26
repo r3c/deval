@@ -76,7 +76,7 @@ function render_code ($source, $pairs, $expect)
 	{
 		return array
 		(
-			new Deval\StringRenderer ($source)
+			new Deval\StringRenderer ($source, 'collapse')
 		);
 	}, $pairs, $expect);
 }
@@ -95,8 +95,8 @@ function render_file ($directory, $path, $pairs, $expect)
 	{
 		return array
 		(
-			new Deval\CachedRenderer ($directory . DIRECTORY_SEPARATOR . $path, $directory, true),
-			new Deval\FileRenderer ($directory . DIRECTORY_SEPARATOR . $path)
+			new Deval\CachedRenderer ($directory . DIRECTORY_SEPARATOR . $path, $directory, 'collapse', true),
+			new Deval\FileRenderer ($directory . DIRECTORY_SEPARATOR . $path, 'collapse')
 		);
 	}, $pairs, $expect);
 }
@@ -121,11 +121,11 @@ function render ($constructor, $pairs, $expect)
 			$names_expect = array_keys ($volatiles);
 			$names_result = array ();
 
-			$renderer->source (null, $names_result);
+			$renderer->source ($names_result);
 
 			assert (count (array_diff ($names_expect, $names_result)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
 
-			$result = $renderer->render ($volatiles, 'collapse');
+			$result = $renderer->render ($volatiles);
 
 			assert ($result === $expect, 'invalid rendered output: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}
