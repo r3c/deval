@@ -181,6 +181,7 @@ interface Renderer
 {
 	public function inject ($constants);
 	public function render ($volatiles = array (), $style = null);
+	public function source ($style = null, &$names = null);
 }
 
 class CachedRenderer implements Renderer
@@ -208,18 +209,21 @@ class CachedRenderer implements Renderer
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($this->path), PATHINFO_FILENAME) . '_' . md5 ($this->path . ':' . serialize ($this->constants)) . '.php';
 
 		if (!file_exists ($cache) || $this->invalidate)
-		{
-			Loader::load ();
-
-			$compiler = new Compiler (Compiler::parse_file ($this->path));
-
-			if ($this->constants !== null)
-				$compiler->inject ($this->constants);
-
-			file_put_contents ($cache, $compiler->compile ($style));
-		}
+			file_put_contents ($cache, $this->source ($style, $names));
 
 		return Evaluator::path ($cache, $volatiles);
+	}
+
+	public function source ($style = null, &$names = null)
+	{
+		Loader::load ();
+
+		$compiler = new Compiler (Compiler::parse_file ($this->path));
+
+		if ($this->constants !== null)
+			$compiler->inject ($this->constants);
+
+		return $compiler->compile ($style, $names);
 	}
 }
 
@@ -239,12 +243,12 @@ class DirectRenderer implements Renderer
 
 	public function render ($volatiles = array (), $style = null)
 	{
-		return Evaluator::code ($this->compiler->compile ($style), $volatiles);
+		return Evaluator::code ($this->source ($style, $names), $volatiles);
 	}
 
-	public function source ($style = null)
+	public function source ($style = null, &$names = null)
 	{
-		return $this->compiler->compile ($style);
+		return $this->compiler->compile ($style, $names);
 	}
 }
 

@@ -18,25 +18,32 @@ class LetBlock implements Block
 		$output = new Output ();
 		$output->append_code ('{', true);
 
-		$volatiles_exclude = array ();
+		$names = array ();
 
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
-			$output->append_code ('$' . $name . '=' . $value->generate ($volatiles) . ';');
+			// Generate evaluation code for current variable
+			$volatiles_inner = array ();
 
-			$volatiles_exclude[$name] = true;
+			$output->append_code ('$' . $name . '=' . $value->generate ($volatiles_inner) . ';');
+
+			// Append required volatiles but the ones provided by previous assignments
+			$volatiles += array_diff_key ($volatiles_inner, $names);
+
+			// Make variable as available for next generations
+			$names[$name] = true;
 		}
 
+		// Generate evaluation code for body
 		$volatiles_inner = array ();
 
 		$output->append ($this->body->compile ($trim, $volatiles_inner));
-
-		foreach (array_keys (array_diff_key ($volatiles_inner, $volatiles_exclude)) as $name)
-			$volatiles[$name] = true;
-
 		$output->append_code ('}');
+
+		// Append required volatiles but the ones provided by all assignments
+		$volatiles += array_diff_key ($volatiles_inner, $names);
 
 		return $output;
 	}
@@ -52,17 +59,15 @@ class LetBlock implements Block
 
 			$value = $value->inject ($constants);
 
+			unset ($constants[$name]);
+
 			// Assignment can be evaluated, move to known constants
 			if ($value->evaluate ($result))
 				$constants[$name] = $result;
 
-			// Assignment can't be computed yet, keep it and remove from outer scope
+			// Assignment can't be computed yet, keep in assignments
 			else
-			{
 				$assignments[] = array ($name, $value);
-
-				unset ($constants[$name]);
-			}
 		}
 
 		$body = $this->body->inject ($constants);

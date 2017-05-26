@@ -58,7 +58,7 @@ class Compiler
 		$this->block = $block;
 	}
 
-	public function compile ($style = null)
+	public function compile ($style, &$names)
 	{
 		static $trims;
 
@@ -80,9 +80,10 @@ class Compiler
 
 		$volatiles = array ();
 		$source = $this->block->compile ($trim, $volatiles);
+		$names = array_keys ($volatiles);
 
 		$output = new Output ();
-		$output->append_code (State::emit_create (array_keys ($volatiles)));
+		$output->append_code (State::emit_create ($names));
 		$output->append ($source);
 
 		return $output->source ();

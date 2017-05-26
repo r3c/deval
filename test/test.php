@@ -102,25 +102,32 @@ function render_file ($directory, $path, $pairs, $expect)
 }
 
 /*
-** Run tests using given renderers builder and set of (constants, volatiles)
-** variable pairs.
-** $create:	renderers builder
-** $pairs:	(constants, volatiles) variable pairs
-** $expect:	expected rendered string
+** Run tests using given renderers constructor and set of
+** (constants, volatiles) variable pairs.
+** $constructor:	renderers constructor
+** $pairs:			(constants, volatiles) variable pairs
+** $expect:			expected rendered string
 */
-function render ($create, $pairs, $expect)
+function render ($constructor, $pairs, $expect)
 {
 	foreach ($pairs as $pair)
 	{
 		list ($constants, $volatiles) = $pair;
 
-		foreach ($create () as $renderer)
+		foreach ($constructor () as $renderer)
 		{
 			$renderer->inject ($constants);
 
+			$names_expect = array_keys ($volatiles);
+			$names_result = array ();
+
+			$renderer->source (null, $names_result);
+
+			assert (count (array_diff ($names_expect, $names_result)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
+
 			$result = $renderer->render ($volatiles, 'collapse');
 
-			assert ($result === $expect, var_export ($result, true) . ' !== ' . var_export ($expect, true));
+			assert ($result === $expect, 'invalid rendered output: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}
 	}
 }

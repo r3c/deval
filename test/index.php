@@ -72,7 +72,9 @@ render_code ('{% include template/include_outer.deval %}', make_combinations (ar
 render_code ('{% let a = 5 %}{{ a }}{% end %}', array (), '5');
 render_code ('{% let a = 5, b = 7 %}{{ a }}{{ b }}{% end %}', array (), '57');
 render_code ('{% let a = x %}{{ a }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
-render_code ('{% let a = x, b = a %}{{ b }}{% end %}', make_constants (array ('x' => 'test')), 'test');
+
+render_code ('{% let a = x, b = a %}{{ b }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
+render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations (array ('b' => '1', 'x' => '2')), '12');
 
 // Renderer
 render_file ('template', 'member.deval', make_combinations (array ('x' => 0)), '1337');
