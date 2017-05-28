@@ -13,7 +13,7 @@ class LetBlock implements Block
 		$this->body = $body;
 	}
 
-	public function compile ($trim, &$volatiles)
+	public function compile ($generator, &$volatiles)
 	{
 		$output = new Output ();
 		$output->append_code ('{', true);
@@ -39,7 +39,7 @@ class LetBlock implements Block
 		// Generate evaluation code for body
 		$volatiles_inner = array ();
 
-		$output->append ($this->body->compile ($trim, $volatiles_inner));
+		$output->append ($this->body->compile ($generator, $volatiles_inner));
 		$output->append_code ('}');
 
 		// Append required volatiles but the ones provided by all assignments
@@ -71,7 +71,7 @@ class LetBlock implements Block
 		}
 
 		$body = $this->body->inject ($constants);
-		$body->compile (function ($s) { return ''; }, $requires);
+		$body->compile (Generator::dummy (), $requires);
 
 		if (count ($assignments) === 0 || count ($requires) === 0)
 			return $body;

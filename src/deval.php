@@ -279,44 +279,12 @@ class StringRenderer extends DirectRenderer
 
 class State
 {
-	private $loops = array ();
-
-	public static function emit_loop_start ()
-	{
-		return '$' . self::$state_name . '->loop_start()';
-	}
-
-	public static function emit_loop_step ()
-	{
-		return '$' . self::$state_name . '->loop_step()';
-	}
-
-	public static function emit_loop_stop ()
-	{
-		return '$' . self::$state_name . '->loop_stop()';
-	}
-
 	public function __construct ($required, &$provided)
 	{
 		$undefined = array_diff ($required, array_keys ($provided));
 
 		if (count ($undefined) > 0)
 			throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $undefined));
-	}
-
-	public function loop_start ()
-	{
-		$this->loops[] = 0;
-	}
-
-	public function loop_step ()
-	{
-		++$this->loops[count ($this->loops) - 1];
-	}
-
-	public function loop_stop ()
-	{
-		return array_pop ($this->loops);
 	}
 }
 

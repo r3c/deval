@@ -17,7 +17,7 @@ class Generator
 	public static function emit_create ($names)
 	{
 		return
-			'$' . self::$state_name . '=new \\' . get_class () . '(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
+			'$' . self::$state_name . '=new \\Deval\\State(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
 			'extract($' . self::$input_name . ');';
 	}
 
@@ -49,6 +49,11 @@ class Generator
 		return var_export ($input, true);
 	}
 
+	public static function dummy ()
+	{
+		return new self (function ($s) { return ''; });
+	}
+
 	public static function member ($source, $index)
 	{
 		$array = (array)$source;
@@ -59,11 +64,25 @@ class Generator
 		return null;
 	}
 
-	private $local = 0;
+	private $local;
+	private $trim;
+
+	public function __construct ($trim)
+	{
+		$this->local = 0;
+		$this->trim = $trim;
+	}
 
 	public function make_local ()
 	{
 		return self::$local_name . $this->local++;
+	}
+
+	public function make_plain ($text)
+	{
+		$trim = $this->trim;
+
+		return $trim ($text);
 	}
 }
 

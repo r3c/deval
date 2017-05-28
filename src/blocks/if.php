@@ -10,7 +10,7 @@ class IfBlock implements Block
 		$this->fallback = $fallback;
 	}
 
-	public function compile ($trim, &$volatiles)
+	public function compile ($generator, &$volatiles)
 	{
 		$output = new Output ();
 		$first = true;
@@ -21,7 +21,7 @@ class IfBlock implements Block
 
 			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($volatiles) . ')');
 			$output->append_code ('{');
-			$output->append ($body->compile ($trim, $volatiles));
+			$output->append ($body->compile ($generator, $volatiles));
 			$output->append_code ('}');
 
 			$first = false;
@@ -31,7 +31,7 @@ class IfBlock implements Block
 		{
 			$output->append_code ('else');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($trim, $volatiles));
+			$output->append ($this->fallback->compile ($generator, $volatiles));
 			$output->append_code ('}');
 		}
 

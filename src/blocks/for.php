@@ -18,12 +18,14 @@ class ForBlock implements Block
 		$this->value = $value;
 	}
 
-	public function compile ($trim, &$volatiles)
+	public function compile ($generator, &$volatiles)
 	{
 		$output = new Output ();
 
 		// Write loop control
-		$output->append_code (State::emit_loop_start() . ';');
+		$loop = $generator->make_local ();
+
+		$output->append_code ('$' . $loop . '=0;');
 		$output->append_code ('foreach(' . $this->source->generate ($volatiles) . ' as ');
 
 		if ($this->key !== null)
@@ -37,8 +39,8 @@ class ForBlock implements Block
 		$volatiles_inner = array ();
 
 		$output->append_code ('{');
-		$output->append ($this->body->compile ($trim, $volatiles_inner));
-		$output->append_code (State::emit_loop_step() . ';');
+		$output->append ($this->body->compile ($generator, $volatiles_inner));
+		$output->append_code ('++$' . $loop . ';');
 		$output->append_code ('}');
 
 		if ($this->key !== null)
@@ -52,13 +54,11 @@ class ForBlock implements Block
 		// Write fallback block if any
 		if ($this->fallback !== null)
 		{
-			$output->append_code ('if(' . State::emit_loop_stop() . ')');
+			$output->append_code ('if($' . $loop . '==0)');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($trim, $volatiles));
+			$output->append ($this->fallback->compile ($generator, $volatiles));
 			$output->append_code ('}');
 		}
-		else
-			$output->append_code (State::emit_loop_stop() . ';');
 
 		return $output;
 	}

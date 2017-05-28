@@ -79,7 +79,7 @@ class Compiler
 			$trim = function ($s) { return $s; };
 
 		$volatiles = array ();
-		$source = $this->block->compile ($trim, $volatiles);
+		$source = $this->block->compile (new Generator ($trim), $volatiles);
 		$names = array_keys ($volatiles);
 
 		$output = new Output ();

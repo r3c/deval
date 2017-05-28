@@ -24,15 +24,15 @@ class ConcatBlock implements Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile ($trim, &$volatiles)
+	public function compile ($generator, &$volatiles)
 	{
 		if (count ($this->blocks) < 1)
 			return new Output ();
 
-		$output = $this->blocks[0]->compile ($trim, $volatiles);
+		$output = $this->blocks[0]->compile ($generator, $volatiles);
 
 		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$output->append ($this->blocks[$i]->compile ($trim, $volatiles));
+			$output->append ($this->blocks[$i]->compile ($generator, $volatiles));
 
 		return $output;
 	}

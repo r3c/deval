@@ -9,7 +9,7 @@ class EchoBlock implements Block
 		$this->value = $value;
 	}
 
-	public function compile ($trim, &$volatiles)
+	public function compile ($generator, &$volatiles)
 	{
 		return (new Output ())->append_code ('echo ' . $this->value->generate ($volatiles) . ';');
 	}
