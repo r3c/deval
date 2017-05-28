@@ -27,7 +27,7 @@ class LetBlock implements Block
 			// Generate evaluation code for current variable
 			$volatiles_inner = array ();
 
-			$output->append_code ('$' . $name . '=' . $value->generate ($volatiles_inner) . ';');
+			$output->append_code ('$' . $name . '=' . $value->generate ($generator, $volatiles_inner) . ';');
 
 			// Append required volatiles but the ones provided by previous assignments
 			$volatiles += array_diff_key ($volatiles_inner, $names);

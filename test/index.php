@@ -28,7 +28,7 @@ render_code ('{{ 1 || 0 }}', array (), '1');
 render_code ('{{ one() }}', make_combinations (array ('one' => function () { return 1; })), '1');
 render_code ('{{ strlen("Hello, World!") }}', make_combinations (array ('strlen' => 'strlen')), '13');
 render_code ('{{ implode(":", [1, 2, 3]) }}', make_combinations (array ('implode' => 'implode')), '1:2:3');
-render_code ('{{ two()() }}', make_constants (array ('two' => function () { return function () { return 2; }; })), '2');
+render_code ('{{ two()() }}', make_combinations (array ('two' => function () { return function () { return 2; }; })), '2');
 render_code ('{{ strlen(x) }}', make_combinations (array ('strlen' => 'strlen', 'x' => 'something')), '9');
 
 // Expressions (member)

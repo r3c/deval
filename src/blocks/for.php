@@ -26,7 +26,7 @@ class ForBlock implements Block
 		$loop = $generator->make_local ();
 
 		$output->append_code ('$' . $loop . '=0;');
-		$output->append_code ('foreach(' . $this->source->generate ($volatiles) . ' as ');
+		$output->append_code ('foreach(' . $this->source->generate ($generator, $volatiles) . ' as ');
 
 		if ($this->key !== null)
 			$output->append_code ('$' . $this->key . '=>$' . $this->value);

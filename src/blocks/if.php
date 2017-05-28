@@ -19,7 +19,7 @@ class IfBlock implements Block
 		{
 			list ($condition, $body) = $branch;
 
-			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($volatiles) . ')');
+			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($generator, $volatiles) . ')');
 			$output->append_code ('{');
 			$output->append ($body->compile ($generator, $volatiles));
 			$output->append_code ('}');

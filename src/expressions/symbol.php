@@ -21,7 +21,7 @@ class SymbolExpression implements Expression
 		return false;
 	}
 
-	public function generate (&$volatiles)
+	public function generate ($generator, &$volatiles)
 	{
 		$volatiles[$this->name] = true;
 

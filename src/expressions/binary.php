@@ -72,11 +72,11 @@ class BinaryExpression implements Expression
 		return false;
 	}
 
-	public function generate (&$volatiles)
+	public function generate ($generator, &$volatiles)
 	{
 		$generate = $this->f_generate;
 
-		return $generate ($this->lhs->generate ($volatiles), $this->rhs->generate ($volatiles));
+		return $generate ($this->lhs->generate ($generator, $volatiles), $this->rhs->generate ($generator, $volatiles));
 	}
 
 	public function inject ($constants)

@@ -19,12 +19,12 @@ class ArrayExpression implements Expression
 		return false;
 	}
 
-	public function generate (&$volatiles)
+	public function generate ($generator, &$volatiles)
 	{
 		$elements = array ();
 
 		foreach ($this->elements as $element)
-			$elements[] = $element->generate ($volatiles);
+			$elements[] = $element->generate ($generator, $volatiles);
 
 		return 'array(' . implode (',', $elements) . ')';
 	}

@@ -56,11 +56,11 @@ class UnaryExpression implements Expression
 		return false;
 	}
 
-	public function generate (&$volatiles)
+	public function generate ($generator, &$volatiles)
 	{
 		$generate = $this->f_generate;
 
-		return $generate ($this->value->generate ($volatiles));
+		return $generate ($this->value->generate ($generator, $volatiles));
 	}
 
 	public function inject ($constants)

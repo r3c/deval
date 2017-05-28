@@ -11,7 +11,7 @@ class EchoBlock implements Block
 
 	public function compile ($generator, &$volatiles)
 	{
-		return (new Output ())->append_code ('echo ' . $this->value->generate ($volatiles) . ';');
+		return (new Output ())->append_code ('echo ' . $this->value->generate ($generator, $volatiles) . ';');
 	}
 
 	public function inject ($constants)

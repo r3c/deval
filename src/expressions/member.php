@@ -20,9 +20,12 @@ class MemberExpression implements Expression
 		return false;
 	}
 
-	public function generate (&$volatiles)
+	public function generate ($generator, &$volatiles)
 	{
-		return Generator::emit_member ($this->source->generate ($volatiles), $this->index->generate ($volatiles));
+		$index = $this->index->generate ($generator, $volatiles);
+		$source = $this->source->generate ($generator, $volatiles);
+
+		return Generator::emit_member ($source, $index);
 	}
 
 	public function inject ($constants)

@@ -84,6 +84,11 @@ class Generator
 
 		return $trim ($text);
 	}
+
+	public function version ($required)
+	{
+		return version_compare (PHP_VERSION, $required) >= 0;
+	}
 }
 
 ?>

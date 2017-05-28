@@ -20,23 +20,30 @@ class InvokeExpression implements Expression
 		return false;
 	}
 
-	public function generate (&$volatiles)
+	public function generate ($generator, &$volatiles)
 	{
 		$arguments = array ();
 
 		foreach ($this->arguments as $argument)
-			$arguments[] = $argument->generate ($volatiles);
+			$arguments[] = $argument->generate ($generator, $volatiles);
 
-		/*
-		** PHP hack: function name must be written as a literal symbol when
-		** constant and only in that case e.g. "func()" vs "$f = 'func'; $f()".
-		*/
+		// Hack: use literal function name if possible e.g. "func()" vs "$f = 'func'; $f()"
 		if ($this->caller->evaluate ($result))
+		{
 			self::check_callable ($this->caller, $result);
-		else
-			$result = $this->caller->generate ($volatiles);
 
-		return $result . '(' . implode (',', $arguments) . ')';
+			$caller = $result;
+		}
+		else
+		{
+			$caller = $this->caller->generate ($generator, $volatiles);
+
+			// Hack: PHP versions < 7.0.1 do not support syntax "func()()"
+			if (!($this->caller instanceof SymbolExpression) && !$generator->version ('7.0.1'))
+				return 'call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
+		}
+
+		return $caller . '(' . implode (',', $arguments) . ')';
 	}
 
 	public function inject ($constants)
