@@ -7,7 +7,7 @@ class LetBlock implements Block
 	public function __construct ($assignments, $body)
 	{
 		foreach ($assignments as $assignment)
-			State::assert_symbol ($assignment[0]);
+			Generator::assert_symbol ($assignment[0]);
 
 		$this->assignments = $assignments;
 		$this->body = $body;

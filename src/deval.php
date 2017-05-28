@@ -104,6 +104,7 @@ class Loader
 		require $path . '/expressions/member.php';
 		require $path . '/expressions/symbol.php';
 		require $path . '/expressions/unary.php';
+		require $path . '/generator.php';
 		require $path . '/parser.php';
 
 		$setup = true;
@@ -278,23 +279,7 @@ class StringRenderer extends DirectRenderer
 
 class State
 {
-	private static $input_name = '_deval_input';
-	private static $state_name = '_deval_state';
-
 	private $loops = array ();
-
-	public static function assert_symbol ($name)
-	{
-		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
-			throw new \Exception ('invalid symbol name');
-	}
-
-	public static function emit_create ($names)
-	{
-		return
-			'$' . self::$state_name . '=new \\' . get_class () . '(' . self::export ($names) . ',$' . self::$input_name . ');' .
-			'extract($' . self::$input_name . ');';
-	}
 
 	public static function emit_loop_start ()
 	{
@@ -309,44 +294,6 @@ class State
 	public static function emit_loop_stop ()
 	{
 		return '$' . self::$state_name . '->loop_stop()';
-	}
-
-	public static function emit_member ($source, $index)
-	{
-		return '\\' . get_class () . '::member(' . $source . ',' . $index . ')';
-	}
-
-	public static function export ($input)
-	{
-		if (is_array ($input))
-		{
-			$out = '';
-
-			if (array_reduce (array_keys ($input), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($input))
-			{
-				foreach ($input as $key => $value)
-					$out .= ($out !== '' ? ',' : '') . self::export ($key) . '=>' . self::export ($value);
-			}
-			else
-			{
-				foreach ($input as $value)
-					$out .= ($out !== '' ? ',' : '') . self::export ($value);
-			}
-
-			return 'array(' . $out . ')';
-		}
-
-		return var_export ($input, true);
-	}
-
-	public static function member ($source, $index)
-	{
-		$array = (array)$source;
-
-		if (isset ($array[$index]))
-			return $array[$index];
-
-		return null;
 	}
 
 	public function __construct ($required, &$provided)

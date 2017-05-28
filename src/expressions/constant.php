@@ -23,7 +23,7 @@ class ConstantExpression implements Expression
 
 	public function generate (&$volatiles)
 	{
-		return State::export ($this->value);
+		return Generator::emit_value ($this->value);
 	}
 
 	public function inject ($constants)

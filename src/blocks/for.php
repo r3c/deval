@@ -7,9 +7,9 @@ class ForBlock implements Block
 	public function __construct ($source, $key, $value, $body, $fallback)
 	{
 		if ($key !== null)
-			State::assert_symbol ($key);
+			Generator::assert_symbol ($key);
 
-		State::assert_symbol ($value);
+		Generator::assert_symbol ($value);
 
 		$this->body = $body;
 		$this->fallback = $fallback;
