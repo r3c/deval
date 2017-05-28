@@ -42,6 +42,7 @@ render_code ('{{ strlen("Hello, World!") }}', make_combinations (array ('strlen'
 render_code ('{{ implode(":", [1, 2, 3]) }}', make_combinations (array ('implode' => 'implode')), '1:2:3');
 render_code ('{{ two()() }}', make_combinations (array ('two' => function () { return function () { return 2; }; })), '2');
 render_code ('{{ strlen(x) }}', make_combinations (array ('strlen' => 'strlen', 'x' => 'something')), '9');
+render_code ('{{ inc(x) }}', make_slices (array ('inc' => function ($x) { return $x + 1; }, 'x' => 1)), '2');
 
 // Render member expressions
 render_code ('{{ [1][0] }}', array (), '1');

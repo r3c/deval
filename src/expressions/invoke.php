@@ -30,20 +30,26 @@ class InvokeExpression implements Expression
 		// Hack: use literal function name if possible e.g. "func()" vs "$f = 'func'; $f()"
 		if ($this->caller->evaluate ($result))
 		{
-			self::check_callable ($this->caller, $result);
+			if (!is_callable ($result))
+				throw new InjectException ($this->caller, 'is not callable');
+
+			if (!is_string ($result))
+				throw new InjectException ($this->caller, 'only strings can be injected as functions, not closures');
 
 			$caller = $result;
+			$direct = true;
 		}
 		else
 		{
 			$caller = $this->caller->generate ($generator, $volatiles);
-
-			// Hack: PHP versions < 7.0.1 do not support syntax "func()()"
-			if (!($this->caller instanceof SymbolExpression) && !$generator->version ('7.0.1'))
-				return 'call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
+			$direct = $this->caller instanceof SymbolExpression || $generator->version ('7.0.1');
 		}
 
-		return $caller . '(' . implode (',', $arguments) . ')';
+		// Hack: PHP versions < 7.0.1 do not support syntax "func()()"
+		if ($direct)
+			return $caller . '(' . implode (',', $arguments) . ')';
+		else
+			return 'call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
 	}
 
 	public function inject ($constants)
@@ -68,19 +74,14 @@ class InvokeExpression implements Expression
 		// Invoke and pass return value if caller and arguments were evaluated
 		if ($ready && $caller->evaluate ($result))
 		{
-			self::check_callable ($caller, $result);
+			if (!is_callable ($result))
+				throw new InjectException ($caller, 'is not callable');
 
 			return new ConstantExpression (call_user_func_array ($result, $values));
 		}
 
 		// Otherwise return injected caller and arguments
 		return new self ($caller, $arguments);
-	}
-
-	private static function check_callable ($caller, $value)
-	{
-		if (!is_callable ($value))
-			throw new InjectException ($caller, 'is not callable');
 	}
 }
 

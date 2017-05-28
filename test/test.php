@@ -54,13 +54,13 @@ function make_combinations ($variables)
 }
 
 /*
-** Wrap variables in a single-pair (constants, empty) array.
+** Wrap variables in a ((constants, empty), (empty, volatiles)) array.
 ** $variables:	key => value variables array
-** return:		(constants, empty) single-pair array
+** return:		two-pairs array
 */
-function make_constants ($variables)
+function make_slices ($variables)
 {
-	return array (array ($variables, array ()));
+	return array (array ($variables, array ()), array (array (), $variables));
 }
 
 /*
