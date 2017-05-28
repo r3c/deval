@@ -19,6 +19,10 @@ raise_inject ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
 render_code ('lol', array (), 'lol');
 render_code ('l{o}l', array (), 'l{o}l');
 
+// Render interleaved blocks
+render_code ("A {{ \"B\" }} C", array (), "A B C");
+render_code ("A\n{{ \"B\" }}\nC", array (), "A\nB\nC");
+
 // Render variables
 render_code ('{{ bool }}', make_combinations (array ('bool' => true)), '1');
 render_code ('{{ int }}', make_combinations (array ('int' => 3)), '3');
