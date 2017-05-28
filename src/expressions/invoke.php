@@ -80,7 +80,7 @@ class InvokeExpression implements Expression
 	private static function check_callable ($caller, $value)
 	{
 		if (!is_callable ($value))
-			throw new RuntimeException ('function caller is not a callable variable: ' . $caller);
+			throw new InjectException ($caller, 'is not callable');
 	}
 }
 

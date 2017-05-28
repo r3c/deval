@@ -86,9 +86,11 @@ class ForBlock implements Block
 		}
 
 		// Source was evaluated, unroll loop and generate result blocks
+		if (!is_array ($result) && !($result instanceof \Traversable))
+			throw new InjectException ($source, 'is not iterable');
+
 		$blocks = array ();
 
-		// FIXME: verify $result is iterable
 		foreach ($result as $key => $value)
 		{
 			$constants_inner = $constants;

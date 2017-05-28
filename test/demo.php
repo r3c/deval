@@ -178,25 +178,12 @@ if ($template !== '')
 <?php
 
 	}
-	catch (Deval\CompileException $exception)
+	catch (Exception $exception)
 	{
 
 ?>
 		<div class="window">
-			<h1 class="fail">Compile error</h1>
-			<div class="body">
-				<p><?php echo htmlspecialchars ($exception->getMessage ()); ?></p>
-			</div>
-		</div>
-<?php
-
-	}
-	catch (Deval\RuntimeException $exception)
-	{
-
-?>
-		<div class="window">
-			<h1 class="fail">Runtime error</h1>
+			<h1 class="fail">Error</h1>
 			<div class="body">
 				<p><?php echo htmlspecialchars ($exception->getMessage ()); ?></p>
 			</div>

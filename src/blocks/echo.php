@@ -20,7 +20,9 @@ class EchoBlock implements Block
 
 		if ($value->evaluate ($result))
 		{
-			// FIXME: verify $result can be converted to string
+			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
+				throw new InjectException ($value, 'cannot be converted to string');
+
 			return new PlainBlock ((string)$result);
 		}
 

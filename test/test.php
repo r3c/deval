@@ -64,6 +64,90 @@ function make_constants ($variables)
 }
 
 /*
+** Compare exception message and search for expected content.
+** $exception:	raised exception
+** $expect:		expected message
+*/
+function raise ($exception, $expect)
+{
+	$message = $exception->getMessage ();
+
+	assert (strpos ($message, $expect) !== false, 'should have raised exception with message "' . $expect . '" but was "' . $message . '"');
+}
+
+/*
+** Ensure source code throw compile exception when compiled.
+** $source:		template source code
+** $message:	expected exception message
+*/
+function raise_compile ($source, $message)
+{
+	try
+	{
+		$renderer = new Deval\StringRenderer ($source);
+
+		assert (false, 'should have raised exception');
+	}
+	catch (Deval\CompileException $exception)
+	{
+		raise ($exception, $message);
+	}
+}
+
+/*
+** Ensure source code throw inject exception when injected given constants.
+** $source:		template source code
+** $constants:	injected constants
+** $message:	expected exception message
+*/
+function raise_inject ($source, $constants, $message)
+{
+	$renderer = new Deval\StringRenderer ($source);
+
+	try
+	{
+		$renderer->inject ($constants);
+
+		assert (false, 'should have raised exception');
+	}
+	catch (Deval\InjectException $exception)
+	{
+		raise ($exception, $message);
+	}
+}
+
+/*
+** Run tests using given renderers constructor and set of
+** (constants, volatiles) variable pairs.
+** $constructor:	renderers constructor
+** $pairs:			(constants, volatiles) variable pairs
+** $expect:			expected rendered string
+*/
+function render ($constructor, $pairs, $expect)
+{
+	foreach ($pairs as $pair)
+	{
+		list ($constants, $volatiles) = $pair;
+
+		foreach ($constructor () as $renderer)
+		{
+			$renderer->inject ($constants);
+
+			$names_expect = array_keys ($volatiles);
+			$names_result = array ();
+
+			$renderer->source ($names_result);
+
+			assert (count (array_diff ($names_expect, $names_result)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
+
+			$result = $renderer->render ($volatiles);
+
+			assert ($result === $expect, 'invalid rendered output: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
+		}
+	}
+}
+
+/*
 ** Run tests on code-based renderers using given source code and set of
 ** (constants, volatiles) variable pairs.
 ** $source:	template source code
@@ -99,37 +183,6 @@ function render_file ($path, $directory, $pairs, $expect)
 			new Deval\FileRenderer ($path, 'collapse')
 		);
 	}, $pairs, $expect);
-}
-
-/*
-** Run tests using given renderers constructor and set of
-** (constants, volatiles) variable pairs.
-** $constructor:	renderers constructor
-** $pairs:			(constants, volatiles) variable pairs
-** $expect:			expected rendered string
-*/
-function render ($constructor, $pairs, $expect)
-{
-	foreach ($pairs as $pair)
-	{
-		list ($constants, $volatiles) = $pair;
-
-		foreach ($constructor () as $renderer)
-		{
-			$renderer->inject ($constants);
-
-			$names_expect = array_keys ($volatiles);
-			$names_result = array ();
-
-			$renderer->source ($names_result);
-
-			assert (count (array_diff ($names_expect, $names_result)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
-
-			$result = $renderer->render ($volatiles);
-
-			assert ($result === $expect, 'invalid rendered output: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
-		}
-	}
 }
 
 ?>

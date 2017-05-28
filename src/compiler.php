@@ -8,7 +8,7 @@ class Compiler
 
 	public static function parse_code ($source, $blocks = array ())
 	{
-		return self::parse ('source code', $source, $blocks);
+		return self::parse ('<source>', $source, $blocks);
 	}
 
 	public static function parse_file ($path, $blocks = array ())

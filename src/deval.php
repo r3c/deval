@@ -6,7 +6,15 @@ class CompileException extends \Exception
 {
 	public function __construct ($context, $message)
 	{
-		parent::__construct ('compile error in ' . $context . ': ' . $message);
+		parent::__construct ('compile error: ' . $message . ' in "' . $context . '"');
+	}
+}
+
+class InjectException extends \Exception
+{
+	public function __construct ($expression, $message)
+	{
+		parent::__construct ('inject error: "' . $expression . '" ' . $message);
 	}
 }
 
