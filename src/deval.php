@@ -285,15 +285,12 @@ class StringRenderer extends DirectRenderer
 	}
 }
 
-class State
+function run ($required, &$provided)
 {
-	public function __construct ($required, &$provided)
-	{
-		$undefined = array_diff ($required, array_keys ($provided));
+	$undefined = array_diff ($required, array_keys ($provided));
 
-		if (count ($undefined) > 0)
-			throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $undefined));
-	}
+	if (count ($undefined) > 0)
+		throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $undefined));
 }
 
 ?>

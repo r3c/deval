@@ -49,7 +49,7 @@ class InvokeExpression implements Expression
 		if ($direct)
 			return $caller . '(' . implode (',', $arguments) . ')';
 		else
-			return 'call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
+			return '\\call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
 	}
 
 	public function inject ($constants)

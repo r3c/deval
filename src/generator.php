@@ -6,7 +6,6 @@ class Generator
 {
 	private static $input_name = '_deval_input';
 	private static $local_name = '_deval_local';
-	private static $state_name = '_deval_state';
 
 	public static function assert_symbol ($name)
 	{
@@ -17,8 +16,8 @@ class Generator
 	public static function emit_create ($names)
 	{
 		return
-			'$' . self::$state_name . '=new \\Deval\\State(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
-			'extract($' . self::$input_name . ');';
+			'\\' . __NAMESPACE__ . '\\run(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
+			'\\extract($' . self::$input_name . ');';
 	}
 
 	public static function emit_member ($source, $index)
