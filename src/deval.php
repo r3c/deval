@@ -285,6 +285,16 @@ class StringRenderer extends DirectRenderer
 	}
 }
 
+function member ($source, $index)
+{
+	$array = (array)$source;
+
+	if (isset ($array[$index]))
+		return $array[$index];
+
+	return null;
+}
+
 function run ($required, &$provided)
 {
 	$undefined = array_diff ($required, array_keys ($provided));

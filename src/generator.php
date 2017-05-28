@@ -22,7 +22,7 @@ class Generator
 
 	public static function emit_member ($source, $index)
 	{
-		return '\\' . get_class () . '::member(' . $source . ',' . $index . ')';
+		return '\\' . __NAMESPACE__ . '\\member(' . $source . ',' . $index . ')';
 	}
 
 	public static function emit_value ($input)
@@ -51,16 +51,6 @@ class Generator
 	public static function dummy ()
 	{
 		return new self (function ($s) { return ''; });
-	}
-
-	public static function member ($source, $index)
-	{
-		$array = (array)$source;
-
-		if (isset ($array[$index]))
-			return $array[$index];
-
-		return null;
 	}
 
 	private $local;
