@@ -42,7 +42,7 @@ class InvokeExpression implements Expression
 		else
 		{
 			$caller = $this->caller->generate ($generator, $volatiles);
-			$direct = $this->caller instanceof SymbolExpression || $generator->version ('7.0.1');
+			$direct = $this->caller instanceof SymbolExpression || $generator->support ('7.0.1');
 		}
 
 		// Hack: PHP versions < 7.0.1 do not support syntax "func()()"

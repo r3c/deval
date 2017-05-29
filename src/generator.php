@@ -50,16 +50,49 @@ class Generator
 
 	public static function dummy ()
 	{
-		return new self (function ($s) { return ''; });
+		static $instance;
+
+		if (!isset ($instance))
+			$instance = new self (null);
+
+		return $instance;
 	}
 
 	private $local;
-	private $trim;
+	private $trimmer;
+	private $version;
 
-	public function __construct ($trim)
+	public function __construct ($setup)
 	{
+		static $trims;
+
+		if ($setup !== null)
+		{
+			if (!isset ($trims))
+			{
+				$trims = array
+				(
+					'collapse'	=> function ($s) { return preg_replace ('/\\s+/', ' ', $s); },
+					'html'		=> function ($s) { return preg_replace (array ('/(^|>)\\s+/m', '/\\s+(<|$)/m'), array ('$1 ', ' $1'), $s); }
+				);
+			}
+
+			if (is_string ($setup->style) && isset ($trims[$setup->style]))
+				$this->trimmer = $trims[$setup->style];
+			else if (is_callable ($setup->style))
+				$this->trimmer = $setup->style;
+			else
+				throw new CompileException ('<setup>', 'invalid style, must be either builtin style or callable');
+
+			$this->version = $setup->version;
+		}
+		else
+		{
+			$this->trimmer = function ($s) { return $s; };
+			$this->version = PHP_VERSION;
+		}
+
 		$this->local = 0;
-		$this->trim = $trim;
 	}
 
 	public function make_local ()
@@ -69,14 +102,14 @@ class Generator
 
 	public function make_plain ($text)
 	{
-		$trim = $this->trim;
+		$trim = $this->trimmer;
 
 		return $trim ($text);
 	}
 
-	public function version ($required)
+	public function support ($required)
 	{
-		return version_compare (PHP_VERSION, $required) >= 0;
+		return version_compare ($this->version, $required) >= 0;
 	}
 }
 

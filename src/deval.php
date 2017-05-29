@@ -133,15 +133,15 @@ class CachedRenderer implements Renderer
 	private $directory;
 	private $invalidate;
 	private $path;
-	private $style;
+	private $setup;
 
-	public function __construct ($path, $directory, $style = null, $invalidate = false)
+	public function __construct ($path, $directory, $setup = null, $invalidate = false)
 	{
 		$this->constants = null;
 		$this->directory = $directory;
 		$this->invalidate = $invalidate;
 		$this->path = $path;
-		$this->style = $style;
+		$this->setup = $setup;
 	}
 
 	public function inject ($constants)
@@ -168,19 +168,19 @@ class CachedRenderer implements Renderer
 		if ($this->constants !== null)
 			$compiler->inject ($this->constants);
 
-		return $compiler->compile ($this->style, $names);
+		return $compiler->compile ($this->setup, $names);
 	}
 }
 
 class DirectRenderer implements Renderer
 {
 	private $compiler;
-	private $style;
+	private $setup;
 
-	protected function __construct ($compiler, $style)
+	protected function __construct ($compiler, $setup)
 	{
 		$this->compiler = $compiler;
-		$this->style = $style;
+		$this->setup = $setup;
 	}
 
 	public function inject ($constants)
@@ -195,28 +195,34 @@ class DirectRenderer implements Renderer
 
 	public function source (&$names = null)
 	{
-		return $this->compiler->compile ($this->style, $names);
+		return $this->compiler->compile ($this->setup, $names);
 	}
 }
 
 class FileRenderer extends DirectRenderer
 {
-	public function __construct ($path, $style = null)
+	public function __construct ($path, $setup = null)
 	{
 		Loader::load ();
 
-		parent::__construct (new Compiler (Compiler::parse_file ($path)), $style);
+		parent::__construct (new Compiler (Compiler::parse_file ($path)), $setup);
 	}
 }
 
 class StringRenderer extends DirectRenderer
 {
-	public function __construct ($source, $style = null)
+	public function __construct ($source, $setup = null)
 	{
 		Loader::load ();
 
-		parent::__construct (new Compiler (Compiler::parse_code ($source)), $style);
+		parent::__construct (new Compiler (Compiler::parse_code ($source)), $setup);
 	}
+}
+
+class Setup
+{
+	public $style = null;
+	public $version = PHP_VERSION;
 }
 
 function member ($source, $index)
