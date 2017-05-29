@@ -95,6 +95,6 @@ render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations 
 
 // Render files
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');
-render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), '1 2 3');
+render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "1\n2\n3");
 
 ?>

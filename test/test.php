@@ -160,7 +160,7 @@ function render_code ($source, $pairs, $expect)
 	{
 		return array
 		(
-			new Deval\StringRenderer ($source, 'collapse')
+			new Deval\StringRenderer ($source)
 		);
 	}, $pairs, $expect);
 }
@@ -179,8 +179,8 @@ function render_file ($path, $directory, $pairs, $expect)
 	{
 		return array
 		(
-			new Deval\CachedRenderer ($path, $directory, 'collapse', true),
-			new Deval\FileRenderer ($path, 'collapse')
+			new Deval\CachedRenderer ($path, $directory, null, true),
+			new Deval\FileRenderer ($path, null)
 		);
 	}, $pairs, $expect);
 }
