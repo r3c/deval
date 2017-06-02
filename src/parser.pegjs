@@ -233,7 +233,7 @@ ExpressionMemberIndex
 ExpressionPrimary
 	= "(" _ value:Expression _ ")" { return $value; }
 	/ value:Array { return new \Deval\ArrayExpression ($value); }
-	/ value:Constant { return new \Deval\ConstantExpression ($value); }
+	/ value:Scalar { return new \Deval\ConstantExpression ($value); }
 	/ value:Symbol { return new \Deval\SymbolExpression ($value); }
 
 Array
@@ -241,20 +241,36 @@ Array
 	{
 		return array ();
 	}
-	/ "[" _ head:Expression _ tail:("," _ token:Expression _ { return $token; })* "]"
+	/ "[" _ head:ArrayElement _ tail:("," _ token:ArrayElement _ { return $token; })* "]"
 	{
 		return array_merge (array ($head), $tail);
 	}
 
-Constant
+ArrayElement
+	= key:Scalar _ ":" _ value:Expression
+	{
+		return array ($key, $value);
+	}
+	/ value:Expression
+	{
+		return array (null, $value);
+	}
+
+Scalar
 	= Integer
 	/ String
 
 Integer "integer"
-	= digits:$[0-9]+ { return intval ($digits); }
+	= digits:$[0-9]+
+	{
+		return intval ($digits);
+	}
 
 String "string"
-	= '"' chars:StringChar* '"' { return implode ('', $chars); }
+	= '"' chars:StringChar* '"'
+	{
+		return implode ('', $chars);
+	}
 
 StringChar
 	= [^\0-\x1F\x22\x5C]

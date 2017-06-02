@@ -5,7 +5,6 @@ TODO
 ----
 
 - Implement {% escape $callback %}{% end %} block
-- Allow literal key/value arrays
 
 DONE
 ----
@@ -13,3 +12,4 @@ DONE
 - Allow multiple calls to "inject" in CachedRenderer
 - Fix absolute path inclusions
 - Escape PHP tags in plain text
+- Allow literal key/value arrays

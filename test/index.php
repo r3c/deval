@@ -33,6 +33,14 @@ render_code ('<script language="php"> 6 </script>', make_empty (), '<script lang
 render_code ("A {{ \"B\" }} C", make_empty (), "A B C");
 render_code ("A\n{{ \"B\" }}\nC", make_empty (), "A\nB\nC");
 
+// Render constants
+render_code ('{{ 1 }}', make_empty (), '1');
+render_code ('{{ "hello" }}', make_empty (), 'hello');
+render_code ('{{ [1][0] }}', make_empty (), '1');
+render_code ('{{ [1: 2][1] }}', make_empty (), '2');
+render_code ('{{ ["x": 3]["x"] }}', make_empty (), '3');
+render_code ('{{ ["y": [2: 4]]["y"][2] }}', make_empty (), '4');
+
 // Render variables
 render_code ('{{ bool }}', make_combinations (array ('bool' => true)), '1');
 render_code ('{{ int }}', make_combinations (array ('int' => 3)), '3');

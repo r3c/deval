@@ -6,12 +6,22 @@ class ArrayExpression implements Expression
 {
 	public function __construct ($elements)
 	{
-		$this->elements = $elements;
+		$this->elements = array ();
+
+		foreach ($elements as $element)
+		{
+			list ($key, $value) = $element;
+
+			if ($key !== null)
+				$this->elements[$key] = $value;
+			else
+				$this->elements[] = $value;
+		}
 	}
 
 	public function __toString ()
 	{
-		return '[' . implode (', ', array_map (function ($e) { return (string)$e; }, $this->elements)) . ']';
+		return '[' . implode (', ', array_map (function ($k, $v) { return $k . ': ' . $v; }, array_keys ($this->elements), $this->elements)) . ']';
 	}
 
 	public function evaluate (&$result)
@@ -23,10 +33,23 @@ class ArrayExpression implements Expression
 	{
 		$elements = array ();
 
-		foreach ($this->elements as $element)
-			$elements[] = $element->generate ($generator, $volatiles);
+		foreach ($this->elements as $key => $value)
+			$elements[$key] = $value->generate ($generator, $volatiles);
 
-		return 'array(' . implode (',', $elements) . ')';
+		$source = '';
+
+		if (array_reduce (array_keys ($elements), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($elements))
+		{
+			foreach ($elements as $key => $value)
+				$source .= ($source !== '' ? ',' : '') . Generator::emit_value ($key) . '=>' . $value;
+		}
+		else
+		{
+			foreach ($elements as $value)
+				$source .= ($source !== '' ? ',' : '') . $value;
+		}
+
+		return 'array(' . $source . ')';
 	}
 
 	public function inject ($constants)
@@ -35,16 +58,16 @@ class ArrayExpression implements Expression
 		$ready = true;
 		$values = array ();
 
-		foreach ($this->elements as $element)
+		foreach ($this->elements as $key => $value)
 		{
-			$element = $element->inject ($constants);
+			$value = $value->inject ($constants);
 
-			if ($element->evaluate ($result))
-				$values[] = $result;
+			if ($value->evaluate ($result))
+				$values[$key] = $result;
 			else
 				$ready = false;
 
-			$elements[] = $element;
+			$elements[] = array ($key, $value);
 		}
 
 		// Return fully built array if all elements could be evaluated
