@@ -22,6 +22,12 @@ render_code ('\\{', make_empty (), '{');
 render_code ('{\\{', make_empty (), '{{');
 render_code ('{\\%', make_empty (), '{%');
 render_code ('a%{b', make_empty (), 'a%{b');
+render_code ('<?php 1 ?>', make_empty (), '<?php 1 ?>');
+render_code ('<? 2 ?>', make_empty (), '<? 2 ?>');
+render_code ('<?= 3 ?>', make_empty (), '<?= 3 ?>');
+render_code ('<% 4 %>', make_empty (), '<% 4 %>');
+render_code ('<%= 5 %>', make_empty (), '<%= 5 %>');
+render_code ('<script language="php"> 6 </script>', make_empty (), '<script language="php"> 6 </script>');
 
 // Render interleaved blocks
 render_code ("A {{ \"B\" }} C", make_empty (), "A B C");

@@ -16,10 +16,10 @@ class Output
 
 		foreach ($other->snippets as $snippet)
 		{
-			list ($output, $is_code) = $snippet;
+			list ($source, $is_code) = $snippet;
 
 			if ($count > 0 && $is_code === $last)
-				$this->snippets[$count - 1][0] .= $output;
+				$this->snippets[$count - 1][0] .= $source;
 			else
 			{
 				$this->snippets[] = $snippet;
@@ -50,22 +50,40 @@ class Output
 
 	public function source ()
 	{
-		$output = '';
 		$is_code = false;
+		$source = '';
 
 		foreach ($this->snippets as $snippet)
 		{
-			list ($block_output, $block_is_code) = $snippet;
+			list ($block_source, $block_is_code) = $snippet;
 
+			// Escape PHP tags in plain text
+			if (!$block_is_code)
+			{
+				$tags = array ('<\\?php(?![[:alpha:]])', '<\\?=', '\\?>', '<script\\s+language\\s*=\\s*["\']?php["\']?\\s*>', '</script\\s*>');
+
+				if (ini_get ('asp_tags'))
+					$tags = array_merge ($tags, array ('<%', '<%=', '%>'));
+
+				if (ini_get ('short_open_tag'))
+					$tags = array_merge ($tags, array ('<\\?(?![[:alpha:]])'));
+
+				$block_source = preg_replace_callback ('@' . implode ('|', $tags) . '@', function ($match)
+				{
+					return '<?php echo ' . var_export ($match[0], true) . '; ?>';
+				}, $block_source);
+			}
+
+			// Append content to source stream
 			if ($block_is_code === $is_code)
-				$output .= $block_output;
+				$source .= $block_source;
 			else if ($is_code)
-				$output .= " ?>\n" . $block_output . '<?php ';
+				$source .= " ?>\n" . $block_source . '<?php ';
 			else
-				$output .= '<?php ' . $block_output . " ?>\n";
+				$source .= '<?php ' . $block_source . " ?>\n";
 		}
 
-		return $output;
+		return $source;
 	}
 }
 
