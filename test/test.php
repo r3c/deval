@@ -54,6 +54,15 @@ function make_combinations ($variables)
 }
 
 /*
+** Return a single element array of (empty, empty) pair.
+** return:	array with empty pair
+*/
+function make_empty ()
+{
+	return array (array (array (), array ()));
+}
+
+/*
 ** Wrap variables in a ((constants, empty), (empty, volatiles)) array.
 ** $variables:	key => value variables array
 ** return:		two-pairs array
