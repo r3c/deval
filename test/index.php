@@ -18,6 +18,10 @@ raise_inject ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
 // Render plain texts
 render_code ('lol', make_empty (), 'lol');
 render_code ('l{o}l', make_empty (), 'l{o}l');
+render_code ('\\{', make_empty (), '{');
+render_code ('{\\{', make_empty (), '{{');
+render_code ('{\\%', make_empty (), '{%');
+render_code ('a%{b', make_empty (), 'a%{b');
 
 // Render interleaved blocks
 render_code ("A {{ \"B\" }} C", make_empty (), "A B C");

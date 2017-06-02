@@ -35,17 +35,23 @@ _ "whitespace"
 // Plain text tree
 
 Plain
-	= chars:PlainCharacter+ { return implode ('', $chars); }
+	= chars:PlainCharacter+
+	{
+		return implode ('', $chars);
+	}
 
 PlainCharacter
-	= brace:"{" char:PlainSafe { return $brace . $char; }
-	/ PlainSafe
-
-PlainSafe
-	= [^\\{%]
-	/ "\\" sequence:("\\" / "{" / "%")
+	= brace:"{" char:([^\\{%] / PlainEscape)
 	{
-		return $sequence;
+		return $brace . $char;
+	}
+	/ [^\\{]
+	/ PlainEscape
+
+PlainEscape
+	= "\\" char:("\\" / "{" / "%")
+	{
+		return $char;
 	}
 
 // Command tree
