@@ -14,7 +14,9 @@ class Compiler
 	public static function parse_file ($path, $blocks = array ())
 	{
 		$base = count (self::$bases) > 0 ? self::$bases[count (self::$bases) - 1] : '.';
-		$path = strlen ($path) > 0 && $path[0] === DIRECTORY_SEPARATOR ? $path : $base . DIRECTORY_SEPARATOR . $path;
+
+		if (!preg_match ('@^(/|[A-Za-z][-+.0-9A-Za-z]*://)@', $path) && count (self::$bases) > 0)
+			$path = $base . DIRECTORY_SEPARATOR . $path;
 
 		if (!file_exists ($path))
 			throw new CompileException ($path, 'source file doesn\'t exist');

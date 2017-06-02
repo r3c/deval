@@ -84,6 +84,7 @@ render_code ('{% import template/import_outer.deval %}{% end %}', make_combinati
 // Render include command
 render_code ('{% include template/include_inner.deval %}', make_combinations (array ('inner_x' => 'x', 'inner_y' => 'y')), 'xy');
 render_code ('{% include template/include_outer.deval %}', make_combinations (array ('outer_x' => 'x', 'outer_y' => 'y')), 'xy');
+render_code ('{% include ' . dirname (__FILE__) . '/template/include_inner.deval %}', make_combinations (array ('inner_x' => '1', 'inner_y' => '2')), '12');
 
 // Render let command
 render_code ('{% let a = 5 %}{{ a }}{% end %}', array (), '5');
