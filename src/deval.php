@@ -137,7 +137,7 @@ class CachedRenderer implements Renderer
 
 	public function __construct ($path, $directory, $setup = null, $invalidate = false)
 	{
-		$this->constants = null;
+		$this->constants = array ();
 		$this->directory = $directory;
 		$this->invalidate = $invalidate;
 		$this->path = $path;
@@ -146,7 +146,7 @@ class CachedRenderer implements Renderer
 
 	public function inject ($constants)
 	{
-		$this->constants = $constants;
+		$this->constants += $constants;
 	}
 
 	public function render ($volatiles = array ())
@@ -164,9 +164,7 @@ class CachedRenderer implements Renderer
 		Loader::load ();
 
 		$compiler = new Compiler (Compiler::parse_file ($this->path));
-
-		if ($this->constants !== null)
-			$compiler->inject ($this->constants);
+		$compiler->inject ($this->constants);
 
 		return $compiler->compile ($this->setup, $names);
 	}
