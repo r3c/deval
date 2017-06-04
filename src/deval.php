@@ -28,11 +28,16 @@ class RuntimeException extends \Exception
 
 class Builtin
 {
+	public static function _builtin_php ($name)
+	{
+		return $name;
+	}
+
 	public static function deval ()
 	{
 		return array
 		(
-			'php'	=> function ($name) { return $name; }
+			'php'	=> '\\Builtin::_builtin_php'
 		);
 	}
 
