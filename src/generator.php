@@ -29,20 +29,20 @@ class Generator
 	{
 		if (is_array ($input))
 		{
-			$out = '';
+			$source = '';
 
 			if (array_reduce (array_keys ($input), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($input))
 			{
 				foreach ($input as $key => $value)
-					$out .= ($out !== '' ? ',' : '') . self::emit_value ($key) . '=>' . self::emit_value ($value);
+					$source .= ($source !== '' ? ',' : '') . self::emit_value ($key) . '=>' . self::emit_value ($value);
 			}
 			else
 			{
 				foreach ($input as $value)
-					$out .= ($out !== '' ? ',' : '') . self::emit_value ($value);
+					$source .= ($source !== '' ? ',' : '') . self::emit_value ($value);
 			}
 
-			return 'array(' . $out . ')';
+			return 'array(' . $source . ')';
 		}
 
 		return var_export ($input, true);

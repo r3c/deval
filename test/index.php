@@ -53,10 +53,23 @@ render_code ('{{ 2 - 1 }}', make_empty (), '1');
 render_code ('{{ 2 * 2 }}', make_empty (), '4');
 render_code ('{{ 6 / 3 }}', make_empty (), '2');
 render_code ('{{ 4 % 3 }}', make_empty (), '1');
+render_code ('{{ "a" . "b" }}', make_empty (), 'ab');
 render_code ('{{ 1 && 0 }}', make_empty (), '');
 render_code ('{{ 1 && 2 }}', make_empty (), '1');
 render_code ('{{ 0 || 0 }}', make_empty (), '');
 render_code ('{{ 1 || 0 }}', make_empty (), '1');
+render_code ('{{ 0 == 1 }}', make_empty (), '');
+render_code ('{{ 0 == 0 }}', make_empty (), '1');
+render_code ('{{ 0 != 1 }}', make_empty (), '1');
+render_code ('{{ 0 != 0 }}', make_empty (), '');
+render_code ('{{ 0 > 0 }}', make_empty (), '');
+render_code ('{{ 1 > 0 }}', make_empty (), '1');
+render_code ('{{ 0 >= 0 }}', make_empty (), '1');
+render_code ('{{ 1 >= 0 }}', make_empty (), '1');
+render_code ('{{ 0 < 0 }}', make_empty (), '');
+render_code ('{{ 0 < 1 }}', make_empty (), '1');
+render_code ('{{ 0 <= 0 }}', make_empty (), '1');
+render_code ('{{ 0 <= 1 }}', make_empty (), '1');
 
 // Render invoke expressions
 render_code ('{{ one() }}', make_combinations (array ('one' => function () { return 1; })), '1');

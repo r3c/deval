@@ -6,57 +6,33 @@ class BinaryExpression implements Expression
 {
 	public function __construct ($lhs, $rhs, $op)
 	{
-		static $functions;
+		static $callbacks;
 
-		if (!isset ($functions))
+		if (!isset ($callbacks))
 		{
-			$functions = array
+			$callbacks = array
 			(
-				'%' => array
-				(
-					function ($lhs, $rhs) { return $lhs % $rhs; },
-					function ($lhs, $rhs) { return $lhs . '%' . $rhs; }
-				),
-				'&&' => array
-				(
-					function ($lhs, $rhs) { return $lhs && $rhs; },
-					function ($lhs, $rhs) { return $lhs . '&&' . $rhs; }
-				),
-				'*' => array
-				(
-					function ($lhs, $rhs) { return $lhs * $rhs; },
-					function ($lhs, $rhs) { return $lhs . '*' . $rhs; }
-				),
-				'+' => array
-				(
-					function ($lhs, $rhs) { return $lhs + $rhs; },
-					function ($lhs, $rhs) { return $lhs . '+' . $rhs; }
-				),
-				'-' => array
-				(
-					function ($lhs, $rhs) { return $lhs - $rhs; },
-					function ($lhs, $rhs) { return $lhs . '-' . $rhs; }
-				),
-				'/' => array
-				(
-					function ($lhs, $rhs) { return $lhs / $rhs; },
-					function ($lhs, $rhs) { return $lhs . '/' . $rhs; }
-				),
-				'||' => array
-				(
-					function ($lhs, $rhs) { return $lhs || $rhs; },
-					function ($lhs, $rhs) { return $lhs . '||' . $rhs; }
-				)
+				'%'		=> function ($lhs, $rhs) { return $lhs % $rhs; },
+				'&&'	=> function ($lhs, $rhs) { return $lhs && $rhs; },
+				'=='	=> function ($lhs, $rhs) { return $lhs == $rhs; },
+				'!='	=> function ($lhs, $rhs) { return $lhs != $rhs; },
+				'>'		=> function ($lhs, $rhs) { return $lhs > $rhs; },
+				'>='	=> function ($lhs, $rhs) { return $lhs >= $rhs; },
+				'<'		=> function ($lhs, $rhs) { return $lhs < $rhs; },
+				'<='	=> function ($lhs, $rhs) { return $lhs <= $rhs; },
+				'.'		=> function ($lhs, $rhs) { return $lhs . $rhs; },
+				'*'		=> function ($lhs, $rhs) { return $lhs * $rhs; },
+				'+'		=> function ($lhs, $rhs) { return $lhs + $rhs; },
+				'-'		=> function ($lhs, $rhs) { return $lhs - $rhs; },
+				'/'		=> function ($lhs, $rhs) { return $lhs / $rhs; },
+				'||'	=> function ($lhs, $rhs) { return $lhs || $rhs; }
 			);
 		}
 
-		if (!isset ($functions[$op]))
+		if (!isset ($callbacks[$op]))
 			throw new \Exception ('undefined binary operator');
 
-		list ($evaluate, $generate) = $functions[$op];
-
-		$this->f_evaluate = $evaluate;
-		$this->f_generate = $generate;
+		$this->callback = $callbacks[$op];
 		$this->lhs = $lhs;
 		$this->op = $op;
 		$this->rhs = $rhs;
@@ -74,9 +50,7 @@ class BinaryExpression implements Expression
 
 	public function generate ($generator, &$volatiles)
 	{
-		$generate = $this->f_generate;
-
-		return $generate ($this->lhs->generate ($generator, $volatiles), $this->rhs->generate ($generator, $volatiles));
+		return $this->lhs->generate ($generator, $volatiles) . $this->op . $this->rhs->generate ($generator, $volatiles);
 	}
 
 	public function inject ($constants)
@@ -87,9 +61,9 @@ class BinaryExpression implements Expression
 		if (!$lhs->evaluate ($result1) || !$rhs->evaluate ($result2))
 			return new self ($lhs, $rhs, $this->op);
 
-		$evaluate = $this->f_evaluate;
+		$callback = $this->callback;
 
-		return new ConstantExpression ($evaluate ($result1, $result2));		
+		return new ConstantExpression ($callback ($result1, $result2));		
 	}
 }
 

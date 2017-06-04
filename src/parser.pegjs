@@ -171,26 +171,51 @@ ExpressionBooleanOr
 	/ ExpressionBooleanAnd
 
 ExpressionBooleanAnd
-	= lhs:ExpressionMathAdd _ "&&" _ rhs:ExpressionBooleanAnd { return new \Deval\BinaryExpression ($lhs, $rhs, '&&'); }
+	= lhs:ExpressionCompare _ "&&" _ rhs:ExpressionBooleanAnd { return new \Deval\BinaryExpression ($lhs, $rhs, '&&'); }
+	/ ExpressionCompare
+
+ExpressionCompare
+	= lhs:ExpressionStringCat _ op:ExpressionCompareOperator _ rhs:ExpressionCompare { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
+	/ ExpressionStringCat
+
+ExpressionCompareOperator
+	= "=="
+	/ "!="
+	/ ">="
+	/ ">"
+	/ "<="
+	/ "<"
+
+ExpressionStringCat
+	= lhs:ExpressionMathAdd _ "." _ rhs:ExpressionStringCat { return new \Deval\BinaryExpression ($lhs, $rhs, '.'); }
 	/ ExpressionMathAdd
 
 ExpressionMathAdd
-	= lhs:ExpressionMathMul _ "+" _ rhs:ExpressionMathAdd { return new \Deval\BinaryExpression ($lhs, $rhs, '+'); }
-	/ lhs:ExpressionMathMul _ "-" _ rhs:ExpressionMathAdd { return new \Deval\BinaryExpression ($lhs, $rhs, '-'); }
+	= lhs:ExpressionMathMul _ op:ExpressionMathAddOperator _ rhs:ExpressionMathAdd { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
 	/ ExpressionMathMul
 
+ExpressionMathAddOperator
+	= "+"
+	/ "-"
+
 ExpressionMathMul
-	= lhs:ExpressionUnary _ "*" _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, '*'); }
-	/ lhs:ExpressionUnary _ "/" _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, '/'); }
-	/ lhs:ExpressionUnary _ "%" _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, '%'); }
+	= lhs:ExpressionUnary _ op:ExpressionMathMulOperator _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
 	/ ExpressionUnary
 
+ExpressionMathMulOperator
+	= "*"
+	/ "/"
+	/ "%"
+
 ExpressionUnary
-	= "~" _ value:ExpressionUnary { return new \Deval\UnaryExpression ($value, '~'); }
-	/ "!" _ value:ExpressionUnary { return new \Deval\UnaryExpression ($value, '!'); }
-	/ "+" _ value:ExpressionUnary { return new \Deval\UnaryExpression ($value, '+'); }
-	/ "-" _ value:ExpressionUnary { return new \Deval\UnaryExpression ($value, '-'); }
+	= op:ExpressionUnaryOperator _ value:ExpressionUnary { return new \Deval\UnaryExpression ($value, $op); }
 	/ ExpressionInvoke
+
+ExpressionUnaryOperator
+	= "~"
+	/ "!"
+	/ "+"
+	/ "-"
 
 ExpressionInvoke
 	= caller:ExpressionMember _ arguments_list:ExpressionInvokeArguments+

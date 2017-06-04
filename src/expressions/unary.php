@@ -6,42 +6,23 @@ class UnaryExpression implements Expression
 {
 	public function __construct ($value, $op)
 	{
-		static $functions;
+		static $callbacks;
 
-		if (!isset ($functions))
+		if (!isset ($callbacks))
 		{
-			$functions = array
+			$callbacks = array
 			(
-				'!' => array
-				(
-					function ($value) { return !$value; },
-					function ($value) { return '!' . $value; }
-				),
-				'+' => array
-				(
-					function ($value) { return $value; },
-					function ($value) { return '+' . $value; }
-				),
-				'-' => array
-				(
-					function ($value) { return -$value; },
-					function ($value) { return '-' . $value; }
-				),
-				'~' => array
-				(
-					function ($value) { return ~$value; },
-					function ($value) { return '~' . $value; }
-				)
+				'!'	=> function ($value) { return !$value; },
+				'+'	=> function ($value) { return $value; },
+				'-'	=> function ($value) { return -$value; },
+				'~'	=> function ($value) { return ~$value; }
 			);
 		}
 
-		if (!isset ($functions[$op]))
+		if (!isset ($callbacks[$op]))
 			throw new \Exception ('undefined unary operator');
 
-		list ($evaluate, $generate) = $functions[$op];
-
-		$this->f_evaluate = $evaluate;
-		$this->f_generate = $generate;
+		$this->callback = $callbacks[$op];
 		$this->op = $op;
 		$this->value = $value;
 	}
@@ -58,9 +39,7 @@ class UnaryExpression implements Expression
 
 	public function generate ($generator, &$volatiles)
 	{
-		$generate = $this->f_generate;
-
-		return $generate ($this->value->generate ($generator, $volatiles));
+		return $this->op . $this->value->generate ($generator, $volatiles);
 	}
 
 	public function inject ($constants)
@@ -70,9 +49,9 @@ class UnaryExpression implements Expression
 		if (!$value->evaluate ($result))
 			return new self ($value, $this->op);
 
-		$evaluate = $this->f_evaluate;
+		$callback = $this->callback;
 
-		return new ConstantExpression ($evaluate ($result));
+		return new ConstantExpression ($callback ($result));
 	}
 }
 
