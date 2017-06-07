@@ -129,4 +129,13 @@ render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations 
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');
 render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "1\n2\n3");
 
+// Setup style
+foreach (array ('collapse' => '1 2 3', 'deindent' => '123', 'preserve' => "1\n    2\n3") as $style => $expect)
+{
+	$setup = new Deval\Setup ();
+	$setup->style = $style;
+
+	render_code ("{{ 1 }}\n    {{ 2 }}\n{{ 3 }}", make_empty (), $expect, $setup);
+}
+
 ?>

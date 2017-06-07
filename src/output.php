@@ -34,6 +34,9 @@ class Output
 
 	public function append_code ($code)
 	{
+		if ($code === '')
+			return $this;
+
 		$other = new self ();
 		$other->snippets[] = array ($code, true);
 
@@ -42,6 +45,9 @@ class Output
 
 	public function append_text ($text)
 	{
+		if ($text === '')
+			return $this;
+
 		$other = new self ();
 		$other->snippets[] = array ($text, false);
 

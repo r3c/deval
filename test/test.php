@@ -162,16 +162,17 @@ function render ($constructor, $pairs, $expect)
 ** $source:	template source code
 ** $pairs:	(constants, volatiles) variable pairs
 ** $expect:	expected rendered string
+** $setup:	compiler setup
 */
-function render_code ($source, $pairs, $expect)
+function render_code ($source, $pairs, $expect, $setup = null)
 {
-	render (function () use ($source)
+	render (function () use ($setup, $source)
 	{
 		return array
 		(
-			new Deval\StringRenderer ($source)
+			new Deval\StringRenderer ($source, $setup)
 		);
-	}, $pairs, $expect);
+	}, $pairs, $expect, $setup);
 }
 
 /*
@@ -181,17 +182,18 @@ function render_code ($source, $pairs, $expect)
 ** $directory:	caching directory
 ** $pairs:		(constants, volatiles) variable pairs
 ** $expect:		expected rendered string
+** $setup:	compiler setup
 */
-function render_file ($path, $directory, $pairs, $expect)
+function render_file ($path, $directory, $pairs, $expect, $setup = null)
 {
-	render (function () use ($directory, $path)
+	render (function () use ($directory, $path, $setup)
 	{
 		return array
 		(
-			new Deval\CachedRenderer ($path, $directory, null, true),
-			new Deval\FileRenderer ($path, null)
+			new Deval\CachedRenderer ($path, $directory, $setup, true),
+			new Deval\FileRenderer ($path, $setup)
 		);
-	}, $pairs, $expect);
+	}, $pairs, $expect, $setup);
 }
 
 ?>
