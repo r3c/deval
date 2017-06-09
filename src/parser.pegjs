@@ -180,7 +180,13 @@ ExpressionCompare
 
 ExpressionCompareOperator
 	= "=="
+	{
+		return "===";
+	}
 	/ "!="
+	{
+		return "!==";
+	}
 	/ ">="
 	/ ">"
 	/ "<="
