@@ -34,7 +34,10 @@ render_code ("A {{ \"B\" }} C", make_empty (), "A B C");
 render_code ("A\n{{ \"B\" }}\nC", make_empty (), "A\nB\nC");
 
 // Render constants
-render_code ('{{ 1 }}', make_empty (), '1');
+render_code ('{{ null }}', make_empty (), '');
+render_code ('{{ false }}', make_empty (), '');
+render_code ('{{ true }}', make_empty (), '1');
+render_code ('{{ 0 }}', make_empty (), '0');
 render_code ('{{ "hello" }}', make_empty (), 'hello');
 render_code ('{{ [1][0] }}', make_empty (), '1');
 render_code ('{{ [1: 2][1] }}', make_empty (), '2');

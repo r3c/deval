@@ -282,13 +282,31 @@ ArrayElement
 	}
 
 Scalar
-	= Integer
+	= Boolean
+	/ Integer
+	/ Null
 	/ String
+
+Boolean "boolean"
+	= "false"
+	{
+		return false;
+	}
+	/ "true"
+	{
+		return true;
+	}
 
 Integer "integer"
 	= digits:$[0-9]+
 	{
 		return intval ($digits);
+	}
+
+Null "null"
+	= "null"
+	{
+		return null;
 	}
 
 String "string"
