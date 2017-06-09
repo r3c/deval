@@ -1,12 +1,11 @@
-let fs = require('fs');
+let fs = require ('fs');
 let pegjs = require ('pegjs');
 let phppegjs = require ('php-pegjs');
 
 let input = 'src/parser.pegjs';
 let output = 'src/parser.php';
 
-fs.readFile (input, 'utf8', function (err, data)
-{
+fs.readFile (input, 'utf8', function (err, data) {
 	if (err)
 		return console.log (err);
 
@@ -15,8 +14,7 @@ fs.readFile (input, 'utf8', function (err, data)
 		plugins: [phppegjs]
 	});
 
-	fs.writeFile (output, parser, function (err)
-	{
+	fs.writeFile (output, parser, function (err) {
 		if (err)
 			return console.log (err);
 

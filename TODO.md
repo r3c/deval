@@ -5,6 +5,9 @@ TODO
 ----
 
 - Implement {% escape $callback %}{% end %} block
+- Recognize special false, null & true constants
+- Support pure functional lambda
+- Support ternary operator
 
 DONE
 ----
