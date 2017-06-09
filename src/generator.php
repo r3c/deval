@@ -73,7 +73,7 @@ class Generator
 				$trims = array
 				(
 					'collapse'	=> function ($s) { return preg_replace ('/\\s+/m', ' ', $s); },
-					'deindent'	=> function ($s) { return preg_replace ("/^(?:\n|\r|\n\r|\r\n)[\t ]*/", '', $s); },
+					'deindent'	=> function ($s) { return preg_replace ("/^(?:\n|\r|\n\r|\r\n)[\t ]*|(?:\n|\r|\n\r|\r\n)[\t ]*$/", '', $s); },
 					'html'		=> function ($s) { return preg_replace (array ('/(^|>)\\s+/m', '/\\s+(<|$)/m'), array ('$1 ', ' $1'), $s); },
 					'preserve'	=> function ($s) { return $s; }
 				);

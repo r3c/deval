@@ -130,12 +130,12 @@ render_file ('template/member.deval', 'template', make_combinations (array ('x' 
 render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "1\n2\n3");
 
 // Setup style
-foreach (array ('collapse' => '1 2 3', 'deindent' => '123', 'preserve' => "1\n    2\n3") as $style => $expect)
+foreach (array ('collapse' => '1 X2Y 3 4', 'deindent' => '1X2Y34', 'preserve' => "1\n  X2Y\n  3\n4") as $style => $expect)
 {
 	$setup = new Deval\Setup ();
 	$setup->style = $style;
 
-	render_code ("{{ 1 }}\n    {{ 2 }}\n{{ 3 }}", make_empty (), $expect, $setup);
+	render_code ("{{ 1 }}\n  X{{ 2 }}Y\n  {{ 3 }}\n{{ 4 }}", make_empty (), $expect, $setup);
 }
 
 ?>
