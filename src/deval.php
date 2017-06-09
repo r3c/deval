@@ -28,17 +28,80 @@ class RuntimeException extends \Exception
 
 class Builtin
 {
+	public static function _builtin_filter ($items, $predicate)
+	{
+		return array_filter ($items, $predicate);
+	}
+
+	public static function _builtin_join ($items, $separator = '')
+	{
+		return implode ($separator, $items);
+	}
+
+	public static function _builtin_map ($items, $apply)
+	{
+		return array_map ($apply, $items);
+	}
+
 	public static function _builtin_php ($name)
 	{
 		return $name;
 	}
 
+	public static function _builtin_slice ($input, $offset, $count = null)
+	{
+		if (is_array ($input))
+		{
+			if ($count !== null)
+				return array_slice ($input, $offset, $count);
+
+			return array_slice ($input, $offset);
+		}
+		else
+		{
+			if ($count !== null)
+				return substr ((string)$input, $offset, $count);
+
+			return substr ((string)$input, $offset);
+		}
+	}
+
+	public static function _builtin_sort ($items, $compare = null)
+	{
+		if ($compare !== null)
+			uasort ($items, $compare);
+		else
+			asort ($items);
+
+		return $items;
+	}
+
+	public static function _builtin_split ($string, $separator, $limit = null)
+	{
+		if ($limit !== null)
+			return explode ($separator, $string, $limit);
+
+		return explode ($separator, $string);
+	}
+
 	public static function deval ()
 	{
-		return array
+		$class = '\\' . get_class ();
+		$names = array
 		(
-			'php'	=> '\\Builtin::_builtin_php'
+			'filter',
+			'join',
+			'map',
+			'php',
+			'slice',
+			'sort',
+			'split'
 		);
+
+		return array_combine ($names, array_map (function ($name) use ($class)
+		{
+			return array ($class, '_builtin_' . $name);
+		}, $names));
 	}
 
 	public static function php ()
@@ -114,6 +177,7 @@ class Loader
 		require $path . '/expressions/binary.php';
 		require $path . '/expressions/constant.php';
 		require $path . '/expressions/invoke.php';
+		require $path . '/expressions/lambda.php';
 		require $path . '/expressions/member.php';
 		require $path . '/expressions/symbol.php';
 		require $path . '/expressions/unary.php';

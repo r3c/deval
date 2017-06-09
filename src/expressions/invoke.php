@@ -27,23 +27,34 @@ class InvokeExpression implements Expression
 		foreach ($this->arguments as $argument)
 			$arguments[] = $argument->generate ($generator, $volatiles);
 
-		// Hack: use literal function name if possible e.g. "func()" vs "$f = 'func'; $f()"
-		if ($this->caller->evaluate ($result))
-		{
-			if (!is_callable ($result))
-				throw new InjectException ($this->caller, 'is not callable');
-
-			if (!is_string ($result))
-				throw new InjectException ($this->caller, 'only strings can be injected as functions, not closures');
-
-			$caller = $result;
-			$direct = true;
-		}
-		else
+		// If caller can't be evaluated to a value, generate as an expression
+		if (!$this->caller->evaluate ($result))
 		{
 			$caller = $this->caller->generate ($generator, $volatiles);
 			$direct = $this->caller instanceof SymbolExpression || $generator->support ('7.0.1');
 		}
+
+		// Make sure caller is valid before trying to generate code
+		else if (!is_callable ($result))
+			throw new InjectException ($this->caller, 'is not callable');
+
+		// Use array caller syntax if caller is a two-elements array, e.g. "array ('Class', 'method')"
+		else if (is_array ($result) && count ($result) === 2 && is_string ($result[0]) && is_string ($result[1]))
+		{
+			$caller = 'array(' . var_export ($result[0], true) . ',' . var_export ($result[1], true)  . ')';
+			$direct = false;
+		}
+
+		// Use literal function name if caller is a string e.g. "func()"
+		else if (is_string ($result))
+		{
+			$caller = $result;
+			$direct = true;
+		}
+
+		// Otherwise caller is probably a closure and can't be easily serialized
+		else
+			throw new InjectException ($this->caller, 'only strings or arrays can be injected as functions, not closures');
 
 		// Hack: PHP versions < 7.0.1 do not support syntax "func()()"
 		if ($direct)

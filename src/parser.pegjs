@@ -258,14 +258,36 @@ ExpressionMember
 	/ ExpressionPrimary
 
 ExpressionMemberIndex
-	= "[" _ index:Expression _ "]" _ { return $index ; }
-	/ "." index:Symbol { return new \Deval\ConstantExpression ($index); }
+	= "[" _ index:Expression _ "]"
+	{
+		return $index;
+	}
+	/ "." index:Symbol
+	{
+		return new \Deval\ConstantExpression ($index);
+	}
 
 ExpressionPrimary
-	= "(" _ value:Expression _ ")" { return $value; }
-	/ value:Array { return new \Deval\ArrayExpression ($value); }
-	/ value:Scalar { return new \Deval\ConstantExpression ($value); }
-	/ value:Symbol { return new \Deval\SymbolExpression ($value); }
+	= names:LambdaNames _ "=>" _ body:Expression
+	{
+		return new \Deval\LambdaExpression ($names, $body);
+	}
+	/ value:Array
+	{
+		return new \Deval\ArrayExpression ($value);
+	}
+	/ value:Scalar
+	{
+		return new \Deval\ConstantExpression ($value);
+	}
+	/ value:Symbol
+	{
+		return new \Deval\SymbolExpression ($value);
+	}
+	/ "(" _ value:Expression _ ")"
+	{
+		return $value;
+	}
 
 Array
 	= "[" _ "]"
@@ -285,6 +307,16 @@ ArrayElement
 	/ value:Expression
 	{
 		return array (null, $value);
+	}
+
+LambdaNames
+	= "(" _ ")"
+	{
+		return array ();
+	}
+	/ "(" _ head:Symbol _ tail:("," _ token:Symbol _ { return $token; })* ")"
+	{
+		return array_merge (array ($head), $tail);
 	}
 
 Scalar

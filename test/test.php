@@ -22,6 +22,17 @@ function combinations ($k, $n, $candidates = array ())
 }
 
 /*
+** Generate all possible (constants, variables) partitions pairs with given
+** builtin functions.
+** *:		builtin function names
+** return:	(constants, volatiles) pairs array
+*/
+function make_builtins ()
+{
+	return make_combinations (array_intersect_key (Deval\Builtin::deval (), array_flip (func_get_args ())));
+}
+
+/*
 ** Generate all possible (constants, volatiles) partition pairs from given
 ** variables array.
 ** $variables:	key => value variables array
@@ -147,7 +158,7 @@ function render ($constructor, $pairs, $expect)
 
 			$renderer->source ($names_result);
 
-			assert (count (array_diff ($names_expect, $names_result)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
+			assert (count (array_diff ($names_result, $names_expect)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
 
 			$result = $renderer->render ($volatiles);
 

@@ -84,6 +84,11 @@ render_code ('{{ two()() }}', make_combinations (array ('two' => function () { r
 render_code ('{{ strlen(x) }}', make_combinations (array ('strlen' => 'strlen', 'x' => 'something')), '9');
 render_code ('{{ inc(x) }}', make_slices (array ('inc' => function ($x) { return $x + 1; }, 'x' => 1)), '2');
 
+// Render lambda expressions
+render_code ('{{ ((i) => i + 1)(2) }}', make_empty (), '3');
+render_code ('{{ ((x, y) => x * y)(3, 5) }}', make_empty (), '15');
+render_code ('{{ ((x) => x + y)(2) }}', make_combinations (array ('y' => 3)), '5');
+
 // Render member expressions
 render_code ('{{ [1][0] }}', make_empty (), '1');
 render_code ('{{ a[0] }}', make_combinations (array ('a' => array (7))), '7');
@@ -142,5 +147,20 @@ foreach (array ('collapse' => '1 X2Y 3 4', 'deindent' => '1X2Y34', 'preserve' =>
 
 	render_code ("{{ 1 }}\n  X{{ 2 }}Y\n  {{ 3 }}\n{{ 4 }}", make_empty (), $expect, $setup);
 }
+
+// Invoke builtins
+render_code ('{{ join(",", filter([1, 2, 3, 4], (i) => i % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
+render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
+render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
+render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
+render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
+render_code ('{{ slice("1234", -3) }}', make_builtins ('slice'), '234');
+render_code ('{{ slice("1234", -3, 2) }}', make_builtins ('slice'), '23');
+render_code ('{{ join(",", slice([1, 2, 3, 4], 1)) }}', make_builtins ('join', 'slice'), '2,3,4');
+render_code ('{{ join(",", slice([1, 2, 3, 4], 1, 2)) }}', make_builtins ('join', 'slice'), '2,3');
+render_code ('{{ join(",", slice([1, 2, 3, 4], -3)) }}', make_builtins ('join', 'slice'), '2,3,4');
+render_code ('{{ join(",", slice([1, 2, 3, 4], -3, 2)) }}', make_builtins ('join', 'slice'), '2,3');
+render_code ('{{ join(",", sort([4, 2, 3, 1])) }}', make_builtins ('join', 'sort'), '1,2,3,4');
+render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 'split'), '1,2,3,4');
 
 ?>
