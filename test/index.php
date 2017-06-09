@@ -5,6 +5,19 @@ require 'test.php';
 
 header ('Content-Type: text/plain');
 
+class TestClass
+{
+	public function instance_method ()
+	{
+		return 42;
+	}
+
+	public static function static_method ()
+	{
+		return 17;
+	}
+}
+
 // Compile exceptions
 raise_compile ('{{ x y }}', 'but "y" found');
 raise_compile ('{{ x ** y }}', 'but "*" found');
@@ -83,6 +96,8 @@ render_code ('{{ implode(":", [1, 2, 3]) }}', make_combinations (array ('implode
 render_code ('{{ two()() }}', make_combinations (array ('two' => function () { return function () { return 2; }; })), '2');
 render_code ('{{ strlen(x) }}', make_combinations (array ('strlen' => 'strlen', 'x' => 'something')), '9');
 render_code ('{{ inc(x) }}', make_slices (array ('inc' => function ($x) { return $x + 1; }, 'x' => 1)), '2');
+render_code ('{{ method() }}', make_slices (array ('method' => array ('TestClass', 'static_method'))), '17');
+render_code ('{{ obj.instance_method() }}', make_slices (array ('obj' => new TestClass ())), '42');
 
 // Render lambda expressions
 render_code ('{{ ((i) => i + 1)(2) }}', make_empty (), '3');

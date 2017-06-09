@@ -6,6 +6,7 @@ TODO
 
 - Implement {% escape $callback %}{% end %} block
 - Support ternary operator
+- Support both arrays and strings for concatenation operator "."
 
 DONE
 ----

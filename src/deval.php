@@ -294,10 +294,17 @@ class Setup
 
 function member ($source, $index)
 {
-	$array = (array)$source;
-
-	if (isset ($array[$index]))
-		return $array[$index];
+	if (is_object ($source))
+	{
+		if (method_exists ($source, $index))
+			return array ($source, $index);
+		else if (property_exists ($source, $index))
+			return $source->$index;
+		else if (isset ($source[$index]))
+			return $source[$index];
+	}
+	else if (isset ($source[$index]))
+		return $source[$index];
 
 	return null;
 }
