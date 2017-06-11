@@ -286,13 +286,7 @@ class StringRenderer extends DirectRenderer
 	}
 }
 
-class Setup
-{
-	public $style = 'deindent';
-	public $version = PHP_VERSION;
-}
-
-class State
+class Runtime
 {
 	public static function member ($source, $index)
 	{
@@ -330,6 +324,12 @@ class State
 	{
 		$this->scopes[] = func_get_args ();
 	}
+}
+
+class Setup
+{
+	public $style = 'deindent';
+	public $version = PHP_VERSION;
 }
 
 ?>

@@ -10,7 +10,7 @@ class Generator
 
 	public static function emit_member ($source, $index)
 	{
-		return '\\' . __NAMESPACE__ . '\\State::member(' . $source . ',' . $index . ')';
+		return '\\' . __NAMESPACE__ . '\\Runtime::member(' . $source . ',' . $index . ')';
 	}
 
 	public static function emit_scope_pop ($names)
@@ -34,7 +34,7 @@ class Generator
 	public static function emit_state ($names)
 	{
 		return
-			'$' . self::$state_name . '=new\\' . __NAMESPACE__ . '\\State(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
+			'$' . self::$state_name . '=new\\' . __NAMESPACE__ . '\\Runtime(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
 			'\\extract($' . self::$input_name . ');';
 	}
 
