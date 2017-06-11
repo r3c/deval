@@ -7,6 +7,7 @@ TODO
 - Implement {% escape $callback %}{% end %} block
 - Support ternary operator
 - Support both arrays and strings for concatenation operator "."
+- Replace local variables by state members
 
 DONE
 ----
@@ -17,3 +18,4 @@ DONE
 - Allow literal key/value arrays
 - Recognize special false, null & true constants
 - Support pure functional lambda
+- Fix variable scoping

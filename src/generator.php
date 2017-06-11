@@ -4,13 +4,31 @@ namespace Deval;
 
 class Generator
 {
-	private static $input_name = '_deval_input';
-	private static $local_name = '_deval_local';
-	private static $state_name = '_deval_state';
+	public static $input_name = '_deval_input';
+	public static $local_name = '_deval_local';
+	public static $state_name = '_deval_state';
 
 	public static function emit_member ($source, $index)
 	{
 		return '\\' . __NAMESPACE__ . '\\State::member(' . $source . ',' . $index . ')';
+	}
+
+	public static function emit_scope_pop ($names)
+	{
+		return 'list(' . implode (',', array_map (function ($name)
+		{
+			return Generator::emit_symbol ($name);
+		}, $names)) . ')=$' . self::$state_name . '->scope_pop();';
+	}
+
+	public static function emit_scope_push ($names)
+	{
+		return '$' . self::$state_name . '->scope_push(' . implode (',', array_map (function ($name)
+		{
+			$symbol = Generator::emit_symbol ($name);
+
+			return 'isset(' . $symbol . ')?' . $symbol . ':null';
+		}, $names)) . ');';
 	}
 
 	public static function emit_state ($names)

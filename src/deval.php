@@ -311,12 +311,24 @@ class State
 		return null;
 	}
 
+	private $scopes = array ();
+
 	public function __construct ($required, &$provided)
 	{
 		$undefined = array_diff ($required, array_keys ($provided));
 
 		if (count ($undefined) > 0)
 			throw new RenderException ('undefined symbol(s) ' . implode (', ', $undefined));
+	}
+
+	public function scope_pop ()
+	{
+		return array_pop ($this->scopes);
+	}
+
+	public function scope_push ()
+	{
+		$this->scopes[] = func_get_args ();
 	}
 }
 

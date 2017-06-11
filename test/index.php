@@ -154,6 +154,7 @@ render_code ('{% let a = 5, b = 7 %}{{ a }}{{ b }}{% end %}', make_empty (), '57
 render_code ('{% let a = x %}{{ a }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
 render_code ('{% let a = x, b = a %}{{ b }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
 render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations (array ('b' => '1', 'x' => '2')), '12');
+render_code ('{% let a = x %}{{ a }}{% let a = y %}{{ a }}{% end %}{{ a }}{% end %}', make_combinations (array ('x' => 1, 'y' => 2)), '121');
 
 // Render files
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');

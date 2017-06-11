@@ -13,8 +13,14 @@ class LetBlock implements Block
 	public function compile ($generator, &$volatiles)
 	{
 		$output = new Output ();
-		$output->append_code ('{', true);
 
+		// Push current variables to scopes stack
+		$output->append_code (Generator::emit_scope_push (array_map (function ($a)
+		{
+			return $a[0];
+		}, $this->assignments)));
+
+		// Assign specified variables
 		$names = array ();
 
 		foreach ($this->assignments as $assignment)
@@ -37,7 +43,12 @@ class LetBlock implements Block
 		$volatiles_inner = array ();
 
 		$output->append ($this->body->compile ($generator, $volatiles_inner));
-		$output->append_code ('}');
+
+		// Restore previous variables from scopes stack
+		$output->append_code (Generator::emit_scope_pop (array_map (function ($a)
+		{
+			return $a[0];
+		}, $this->assignments)));
 
 		// Append required volatiles but the ones provided by all assignments
 		$volatiles += array_diff_key ($volatiles_inner, $names);
