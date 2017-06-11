@@ -106,7 +106,7 @@ function raise_compile ($source, $message)
 	{
 		$renderer = new Deval\StringRenderer ($source);
 
-		assert (false, 'should have raised exception');
+		assert (false, 'should have raised exception at compilation');
 	}
 	catch (Deval\CompileException $exception)
 	{
@@ -128,9 +128,34 @@ function raise_inject ($source, $constants, $message)
 	{
 		$renderer->inject ($constants);
 
-		assert (false, 'should have raised exception');
+		assert (false, 'should have raised exception at injection');
 	}
 	catch (Deval\InjectException $exception)
+	{
+		raise ($exception, $message);
+	}
+}
+
+/*
+** Ensure source code throw render exception when injected given constants and
+** volatiles.
+** $source:		template source code
+** $constants:	injected constants
+** $volatiles:	injected volatiles
+** $message:	expected exception message
+*/
+function raise_render ($source, $constants, $volatiles, $message)
+{
+	$renderer = new Deval\StringRenderer ($source);
+	$renderer->inject ($constants);
+
+	try
+	{
+		$renderer->render ($constants);
+
+		assert (false, 'should have raised exception at rendering');
+	}
+	catch (Deval\RenderException $exception)
 	{
 		raise ($exception, $message);
 	}

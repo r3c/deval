@@ -28,6 +28,10 @@ raise_inject ('{% for i in x %}{% end %}', array ('x' => 1), 'is not iterable');
 raise_inject ('{{ f() }}', array ('f' => 1), 'is not callable');
 raise_inject ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
 
+// Render exceptions
+raise_render ('{{ a }}', array (), array (), 'undefined symbol(s) a');
+raise_render ('{{ a }}{% let a = 1 %}{% end %}', array (), array (), 'undefined symbol(s) a');
+
 // Render plain texts
 render_code ('lol', make_empty (), 'lol');
 render_code ('l{o}l', make_empty (), 'l{o}l');
@@ -146,7 +150,6 @@ render_code ('{% include ' . dirname (__FILE__) . '/template/include_inner.deval
 render_code ('{% let a = 5 %}{{ a }}{% end %}', make_empty (), '5');
 render_code ('{% let a = 5, b = 7 %}{{ a }}{{ b }}{% end %}', make_empty (), '57');
 render_code ('{% let a = x %}{{ a }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
-
 render_code ('{% let a = x, b = a %}{{ b }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
 render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations (array ('b' => '1', 'x' => '2')), '12');
 

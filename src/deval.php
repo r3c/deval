@@ -18,7 +18,7 @@ class InjectException extends \Exception
 	}
 }
 
-class RuntimeException extends \Exception
+class RenderException extends \Exception
 {
 	public function __construct ($message)
 	{
@@ -314,7 +314,7 @@ function run ($required, &$provided)
 	$undefined = array_diff ($required, array_keys ($provided));
 
 	if (count ($undefined) > 0)
-		throw new RuntimeException ('undefined symbol(s) ' . implode (', ', $undefined));
+		throw new RenderException ('undefined symbol(s) ' . implode (', ', $undefined));
 }
 
 ?>
