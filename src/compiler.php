@@ -67,7 +67,7 @@ class Compiler
 		$names = array_keys ($volatiles);
 
 		$output = new Output ();
-		$output->append_code (Generator::emit_create ($names));
+		$output->append_code (Generator::emit_state ($names));
 		$output->append ($source);
 
 		return $output->source ();

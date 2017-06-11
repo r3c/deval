@@ -31,6 +31,8 @@ raise_inject ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
 // Render exceptions
 raise_render ('{{ a }}', array (), array (), 'undefined symbol(s) a');
 raise_render ('{{ a }}{% let a = 1 %}{% end %}', array (), array (), 'undefined symbol(s) a');
+raise_render ('{{ _deval_input }}', array (), array ('_deval_input' => 0), 'invalid symbol name _deval_input');
+raise_render ('{{ _deval_state }}', array (), array ('_deval_state' => 0), 'invalid symbol name _deval_state');
 
 // Render plain texts
 render_code ('lol', make_empty (), 'lol');

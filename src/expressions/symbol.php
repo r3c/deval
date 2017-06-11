@@ -6,8 +6,6 @@ class SymbolExpression implements Expression
 {
 	public function __construct ($name)
 	{
-		Generator::assert_symbol ($name);
-
 		$this->name = $name;
 	}
 
@@ -25,7 +23,7 @@ class SymbolExpression implements Expression
 	{
 		$volatiles[$this->name] = true;
 
-		return '$' . $this->name;
+		return Generator::emit_symbol ($this->name);
 	}
 
 	public function inject ($constants)

@@ -6,11 +6,6 @@ class ForBlock implements Block
 {
 	public function __construct ($source, $key, $value, $body, $fallback)
 	{
-		if ($key !== null)
-			Generator::assert_symbol ($key);
-
-		Generator::assert_symbol ($value);
-
 		$this->body = $body;
 		$this->fallback = $fallback;
 		$this->key = $key;
@@ -29,9 +24,9 @@ class ForBlock implements Block
 		$output->append_code ('foreach(' . $this->source->generate ($generator, $volatiles) . ' as ');
 
 		if ($this->key !== null)
-			$output->append_code ('$' . $this->key . '=>$' . $this->value);
+			$output->append_code (Generator::emit_symbol ($this->key) . '=>' . Generator::emit_symbol ($this->value));
 		else
-			$output->append_code ('$' . $this->value);
+			$output->append_code (Generator::emit_symbol ($this->value));
 
 		$output->append_code (')');
 

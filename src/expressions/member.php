@@ -35,7 +35,7 @@ class MemberExpression implements Expression
 
 		// Resolve to constant value if both source and index were evaluated
 		if ($index->evaluate ($index_result) && $source->evaluate ($source_result))
-			return new ConstantExpression (member ($source_result, $index_result));
+			return new ConstantExpression (State::member ($source_result, $index_result));
 
 		// Otherwise return injected source and index
 		return new self ($source, $index);

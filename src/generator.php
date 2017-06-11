@@ -6,23 +6,26 @@ class Generator
 {
 	private static $input_name = '_deval_input';
 	private static $local_name = '_deval_local';
-
-	public static function assert_symbol ($name)
-	{
-		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name))
-			throw new \Exception ('invalid symbol name');
-	}
-
-	public static function emit_create ($names)
-	{
-		return
-			'\\' . __NAMESPACE__ . '\\run(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
-			'\\extract($' . self::$input_name . ');';
-	}
+	private static $state_name = '_deval_state';
 
 	public static function emit_member ($source, $index)
 	{
-		return '\\' . __NAMESPACE__ . '\\member(' . $source . ',' . $index . ')';
+		return '\\' . __NAMESPACE__ . '\\State::member(' . $source . ',' . $index . ')';
+	}
+
+	public static function emit_state ($names)
+	{
+		return
+			'$' . self::$state_name . '=new\\' . __NAMESPACE__ . '\\State(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
+			'\\extract($' . self::$input_name . ');';
+	}
+
+	public static function emit_symbol ($name)
+	{
+		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name) || $name === self::$input_name || $name === self::$state_name)
+			throw new RenderException ('invalid symbol name ' . $name);
+
+		return '$' . $name;
 	}
 
 	public static function emit_value ($input)

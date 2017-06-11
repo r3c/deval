@@ -292,29 +292,32 @@ class Setup
 	public $version = PHP_VERSION;
 }
 
-function member ($source, $index)
+class State
 {
-	if (is_object ($source))
+	public static function member ($source, $index)
 	{
-		if (method_exists ($source, $index))
-			return array ($source, $index);
-		else if (property_exists ($source, $index))
-			return $source->$index;
+		if (is_object ($source))
+		{
+			if (method_exists ($source, $index))
+				return array ($source, $index);
+			else if (property_exists ($source, $index))
+				return $source->$index;
+			else if (isset ($source[$index]))
+				return $source[$index];
+		}
 		else if (isset ($source[$index]))
 			return $source[$index];
+
+		return null;
 	}
-	else if (isset ($source[$index]))
-		return $source[$index];
 
-	return null;
-}
+	public function __construct ($required, &$provided)
+	{
+		$undefined = array_diff ($required, array_keys ($provided));
 
-function run ($required, &$provided)
-{
-	$undefined = array_diff ($required, array_keys ($provided));
-
-	if (count ($undefined) > 0)
-		throw new RenderException ('undefined symbol(s) ' . implode (', ', $undefined));
+		if (count ($undefined) > 0)
+			throw new RenderException ('undefined symbol(s) ' . implode (', ', $undefined));
+	}
 }
 
 ?>
