@@ -18,9 +18,9 @@ class ForBlock implements Block
 		$output = new Output ();
 
 		// Write loop control
-		$loop = $generator->make_local ();
+		$loop = $generator->emit_local ();
 
-		$output->append_code ('$' . $loop . '=0;');
+		$output->append_code ($loop . '=0;');
 		$output->append_code ('foreach(' . $this->source->generate ($generator, $volatiles) . ' as ');
 
 		if ($this->key !== null)
@@ -35,7 +35,7 @@ class ForBlock implements Block
 
 		$output->append_code ('{');
 		$output->append ($this->body->compile ($generator, $volatiles_inner));
-		$output->append_code ('++$' . $loop . ';');
+		$output->append_code ('++' . $loop . ';');
 		$output->append_code ('}');
 
 		if ($this->key !== null)
@@ -49,7 +49,7 @@ class ForBlock implements Block
 		// Write fallback block if any
 		if ($this->fallback !== null)
 		{
-			$output->append_code ('if($' . $loop . '==0)');
+			$output->append_code ('if(' . $loop . '==0)');
 			$output->append_code ('{');
 			$output->append ($this->fallback->compile ($generator, $volatiles));
 			$output->append_code ('}');

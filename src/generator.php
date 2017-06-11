@@ -4,9 +4,8 @@ namespace Deval;
 
 class Generator
 {
-	public static $input_name = '_deval_input';
-	public static $local_name = '_deval_local';
-	public static $state_name = '_deval_state';
+	private static $input_name = '_deval_input';
+	private static $state_name = '_deval_state';
 
 	public static function emit_member ($source, $index)
 	{
@@ -118,9 +117,9 @@ class Generator
 		$this->local = 0;
 	}
 
-	public function make_local ()
+	public function emit_local ()
 	{
-		return self::$local_name . $this->local++;
+		return '$' . self::$state_name . '->_' . $this->local++;
 	}
 
 	public function make_plain ($text)
