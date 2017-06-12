@@ -134,7 +134,7 @@ CommandLet "let command"
 	}
 
 CommandLetAssignments "assignments"
-	= head:CommandLetAssignmentsPair _ tail:("," _ token:CommandLetAssignmentsPair { return $token; })*
+	= head:CommandLetAssignmentsPair _ tail:("," _ token:CommandLetAssignmentsPair _ { return $token; })*
 	{
 		return array_merge (array ($head), $tail);
 	}
@@ -224,11 +224,11 @@ ExpressionUnaryOperator
 	/ "-"
 
 ExpressionInvoke
-	= caller:ExpressionMember _ arguments_list:ExpressionInvokeArguments+
+	= caller:ExpressionMember _ lists:(token:ExpressionInvokeArguments _ { return $token; })+
 	{
 		$expression = $caller;
 
-		foreach ($arguments_list as $arguments)
+		foreach ($lists as $arguments)
 			$expression = new \Deval\InvokeExpression ($expression, $arguments);
 
 		return $expression;
@@ -246,7 +246,7 @@ ExpressionInvokeArguments
 	}
 
 ExpressionMember
-	= source:ExpressionPrimary _ indices:ExpressionMemberIndex+
+	= source:ExpressionPrimary _ indices:(token:ExpressionMemberIndex _ { return $token; })+
 	{
 		$expression = $source;
 
