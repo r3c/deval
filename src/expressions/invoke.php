@@ -41,8 +41,13 @@ class InvokeExpression implements Expression
 		// Use array caller syntax if caller is a two-elements array, e.g. "array ('Class', 'method')"
 		else if (is_array ($result) && count ($result) === 2 && is_string ($result[0]) && is_string ($result[1]))
 		{
-			$caller = 'array(' . var_export ($result[0], true) . ',' . var_export ($result[1], true)  . ')';
-			$direct = false;
+			$method = new \ReflectionMethod ($result[0], $result[1]);
+
+			if (!$method->isStatic ())
+				throw new InjectException ($this->caller, 'is not static');
+
+			$caller = $result[0] . '::' . $result[1];
+			$direct = true;
 		}
 
 		// Use literal function name if caller is a string e.g. "func()"
