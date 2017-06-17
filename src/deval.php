@@ -33,6 +33,20 @@ class Builtin
 		return array_filter ($items, $predicate);
 	}
 
+	public static function _builtin_find ($items, $predicate = null)
+	{
+		if ($predicate === null)
+			return each ($items);
+
+		foreach ($items as $key => $value)
+		{
+			if ($predicate ($value))
+				return array ($key, $value);
+		}
+
+		return null;
+	}
+
 	public static function _builtin_join ($items, $separator = '')
 	{
 		return implode ($separator, $items);
@@ -90,6 +104,7 @@ class Builtin
 		$names = array
 		(
 			'filter',
+			'find',
 			'join',
 			'map',
 			'php',

@@ -171,6 +171,8 @@ foreach (array ('collapse' => '1 X2Y 3 4', 'deindent' => '1X2Y34', 'preserve' =>
 
 // Invoke builtins
 render_code ('{{ join(",", filter([1, 2, 3, 4], (i) => i % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
+render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"]) %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '2:two');
+render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"], (v) => v == "four") %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '4:four');
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
