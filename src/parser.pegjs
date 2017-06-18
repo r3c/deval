@@ -205,66 +205,66 @@ ExpressionMathAddOperator
 	/ "-"
 
 ExpressionMathMul
-	= lhs:ExpressionUnary _ op:ExpressionMathMulOperator _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
-	/ ExpressionUnary
+	= lhs:ExpressionPrefix _ op:ExpressionMathMulOperator _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
+	/ ExpressionPrefix
 
 ExpressionMathMulOperator
 	= "*"
 	/ "/"
 	/ "%"
 
-ExpressionUnary
-	= op:ExpressionUnaryOperator _ value:ExpressionUnary { return new \Deval\UnaryExpression ($value, $op); }
-	/ ExpressionInvoke
+ExpressionPrefix
+	= operator:ExpressionPrefixOperator _ expression:ExpressionPrefix
+	{
+		return new \Deval\UnaryExpression ($expression, $operator);
+	}
+	/ ExpressionPostfix
 
-ExpressionUnaryOperator
+ExpressionPrefixOperator
 	= "~"
 	/ "!"
 	/ "+"
 	/ "-"
 
-ExpressionInvoke
-	= caller:ExpressionMember _ lists:(token:ExpressionInvokeArguments _ { return $token; })+
+ExpressionPostfix
+	= expression:ExpressionPrimary operators:(_ token:ExpressionPostfixOperator { return $token; })*
 	{
-		$expression = $caller;
-
-		foreach ($lists as $arguments)
-			$expression = new \Deval\InvokeExpression ($expression, $arguments);
+		foreach ($operators as $operator)
+			$expression = $operator ($expression);
 
 		return $expression;
 	}
-	/ ExpressionMember
 
-ExpressionInvokeArguments
+ExpressionPostfixOperator
 	= "(" _ ")"
 	{
-		return array ();
+		return function ($expression)
+		{
+			return new \Deval\InvokeExpression ($expression, array ());
+		};
 	}
 	/ "(" head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
 	{
-		return array_merge (array ($head), $tail);
+		$arguments = array_merge (array ($head), $tail);
+
+		return function ($expression) use ($arguments)
+		{
+			return new \Deval\InvokeExpression ($expression, $arguments);
+		};
 	}
-
-ExpressionMember
-	= source:ExpressionPrimary _ indices:(token:ExpressionMemberIndex _ { return $token; })+
+	/ "[" _ index:Expression _ "]"
 	{
-		$expression = $source;
-
-		foreach ($indices as $index)
-			$expression = new \Deval\MemberExpression ($expression, $index);
-
-		return $expression;
-	}
-	/ ExpressionPrimary
-
-ExpressionMemberIndex
-	= "[" _ index:Expression _ "]"
-	{
-		return $index;
+		return function ($expression) use ($index)
+		{
+			return new \Deval\MemberExpression ($expression, $index);
+		};
 	}
 	/ "." index:Symbol
 	{
-		return new \Deval\ConstantExpression ($index);
+		return function ($expression) use ($index)
+		{
+			return new \Deval\MemberExpression ($expression, new \Deval\ConstantExpression ($index));
+		};
 	}
 
 ExpressionPrimary

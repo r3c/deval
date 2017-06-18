@@ -19,3 +19,4 @@ DONE
 - Support pure functional lambda
 - Fix variable scoping
 - Replace local variables by state members
+- Support both func()[i] and array[i]() syntaxes

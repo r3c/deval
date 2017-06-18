@@ -122,12 +122,18 @@ render_code ('{{ [2, 9, 3][x] }}', make_combinations (array ('x' => 1)), '9');
 render_code ('{{ a[x][y] }}', make_combinations (array ('a' => array (0, 0, array (0, 5)), 'x' => 2, 'y' => 1)), '5');
 
 // Render unary expressions
-render_code ('{{ 5 + -3 }}', make_empty (), '2');
-render_code ('{{ 5 + +3 }}', make_empty (), '8');
+render_code ('{{ -3 }}', make_empty (), '-3');
+render_code ('{{ +3 }}', make_empty (), '3');
 render_code ('{{ !2 }}', make_empty (), '');
 render_code ('{{ !0 }}', make_empty (), '1');
 render_code ('{{ ~0 }}', make_empty (), '-1');
 render_code ('{{ ~2 }}', make_empty (), '-3');
+
+// Render mixed expressions
+render_code ('{{ 5 + -3 }}', make_empty (), '2');
+render_code ('{{ 5 + +3 }}', make_empty (), '8');
+render_code ('{{ f[0](s) }}', make_combinations (array ('f' => array ('strlen'), 's' => 'test')), '4');
+render_code ('{{ f(s)[0] }}', make_combinations (array ('f' => 'str_split', 's' => 'test')), 't');
 
 // Render for command
 render_code ('{% for v in [1, 2, 3] %}{{ v }}{% end %}', make_empty (), '123');
