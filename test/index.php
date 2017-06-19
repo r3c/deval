@@ -196,5 +196,7 @@ render_code ('{{ join(",", slice([1, 2, 3, 4], -3)) }}', make_builtins ('join', 
 render_code ('{{ join(",", slice([1, 2, 3, 4], -3, 2)) }}', make_builtins ('join', 'slice'), '2,3');
 render_code ('{{ join(",", sort([4, 2, 3, 1])) }}', make_builtins ('join', 'sort'), '1,2,3,4');
 render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 'split'), '1,2,3,4');
+render_code ('{{ when(1 == 1, "OK", "KO") }}', make_builtins ('when'), 'OK');
+render_code ('{{ when("A" == "B", "KO", "OK") }}', make_builtins ('when'), 'OK');
 
 ?>

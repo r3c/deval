@@ -98,6 +98,11 @@ class Builtin
 		return explode ($separator, $string);
 	}
 
+	public static function _builtin_when ($condition, $true = true, $false = false)
+	{
+		return $condition ? $true : $false;
+	}
+
 	public static function deval ()
 	{
 		$class = '\\' . get_class ();
@@ -110,7 +115,8 @@ class Builtin
 			'php',
 			'slice',
 			'sort',
-			'split'
+			'split',
+			'when'
 		);
 
 		return array_combine ($names, array_map (function ($name) use ($class)
