@@ -20,7 +20,6 @@ class BinaryExpression implements Expression
 				'>='	=> function ($lhs, $rhs) { return $lhs >= $rhs; },
 				'<'		=> function ($lhs, $rhs) { return $lhs < $rhs; },
 				'<='	=> function ($lhs, $rhs) { return $lhs <= $rhs; },
-				'.'		=> function ($lhs, $rhs) { return $lhs . $rhs; },
 				'*'		=> function ($lhs, $rhs) { return $lhs * $rhs; },
 				'+'		=> function ($lhs, $rhs) { return $lhs + $rhs; },
 				'-'		=> function ($lhs, $rhs) { return $lhs - $rhs; },

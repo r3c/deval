@@ -175,8 +175,8 @@ ExpressionBooleanAnd
 	/ ExpressionCompare
 
 ExpressionCompare
-	= lhs:ExpressionStringCat _ op:ExpressionCompareOperator _ rhs:ExpressionCompare { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
-	/ ExpressionStringCat
+	= lhs:ExpressionMathAdd _ op:ExpressionCompareOperator _ rhs:ExpressionCompare { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
+	/ ExpressionMathAdd
 
 ExpressionCompareOperator
 	= "=="
@@ -191,10 +191,6 @@ ExpressionCompareOperator
 	/ ">"
 	/ "<="
 	/ "<"
-
-ExpressionStringCat
-	= lhs:ExpressionMathAdd _ "." _ rhs:ExpressionStringCat { return new \Deval\BinaryExpression ($lhs, $rhs, '.'); }
-	/ ExpressionMathAdd
 
 ExpressionMathAdd
 	= lhs:ExpressionMathMul _ op:ExpressionMathAddOperator _ rhs:ExpressionMathAdd { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }

@@ -28,6 +28,23 @@ class RenderException extends \Exception
 
 class Builtin
 {
+	public static function _builtin_cat ()
+	{
+		$args = func_get_args ();
+
+		if (count ($args) < 1)
+			return null;
+		else if (is_array ($args[0]))
+			return call_user_func_array ('array_merge', $args);
+
+		$buffer = '';
+
+		foreach ($args as $arg)
+			$buffer .= (string)$arg;
+
+		return $buffer;
+	}
+
 	public static function _builtin_filter ($items, $predicate)
 	{
 		return array_filter ($items, $predicate);
@@ -108,6 +125,7 @@ class Builtin
 		$class = '\\' . get_class ();
 		$names = array
 		(
+			'cat',
 			'filter',
 			'find',
 			'join',

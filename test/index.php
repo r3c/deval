@@ -77,7 +77,6 @@ render_code ('{{ 2 - 1 }}', make_empty (), '1');
 render_code ('{{ 2 * 2 }}', make_empty (), '4');
 render_code ('{{ 6 / 3 }}', make_empty (), '2');
 render_code ('{{ 4 % 3 }}', make_empty (), '1');
-render_code ('{{ "a" . "b" }}', make_empty (), 'ab');
 render_code ('{{ 1 && 0 }}', make_empty (), '');
 render_code ('{{ 1 && 2 }}', make_empty (), '1');
 render_code ('{{ 0 || 0 }}', make_empty (), '');
@@ -181,6 +180,10 @@ foreach (array ('collapse' => '1 X2Y 3 4', 'deindent' => '1X2Y34', 'preserve' =>
 }
 
 // Invoke builtins
+render_code ('{{ cat(1, 2) }}', make_builtins ('cat'), '12');
+render_code ('{{ cat(1, 2, 3) }}', make_builtins ('cat'), '123');
+render_code ('{{ cat("AB", "CD") }}', make_builtins ('cat'), 'ABCD');
+render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join'), '1,2,3,4');
 render_code ('{{ join(",", filter([1, 2, 3, 4], (i) => i % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"]) %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '2:two');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"], (v) => v == "four") %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '4:four');
