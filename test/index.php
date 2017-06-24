@@ -173,12 +173,20 @@ render_file ('template/member.deval', 'template', make_combinations (array ('x' 
 render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "1\n2\n3");
 
 // Setup style
-foreach (array ('collapse' => '1 X2Y 3 4', 'deindent' => '1X2Y34', 'preserve' => "1\n  X2Y\n  3\n4") as $style => $expect)
+$tests = array
+(
+	'collapse'			=> '1 X2 3Y 4 5',
+	'deindent'			=> '1X2  3Y45',
+	'preserve'			=> "1\n  X2  3Y\n  4\n5",
+	'deindent,collapse'	=> '1X2 3Y45'
+);
+
+foreach ($tests as $style => $expect)
 {
 	$setup = new Deval\Setup ();
 	$setup->style = $style;
 
-	render_code ("{{ 1 }}\n  X{{ 2 }}Y\n  {{ 3 }}\n{{ 4 }}", make_empty (), $expect, $setup);
+	render_code ("{{ 1 }}\n  X{{ 2 }}  {{ 3 }}Y\n  {{ 4 }}\n{{ 5 }}", make_empty (), $expect, $setup);
 }
 
 // Invoke builtins

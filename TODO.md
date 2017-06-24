@@ -21,3 +21,4 @@ DONE
 - Replace local variables by state members
 - Support both func()[i] and array[i]() syntaxes
 - Support both arrays and strings for concatenation operator "."
+- Allow specifying multiple trimmers in configuration

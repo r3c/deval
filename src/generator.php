@@ -99,8 +99,31 @@ class Generator
 				);
 			}
 
-			if (is_string ($setup->style) && isset ($trims[$setup->style]))
-				$this->trimmer = $trims[$setup->style];
+			if (is_string ($setup->style))
+			{
+				$trimmers = array ();
+
+				foreach (explode (',', $setup->style) as $style)
+				{
+					if (!isset ($trims[$style]))
+						throw new CompileException ('<setup>', 'unknown style "' . $style . '"');
+
+					$trimmers[] = $trims[$style];
+				}
+
+				if (count ($trimmers) === 1)
+					$this->trimmer = $trimmers[0];
+				else
+				{
+					$this->trimmer = function ($s) use ($trimmers)
+					{
+						foreach ($trimmers as $trimmer)
+							$s = $trimmer ($s);
+
+						return $s;
+					};
+				}
+			}
 			else if (is_callable ($setup->style))
 				$this->trimmer = $setup->style;
 			else
