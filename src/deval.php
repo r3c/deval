@@ -130,6 +130,11 @@ class Builtin
 		return array_values ($items);
 	}
 
+	public static function _builtin_void ()
+	{
+		return null;
+	}
+
 	public static function _builtin_when ($condition, $true = true, $false = false)
 	{
 		return $condition ? $true : $false;
@@ -157,6 +162,7 @@ class Builtin
 			'sort',
 			'split',
 			'values',
+			'void',
 			'when',
 			'zip'
 		);
