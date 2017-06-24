@@ -52,7 +52,7 @@ class Builtin
 
 	public static function _builtin_filter ($items, $predicate)
 	{
-		return array_filter ($items, $predicate);
+		return array_filter ($items, $predicate, ARRAY_FILTER_USE_BOTH);
 	}
 
 	public static function _builtin_find ($items, $predicate = null)
@@ -62,7 +62,7 @@ class Builtin
 
 		foreach ($items as $key => $value)
 		{
-			if ($predicate ($value))
+			if ($predicate ($value, $key))
 				return array ($key, $value);
 		}
 
@@ -72,6 +72,33 @@ class Builtin
 	public static function _builtin_flip ($items)
 	{
 		return array_flip ($items);
+	}
+
+	public static function _builtin_group ($items, $get_key = null, $get_value = null, $merge = null)
+	{
+		if ($get_key === null)
+			$get_key = function ($v) { return $v; };
+
+		if ($get_value === null)
+			$get_value = function ($v) { return $v; };
+
+		if ($merge === null)
+			$merge = function ($v) { return $v; };
+
+		$groups = array ();
+
+		foreach ($items as $key => $value)
+		{
+			$k = $get_key ($value, $key);
+			$v = $get_value ($value, $key);
+
+			if (isset ($groups[$k]))
+				$groups[$k] = $merge ($groups[$k], $v);
+			else
+				$groups[$k] = $v;
+		}
+
+		return $groups;
 	}
 
 	public static function _builtin_join ($items, $separator = '')
@@ -165,6 +192,7 @@ class Builtin
 			'filter',
 			'find',
 			'flip',
+			'group',
 			'join',
 			'keys',
 			'length',
