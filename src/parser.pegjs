@@ -282,7 +282,7 @@ ExpressionPrimary
 	}
 	/ "(" _ value:Expression _ ")"
 	{
-		return $value;
+		return new \Deval\GroupExpression ($value);
 	}
 
 Array

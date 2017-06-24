@@ -245,6 +245,7 @@ class Loader
 		require $path . '/expressions/array.php';
 		require $path . '/expressions/binary.php';
 		require $path . '/expressions/constant.php';
+		require $path . '/expressions/group.php';
 		require $path . '/expressions/invoke.php';
 		require $path . '/expressions/lambda.php';
 		require $path . '/expressions/member.php';

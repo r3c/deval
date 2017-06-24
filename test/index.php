@@ -96,6 +96,7 @@ render_code ('{{ 0 < 0 }}', make_empty (), '');
 render_code ('{{ 0 < 1 }}', make_empty (), '1');
 render_code ('{{ 0 <= 0 }}', make_empty (), '1');
 render_code ('{{ 0 <= 1 }}', make_empty (), '1');
+render_code ('{{ (x - 1) * 10 }}', make_combinations (array ('x' => '1')), '0');
 
 // Render invoke expressions
 render_code ('{{ one() }}', make_combinations (array ('one' => function () { return 1; })), '1');
