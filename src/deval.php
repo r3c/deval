@@ -45,6 +45,11 @@ class Builtin
 		return $buffer;
 	}
 
+	public static function _builtin_default ($value, $fallback)
+	{
+		return $value ?: $fallback;
+	}
+
 	public static function _builtin_filter ($items, $predicate)
 	{
 		return array_filter ($items, $predicate);
@@ -156,6 +161,7 @@ class Builtin
 		$names = array
 		(
 			'cat',
+			'default',
 			'filter',
 			'find',
 			'flip',

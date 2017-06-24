@@ -185,6 +185,10 @@ foreach (array ('collapse' => '1 X2Y 3 4', 'deindent' => '1X2Y34', 'preserve' =>
 render_code ('{{ cat(1, 2) }}', make_builtins ('cat'), '12');
 render_code ('{{ cat(1, 2, 3) }}', make_builtins ('cat'), '123');
 render_code ('{{ cat("AB", "CD") }}', make_builtins ('cat'), 'ABCD');
+render_code ('{{ default(0, 5) }}', make_builtins ('default'), '5');
+render_code ('{{ default(1, 5) }}', make_builtins ('default'), '1');
+render_code ('{{ default("", "X") }}', make_builtins ('default'), 'X');
+render_code ('{{ default("Y", "X") }}', make_builtins ('default'), 'Y');
 render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join'), '1,2,3,4');
 render_code ('{{ join(",", filter([1, 2, 3, 4], (i) => i % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"]) %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '2:two');
