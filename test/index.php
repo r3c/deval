@@ -188,6 +188,8 @@ render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join
 render_code ('{{ join(",", filter([1, 2, 3, 4], (i) => i % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"]) %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '2:two');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"], (v) => v == "four") %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '4:four');
+render_code ('{{ join(",", flip(["a": 0, "b": 1, "c": 2])) }}', make_builtins ('flip', 'join'),  'a,b,c');
+render_code ('{{ join(",", keys([1: 0, 2: 0, 3: 0])) }}', make_builtins ('join', 'keys'), '1,2,3');
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
@@ -200,7 +202,9 @@ render_code ('{{ join(",", slice([1, 2, 3, 4], -3)) }}', make_builtins ('join', 
 render_code ('{{ join(",", slice([1, 2, 3, 4], -3, 2)) }}', make_builtins ('join', 'slice'), '2,3');
 render_code ('{{ join(",", sort([4, 2, 3, 1])) }}', make_builtins ('join', 'sort'), '1,2,3,4');
 render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 'split'), '1,2,3,4');
+render_code ('{% let x = [1: "a", 2: "b", 3: "c"] %}{{ join(",", keys(values(x))) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values'), '0,1,2:a,b,c');
 render_code ('{{ when(1 == 1, "OK", "KO") }}', make_builtins ('when'), 'OK');
 render_code ('{{ when("A" == "B", "KO", "OK") }}', make_builtins ('when'), 'OK');
+render_code ('{% let x = zip(["a", "b", "c"], [0, 1, 2]) %}{{ join(",", keys(x)) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values', 'zip'), 'a,b,c:0,1,2');
 
 ?>

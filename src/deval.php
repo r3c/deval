@@ -64,9 +64,19 @@ class Builtin
 		return null;
 	}
 
+	public static function _builtin_flip ($items)
+	{
+		return array_flip ($items);
+	}
+
 	public static function _builtin_join ($items, $separator = '')
 	{
 		return implode ($separator, $items);
+	}
+
+	public static function _builtin_keys ($items)
+	{
+		return array_keys ($items);
 	}
 
 	public static function _builtin_map ($items, $apply)
@@ -115,9 +125,19 @@ class Builtin
 		return explode ($separator, $string);
 	}
 
+	public static function _builtin_values ($items)
+	{
+		return array_values ($items);
+	}
+
 	public static function _builtin_when ($condition, $true = true, $false = false)
 	{
 		return $condition ? $true : $false;
+	}
+
+	public static function _builtin_zip ($keys, $values)
+	{
+		return array_combine ($keys, $values);
 	}
 
 	public static function deval ()
@@ -128,13 +148,17 @@ class Builtin
 			'cat',
 			'filter',
 			'find',
+			'flip',
 			'join',
+			'keys',
 			'map',
 			'php',
 			'slice',
 			'sort',
 			'split',
-			'when'
+			'values',
+			'when',
+			'zip'
 		);
 
 		return array_combine ($names, array_map (function ($name) use ($class)
