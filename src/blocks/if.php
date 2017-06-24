@@ -65,12 +65,13 @@ class IfBlock implements Block
 
 	public function resolve ($blocks)
 	{
+		$branches = array ();
 		$fallback = $this->fallback !== null ? $this->fallback->resolve ($blocks) : null;
 
-		return new self (array_map (function ($branch) use ($blocks)
-		{
-			return array ($branch[0], $branch[1]->resolve ($blocks));
-		}, $this->branches), $fallback);
+		foreach ($this->branches as $branch)
+			$branches[] = array ($branch[0], $branch[1]->resolve ($blocks));
+
+		return new self ($branches, $fallback);
 	}
 }
 

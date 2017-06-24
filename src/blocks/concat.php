@@ -39,10 +39,13 @@ class ConcatBlock implements Block
 
 	public function inject ($constants)
 	{
-		return new self (array_map (function ($block) use ($constants)
-		{
-			return $block->inject ($constants);
-		}, $this->blocks));
+		$blocks = array ();
+
+		foreach ($this->blocks as $block)
+
+			$blocks[] = $block->inject ($constants);
+
+		return new self ($blocks);
 	}
 
 	public function resolve ($blocks)
