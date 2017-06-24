@@ -6,22 +6,12 @@ class ArrayExpression implements Expression
 {
 	public function __construct ($elements)
 	{
-		$this->elements = array ();
-
-		foreach ($elements as $element)
-		{
-			list ($key, $value) = $element;
-
-			if ($key !== null)
-				$this->elements[$key] = $value;
-			else
-				$this->elements[] = $value;
-		}
+		$this->elements = $elements;
 	}
 
 	public function __toString ()
 	{
-		return '[' . implode (', ', array_map (function ($k, $v) { return $k . ': ' . $v; }, array_keys ($this->elements), $this->elements)) . ']';
+		return '[' . implode (', ', array_map (function ($e) { return ($e[0] !== null ? $e[0] . ': ' : '') . $e[1]; }, $this->elements)) . ']';
 	}
 
 	public function evaluate (&$result)
@@ -33,23 +23,30 @@ class ArrayExpression implements Expression
 	{
 		$elements = array ();
 
-		foreach ($this->elements as $key => $value)
-			$elements[$key] = $value->generate ($generator, $volatiles);
+		foreach ($this->elements as $element)
+		{
+			list ($key, $value) = $element;
+
+			$elements[] = array
+			(
+				$key !== null ? $key->generate ($generator, $volatiles) : null,
+				$value->generate ($generator, $volatiles)
+			);
+		}
 
 		$source = '';
 
-		if (array_reduce (array_keys ($elements), function (&$result, $item) { return $result === $item ? $item + 1 : null; }, 0) !== count ($elements))
+		foreach ($elements as $element)
 		{
-			foreach ($elements as $key => $value)
-				$source .= ($source !== '' ? ',' : '') . Generator::emit_value ($key) . '=>' . $value;
-		}
-		else
-		{
-			foreach ($elements as $value)
-				$source .= ($source !== '' ? ',' : '') . $value;
+			list ($key, $value) = $element;
+
+			if ($key !== null)
+				$source .= ',' . $key . '=>' . $value;
+			else
+				$source .= ',' . $value;
 		}
 
-		return 'array(' . $source . ')';
+		return 'array(' . (string)substr ($source, 1) . ')';
 	}
 
 	public function inject ($constants)
@@ -58,14 +55,23 @@ class ArrayExpression implements Expression
 		$ready = true;
 		$values = array ();
 
-		foreach ($this->elements as $key => $value)
+		foreach ($this->elements as $element)
 		{
+			list ($key, $value) = $element;
+
+			if ($key !== null)
+				$key = $key->inject ($constants);
+
 			$value = $value->inject ($constants);
 
-			if ($value->evaluate ($result))
-				$values[$key] = $result;
-			else
+			if (!$value->evaluate ($value_result))
 				$ready = false;
+			else if ($key === null)
+				$values[] = $value_result;
+			else if (!$key->evaluate ($key_result))
+				$ready = false;
+			else
+				$values[$key_result] = $value_result;
 
 			$elements[] = array ($key, $value);
 		}

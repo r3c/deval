@@ -296,7 +296,7 @@ Array
 	}
 
 ArrayElement
-	= key:Scalar _ ":" _ value:Expression
+	= key:Expression _ ":" _ value:Expression
 	{
 		return array ($key, $value);
 	}
