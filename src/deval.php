@@ -79,6 +79,11 @@ class Builtin
 		return array_keys ($items);
 	}
 
+	public static function _builtin_length ($input)
+	{
+		return is_array ($input) ? count ($input) : strlen ((string)$input);
+	}
+
 	public static function _builtin_map ($items, $apply)
 	{
 		return array_map ($apply, $items);
@@ -156,6 +161,7 @@ class Builtin
 			'flip',
 			'join',
 			'keys',
+			'length',
 			'map',
 			'php',
 			'slice',

@@ -6,7 +6,7 @@ TODO
 
 - Implement {% escape $callback %}{% end %} block
 - Support ternary operator
-- Support both arrays and strings for concatenation operator "."
+- Support builtin syntax for defering an expression
 
 DONE
 ----
@@ -20,3 +20,4 @@ DONE
 - Fix variable scoping
 - Replace local variables by state members
 - Support both func()[i] and array[i]() syntaxes
+- Support both arrays and strings for concatenation operator "."
