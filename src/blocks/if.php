@@ -40,27 +40,38 @@ class IfBlock implements Block
 
 	public function inject ($constants)
 	{
-		$branches = array ();
+		// Evaluate conditions to find matching branch if any
+		$remains = array ();
 
 		foreach ($this->branches as $branch)
 		{
 			list ($condition, $body) = $branch;
 
-			$body = $body->inject ($constants);
 			$condition = $condition->inject ($constants);
 
 			if (!$condition->evaluate ($result))
-				$branches[] = array ($condition, $body);
+				$remains[] = array ($condition, $body);
 			else if ($result)
-				return $body;
+				return $body->inject ($constants);
 		}
 
 		$fallback = $this->fallback !== null ? $this->fallback->inject ($constants) : null;
 
-		if (count ($branches) === 0)
+		// No unevaluated branch remains, return fallback or empty block
+		if (count ($remains) === 0)
 			return $fallback !== null ? $fallback : new VoidBlock ();
 
-		return new self ($branches, $fallback);
+		// Inject constants in remaining branch and rebuild block
+		$injects = array ();
+
+		foreach ($remains as $branch)
+		{
+			list ($condition, $body) = $branch;
+
+			$injects[] = array ($condition, $body->inject ($constants));
+		}
+
+		return new self ($injects, $fallback);
 	}
 
 	public function resolve ($blocks)

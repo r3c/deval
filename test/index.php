@@ -150,6 +150,8 @@ render_code ('{% if 0 %}x{% else if 4 %}y{% end %}', make_empty (), 'y');
 render_code ('{% if 1 %}x{% else if 0 %}y{% else %}z{% end %}', make_empty (), 'x');
 render_code ('{% if 0 %}x{% else if 1 %}y{% else %}z{% end %}', make_empty (), 'y');
 render_code ('{% if 0 %}x{% else if 0 %}y{% else %}z{% end %}', make_empty (), 'z');
+render_code ('{% if 0 %}{% for x in null %}{% end %}{% end %}', make_empty (), '');
+render_code ('{% if 1 %}{% else %}{% for x in null %}{% end %}{% end %}', make_empty (), '');
 
 // Render import command
 render_code ('{% import template/import_inner.deval %}{% block first %}1{% block second %}2{% end %}', make_combinations (array ('a' => 'A', 'b' => 'B', 'c' => 'C')), 'A1B2C');
