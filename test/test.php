@@ -127,6 +127,7 @@ function raise_inject ($source, $constants, $message)
 	try
 	{
 		$renderer->inject ($constants);
+		$renderer->render ();
 
 		assert (false, 'should have raised exception at injection');
 	}
@@ -151,7 +152,7 @@ function raise_render ($source, $constants, $volatiles, $message)
 
 	try
 	{
-		$renderer->render ($constants);
+		$renderer->render ($volatiles);
 
 		assert (false, 'should have raised exception at rendering');
 	}

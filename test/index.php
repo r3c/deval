@@ -27,7 +27,7 @@ raise_compile ('{{ x ** y }}', 'but "*" found');
 
 // Inject exceptions
 raise_inject ('{{ x }}', array ('x' => array ()), 'cannot be converted to string');
-raise_inject ('{% for i in x %}{% end %}', array ('x' => 1), 'is not iterable');
+raise_inject ('{% for i in x %}{{ i }}{% end %}', array ('x' => 1), 'is not iterable');
 raise_inject ('{{ f() }}', array ('f' => 1), 'is not callable');
 raise_inject ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
 raise_inject ('{{ ["SomeClass", "missing"](x) }}', array ('x' => 1), 'is not callable');

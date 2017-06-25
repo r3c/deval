@@ -16,13 +16,15 @@ class ConstantExpression implements Expression
 
 	public function get_elements (&$elements)
 	{
-		if (!is_array ($this->value) && !($this->value instanceof \Traversable))
-			throw new InjectException ($this, 'is not iterable');
-
 		$elements = array ();
 
-		foreach ($this->value as $key => $value)
-			$elements[$key] = new self ($value);
+		if (is_array ($this->value) || $this->value instanceof \Traversable)
+		{
+			foreach ($this->value as $key => $value)
+				$elements[$key] = new self ($value);
+		}
+		else
+			$elements[] = new ErrorExpression ($this->value, 'is not iterable');
 
 		return true;
 	}

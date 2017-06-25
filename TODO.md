@@ -6,6 +6,7 @@ TODO
 
 - Support ternary operator
 - Support builtin syntax for defering an expression
+- Implement variable aliasing
 
 DONE
 ----

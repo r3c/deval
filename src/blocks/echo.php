@@ -21,7 +21,7 @@ class EchoBlock implements Block
 		if ($value->get_value ($result))
 		{
 			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
-				throw new InjectException ($value, 'cannot be converted to string');
+				return new self (new ErrorExpression ($result, 'cannot be converted to string'));
 
 			return new PlainBlock ((string)$result);
 		}

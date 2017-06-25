@@ -49,7 +49,7 @@ class InvokeExpression implements Expression
 			$method = new \ReflectionMethod ($result[0], $result[1]);
 
 			if (!$method->isStatic ())
-				throw new InjectException ($this->caller, 'is not static');
+				throw new InjectException ($this->caller, 'is not a static method');
 
 			$caller = $result[0] . '::' . $result[1];
 			$direct = true;
@@ -96,7 +96,7 @@ class InvokeExpression implements Expression
 		if ($ready && $caller->get_value ($result))
 		{
 			if (!is_callable ($result))
-				throw new InjectException ($caller, 'is not callable');
+				return new ErrorExpression ($result, 'is not callable');
 
 			return new ConstantExpression (call_user_func_array ($result, $values));
 		}

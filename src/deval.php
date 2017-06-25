@@ -12,9 +12,9 @@ class CompileException extends \Exception
 
 class InjectException extends \Exception
 {
-	public function __construct ($expression, $message)
+	public function __construct ($value, $message)
 	{
-		parent::__construct ('inject error: "' . $expression . '" ' . $message);
+		parent::__construct ('inject error: "' . var_export ($value, true) . '" ' . $message);
 	}
 }
 
@@ -285,6 +285,7 @@ class Loader
 		require $path . '/expressions/array.php';
 		require $path . '/expressions/binary.php';
 		require $path . '/expressions/constant.php';
+		require $path . '/expressions/error.php';
 		require $path . '/expressions/group.php';
 		require $path . '/expressions/invoke.php';
 		require $path . '/expressions/lambda.php';
