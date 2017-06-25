@@ -15,14 +15,18 @@ class MemberExpression implements Expression
 		return $this->source . '[' . $this->index . ']';
 	}
 
-	public function get_member ($index, &$result)
+	public function get_elements (&$elements)
 	{
 		return false;
 	}
 
-	public function get_value (&$result)
+	public function get_value (&$value)
 	{
-		return $this->index->get_value ($index) && $this->source->get_member ($index, $result);
+		return
+			$this->index->get_value ($index) &&
+			$this->source->get_elements ($elements) &&
+			isset ($elements[$index]) &&
+			$elements[$index]->get_value ($value);
 	}
 
 	public function generate ($generator, &$volatiles)

@@ -5,8 +5,8 @@ namespace Deval;
 interface Expression
 {
 	public function __toString ();
-	public function get_member ($index, &$result);
-	public function get_value (&$result);
+	public function get_elements (&$elements);
+	public function get_value (&$value);
 	public function generate ($generator, &$volatiles);
 	public function inject ($constants);
 }

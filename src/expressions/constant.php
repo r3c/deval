@@ -14,14 +14,22 @@ class ConstantExpression implements Expression
 		return var_export ($this->value, true);
 	}
 
-	public function get_member ($index, &$result)
+	public function get_elements (&$elements)
 	{
-		return false;
+		if (!is_array ($this->value) && !($this->value instanceof \Traversable))
+			throw new InjectException ($this, 'is not iterable');
+
+		$elements = array ();
+
+		foreach ($this->value as $key => $value)
+			$elements[$key] = new self ($value);
+
+		return true;
 	}
 
-	public function get_value (&$result)
+	public function get_value (&$value)
 	{
-		$result = $this->value;
+		$value = $this->value;
 
 		return true;
 	}

@@ -69,7 +69,6 @@ render_code ('{{ ["x": 3]["x"] }}', make_empty (), '3');
 render_code ('{{ ["y": [2: 4]]["y"][2] }}', make_empty (), '4');
 render_code ('{{ [3 + 4: 2][7] }}', make_empty (), '2');
 render_code ('{{ [x, 42][1] }}', make_empty (), '42');
-render_code ('{{ [42, x: 17][0] }}', make_empty (), '42');
 
 // Render variables
 render_code ('{{ bool }}', make_combinations (array ('bool' => true)), '1');

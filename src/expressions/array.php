@@ -14,36 +14,31 @@ class ArrayExpression implements Expression
 		return '[' . implode (', ', array_map (function ($e) { return ($e[0] !== null ? $e[0] . ': ' : '') . $e[1]; }, $this->elements)) . ']';
 	}
 
-	public function get_member ($index, &$result)
+	public function get_elements (&$elements)
 	{
-		$copies = array ();
-		$keys = array ();
+		$elements = array ();
 
 		foreach ($this->elements as $element)
 		{
 			list ($key, $value) = $element;
 
-			// Add current key to keys array or cancel if it can't be evaluated
+			// Let PHP define an automatic index if no key was specified
 			if ($key === null)
-				$keys[] = null;
-			else if ($key->get_value ($current))
-				$keys[$current] = null;
+				$elements[] = $value;
+
+			// Assign element to index if key can be evaluated
+			else if ($key->get_value ($index))
+				$elements[$index] = $value;
+
+			// Otherwise keys set can't be evaluated
 			else
 				return false;
-
-			// Compare using arrays to comply with PHP array keys handling
-			$copies[$index] = null;
-
-			if (count (array_diff_key ($keys, $copies)) === 0)
-				return $value->get_value ($result);
-
-			$copies = $keys;
 		}
 
-		return false;
+		return true;
 	}
 
-	public function get_value (&$result)
+	public function get_value (&$value)
 	{
 		return false;
 	}

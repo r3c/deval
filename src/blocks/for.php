@@ -4,13 +4,13 @@ namespace Deval;
 
 class ForBlock implements Block
 {
-	public function __construct ($source, $key, $value, $loop, $empty)
+	public function __construct ($source, $key_name, $value_name, $loop, $empty)
 	{
 		$this->empty = $empty;
-		$this->key = $key;
+		$this->key_name = $key_name;
 		$this->loop = $loop;
 		$this->source = $source;
-		$this->value = $value;
+		$this->value_name = $value_name;
 	}
 
 	public function compile ($generator, &$volatiles)
@@ -25,10 +25,10 @@ class ForBlock implements Block
 
 		$output->append_code ('foreach(' . $this->source->generate ($generator, $volatiles) . ' as ');
 
-		if ($this->key !== null)
-			$output->append_code (Generator::emit_symbol ($this->key) . '=>' . Generator::emit_symbol ($this->value));
+		if ($this->key_name !== null)
+			$output->append_code (Generator::emit_symbol ($this->key_name) . '=>' . Generator::emit_symbol ($this->value_name));
 		else
-			$output->append_code (Generator::emit_symbol ($this->value));
+			$output->append_code (Generator::emit_symbol ($this->value_name));
 
 		$output->append_code (')');
 
@@ -43,10 +43,10 @@ class ForBlock implements Block
 
 		$output->append_code ('}');
 
-		if ($this->key !== null)
-			unset ($requires[$this->key]);
+		if ($this->key_name !== null)
+			unset ($requires[$this->key_name]);
 
-		unset ($requires[$this->value]);
+		unset ($requires[$this->value_name]);
 
 		foreach (array_keys ($requires) as $name)
 			$volatiles[$name] = true;
@@ -65,51 +65,55 @@ class ForBlock implements Block
 
 	public function inject ($constants)
 	{
+		$empty = $this->empty->inject ($constants);
 		$source = $this->source->inject ($constants);
 
-		// Source can't be evaluated, rebuild block with injected children
-		if (!$source->get_value ($result))
+		// Source can be enumerated, unroll loop and generate result blocks
+		if ($source->get_elements ($elements))
 		{
-			// Inject all constants to empty block
-			$empty = $this->empty->inject ($constants);
+			$blocks = array ();
 
+			foreach ($elements as $key => $element)
+			{
+				// Inject key as constant if specified
+				if ($this->key_name !== null)
+					$constants[$this->key_name] = $key;
+
+				// Inject value as constant if evaluated or assignment otherwise
+				$assignments = array ();
+
+				if ($element->get_value ($value))
+					$constants[$this->value_name] = $value;
+				else
+					$assignments[] = array ($this->value_name, $element);
+
+				// Wrap loop inside assignment block
+				$block = new LetBlock ($assignments, $this->loop);
+				$blocks[] = $block->inject ($constants);
+			}
+
+			// Some blocks were generated, return them
+			if (count ($blocks) > 0)
+				return new ConcatBlock ($blocks);
+
+			// No block was generated (empty source), generate empty block
+			return $empty;
+		}
+
+		// Source can't be evaluated, rebuild block with injected children
+		else
+		{
 			// Inject all constants but key (optional) and value to loop block
-			if ($this->key !== null)
-				unset ($constants[$this->key]);
+			if ($this->key_name !== null)
+				unset ($constants[$this->key_name]);
 
-			unset ($constants[$this->value]);
+			unset ($constants[$this->value_name]);
 
 			$loop = $this->loop->inject ($constants);
 
 			// Rebuild block
-			return new self ($source, $this->key, $this->value, $loop, $empty);
+			return new self ($source, $this->key_name, $this->value_name, $loop, $empty);
 		}
-
-		// Source was evaluated, unroll loop and generate result blocks
-		if (!is_array ($result) && !($result instanceof \Traversable))
-			throw new InjectException ($source, 'is not iterable');
-
-		$blocks = array ();
-
-		foreach ($result as $key => $value)
-		{
-			$constants_inner = $constants;
-
-			// Inject all constants after overriding key (optional) and value
-			if ($this->key !== null)
-				$constants_inner[$this->key] = $key;
-
-			$constants_inner[$this->value] = $value;
-
-			$blocks[] = $this->loop->inject ($constants_inner);
-		}
-
-		// Some blocks were generated, return them
-		if (count ($blocks) > 0)
-			return new ConcatBlock ($blocks);
-
-		// No block was generated (empty source), generate empty block
-		return $this->empty->inject ($constants);
 	}
 
 	public function is_void ()
@@ -122,7 +126,7 @@ class ForBlock implements Block
 		$empty = $this->empty->resolve ($blocks);
 		$loop = $this->loop->resolve ($blocks);
 
-		return new self ($this->source, $this->key, $this->value, $loop, $empty);
+		return new self ($this->source, $this->key_name, $this->value_name, $loop, $empty);
 	}
 }
 

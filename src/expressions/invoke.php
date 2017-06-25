@@ -15,12 +15,12 @@ class InvokeExpression implements Expression
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
 	}
 
-	public function get_member ($index, &$result)
+	public function get_elements (&$elements)
 	{
 		return false;
 	}
 
-	public function get_value (&$result)
+	public function get_value (&$value)
 	{
 		return false;
 	}

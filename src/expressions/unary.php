@@ -32,12 +32,12 @@ class UnaryExpression implements Expression
 		return $this->op . $this->value;
 	}
 
-	public function get_member ($index, &$result)
+	public function get_elements (&$elements)
 	{
 		return false;
 	}
 
-	public function get_value (&$result)
+	public function get_value (&$value)
 	{
 		return false;
 	}

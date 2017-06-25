@@ -15,12 +15,12 @@ class LambdaExpression implements Expression
 		return '(' . implode (', ', $this->names) . ') => ' . $this->body;
 	}
 
-	public function get_member ($index, &$result)
+	public function get_elements (&$elements)
 	{
 		return false;
 	}
 
-	public function get_value (&$result)
+	public function get_value (&$value)
 	{
 		return false;
 	}
