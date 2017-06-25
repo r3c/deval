@@ -26,10 +26,10 @@ class LabelBlock implements Block
 
 	public function resolve ($blocks)
 	{
-		if (!isset ($blocks[$this->name]))
-			throw new CompileException ('<linker>', 'undefined label "' . $this->name . '"');
+		if (isset ($blocks[$this->name]))
+			return $blocks[$this->name];
 
-		return $blocks[$this->name];
+		return new VoidBlock ();
 	}
 }
 
