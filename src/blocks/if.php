@@ -27,7 +27,7 @@ class IfBlock implements Block
 			$first = false;
 		}
 
-		if ($this->fallback !== null)
+		if (!$this->fallback->is_void ())
 		{
 			$output->append_code ('else');
 			$output->append_code ('{');
@@ -55,11 +55,11 @@ class IfBlock implements Block
 				return $body->inject ($constants);
 		}
 
-		$fallback = $this->fallback !== null ? $this->fallback->inject ($constants) : null;
+		$fallback = $this->fallback->inject ($constants);
 
 		// No unevaluated branch remains, return fallback or empty block
 		if (count ($remains) === 0)
-			return $fallback !== null ? $fallback : new VoidBlock ();
+			return $fallback;
 
 		// Inject constants in remaining branch and rebuild block
 		$injects = array ();
@@ -74,10 +74,21 @@ class IfBlock implements Block
 		return new self ($injects, $fallback);
 	}
 
+	public function is_void ()
+	{
+		foreach ($this->branches as $branch)
+		{
+			if (!$branch->is_void ())
+				return false;
+		}
+
+		return $this->fallback->is_void ();
+	}
+
 	public function resolve ($blocks)
 	{
 		$branches = array ();
-		$fallback = $this->fallback !== null ? $this->fallback->resolve ($blocks) : null;
+		$fallback = $this->fallback->resolve ($blocks);
 
 		foreach ($this->branches as $branch)
 			$branches[] = array ($branch[0], $branch[1]->resolve ($blocks));

@@ -14,6 +14,11 @@ class VoidBlock implements Block
 		return $this;
 	}
 
+	public function is_void ()
+	{
+		return true;
+	}
+
 	public function resolve ($blocks)
 	{
 		return $this;

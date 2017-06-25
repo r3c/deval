@@ -7,7 +7,7 @@ Document
 Content
 	= blocks:Block*
 	{
-		return \Deval\ConcatBlock::create ($blocks);
+		return new \Deval\ConcatBlock ($blocks);
 	}
 
 // Block tree
@@ -80,9 +80,9 @@ CommandImportBlock
 	}
 
 CommandFor "for command"
-	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd body:Content fallback:CommandForEmpty? BlockCommandBegin _ "end"
+	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd loop:Content empty:CommandForEmpty? BlockCommandBegin _ "end"
 	{
-		return new \Deval\ForBlock ($source, $key, $value, $body, $fallback);
+		return new \Deval\ForBlock ($source, $key, $value, $loop, $empty ?: new \Deval\VoidBlock ());
 	}
 
 CommandForEmpty
@@ -100,7 +100,7 @@ CommandForKey
 CommandIf "if command"
 	= "if" _ condition:Expression _ BlockCommandEnd body:Content branches:CommandIfElseif* fallback:CommandIfElse? BlockCommandBegin _ "end"
 	{
-		return new \Deval\IfBlock (array_merge (array (array ($condition, $body)), $branches), $fallback);
+		return new \Deval\IfBlock (array_merge (array (array ($condition, $body)), $branches), $fallback ?: new \Deval\VoidBlock ());
 	}
 
 CommandIfElseif

@@ -21,28 +21,26 @@ class LetBlock implements Block
 		}, $this->assignments)));
 
 		// Assign specified variables
-		$names = array ();
+		$provides = array ();
 
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
 			// Generate evaluation code for current variable
-			$volatiles_inner = array ();
-
-			$output->append_code (Generator::emit_symbol ($name) . '=' . $value->generate ($generator, $volatiles_inner) . ';');
+			$requires = array ();
+			$output->append_code (Generator::emit_symbol ($name) . '=' . $value->generate ($generator, $requires) . ';');
 
 			// Append required volatiles but the ones provided by previous assignments
-			$volatiles += array_diff_key ($volatiles_inner, $names);
+			$volatiles += array_diff_key ($requires, $provides);
 
 			// Make variable as available for next generations
-			$names[$name] = true;
+			$provides[$name] = true;
 		}
 
 		// Generate evaluation code for body
-		$volatiles_inner = array ();
-
-		$output->append ($this->body->compile ($generator, $volatiles_inner));
+		$requires = array ();
+		$output->append ($this->body->compile ($generator, $requires));
 
 		// Restore previous variables from scopes stack
 		$output->append_code (Generator::emit_scope_pop (array_map (function ($a)
@@ -51,7 +49,7 @@ class LetBlock implements Block
 		}, $this->assignments)));
 
 		// Append required volatiles but the ones provided by all assignments
-		$volatiles += array_diff_key ($volatiles_inner, $names);
+		$volatiles += array_diff_key ($requires, $provides);
 
 		return $output;
 	}
@@ -85,6 +83,11 @@ class LetBlock implements Block
 			return $body;
 
 		return new self ($assignments, $body);
+	}
+
+	public function is_void ()
+	{
+		return $this->body->is_void ();
 	}
 
 	public function resolve ($blocks)

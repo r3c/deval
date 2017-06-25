@@ -29,6 +29,11 @@ class EchoBlock implements Block
 		return new self ($value);
 	}
 
+	public function is_void ()
+	{
+		return $this->body->is_void ();
+	}
+
 	public function resolve ($blocks)
 	{
 		return $this;

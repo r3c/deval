@@ -19,6 +19,11 @@ class PlainBlock implements Block
 		return $this;
 	}
 
+	public function is_void ()
+	{
+		return false;
+	}
+
 	public function resolve ($blocks)
 	{
 		return $this;

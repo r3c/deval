@@ -4,21 +4,6 @@ namespace Deval;
 
 class ConcatBlock implements Block
 {
-	public static function create ($blocks)
-	{
-		switch (count ($blocks))
-		{
-			case 0:
-				return new VoidBlock ();
-
-			case 1:
-				return $blocks[0];
-
-			default:
-				return new self ($blocks);
-		}
-	}
-
 	public function __construct ($blocks)
 	{
 		$this->blocks = $blocks;
@@ -42,10 +27,30 @@ class ConcatBlock implements Block
 		$blocks = array ();
 
 		foreach ($this->blocks as $block)
-
 			$blocks[] = $block->inject ($constants);
 
-		return new self ($blocks);
+		switch (count ($blocks))
+		{
+			case 0:
+				return new VoidBlock ();
+
+			case 1:
+				return $blocks[0];
+
+			default:
+				return new self ($blocks);
+		}
+	}
+
+	public function is_void ()
+	{
+		foreach ($this->blocks as $block)
+		{
+			if (!$block->is_void ())
+				return false;
+		}
+
+		return true;
 	}
 
 	public function resolve ($blocks)

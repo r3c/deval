@@ -23,16 +23,17 @@ class LambdaExpression implements Expression
 	public function generate ($generator, &$volatiles)
 	{
 		// Generate body, split volatiles into parameters and external uses
-		$volatiles_inner = array ();
+		$requires = array ();
+		$body = $this->body->generate ($generator, $requires);
 
-		$body = $this->body->generate ($generator, $volatiles_inner);
-
-		$volatiles_use = array_diff_key ($volatiles_inner, array_flip ($this->names));
-		$volatiles += $volatiles_use;
+		$captures = array_diff_key ($requires, array_flip ($this->names));
+		$volatiles += $captures;
 
 		// Generate lambda code
-		$parameters = array_map (function ($name) { return '$' . $name; }, $this->names);
-		$uses = array_map (function ($name) { return '$' . $name; }, array_keys ($volatiles_use));
+		$emit_symbol = function ($name) use ($generator) { return $generator->emit_symbol ($name); };
+
+		$parameters = array_map ($emit_symbol, $this->names);
+		$uses = array_map ($emit_symbol, array_keys ($captures));
 
 		return
 			'function(' . implode (',', $parameters) . ')' .
