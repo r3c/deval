@@ -12,36 +12,48 @@ class LetBlock implements Block
 
 	public function compile ($generator, &$volatiles)
 	{
-		$backups = array_map (function ($a) { return $a[0]; }, $this->assignments);
-		$output = new Output ();
-
-		// Push current variables to scopes stack
-		$output->append_code (Generator::emit_scope_push ($backups));
-
-		// Assign specified variables
+		// Evalulate or generate code for assignment variables
+		$assignments = new Output ();
+		$constants = array ();
 		$provides = array ();
 
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
-			// Generate evaluation code for current variable
-			$requires = array ();
-			$output->append_code (Generator::emit_symbol ($name) . '=' . $value->generate ($generator, $requires) . ';');
+			// Inject constants computed from previous assignments
+			$value = $value->inject ($constants);
 
-			// Append required volatiles but the ones provided by previous assignments
-			$volatiles += array_diff_key ($requires, $provides);
+			// Append to constants if assignment can be evaluated
+			if ($value->get_value ($result))
+				$constants[$name] = $result;
 
-			// Make variable as available for next generations
-			$provides[$name] = true;
+			// Or generate dynamic assignment otherwise
+			else
+			{
+				// Generate evaluation code for current variable
+				$requires = array ();
+				$assignments->append_code (Generator::emit_symbol ($name) . '=' . $value->generate ($generator, $requires) . ';');
+
+				// Append required volatiles but the ones provided by previous assignments
+				$volatiles += array_diff_key ($requires, $provides);
+
+				// Mark variable as available for next assignments
+				$provides[$name] = true;
+			}
 		}
 
-		// Generate evaluation code for body
-		$requires = array ();
-		$output->append ($this->body->compile ($generator, $requires));
+		// Backup provided variables and assign them new values
+		$output = new Output ();
+		$output->append_code (Generator::emit_scope_push (array_keys ($provides)));
+		$output->append ($assignments);
 
-		// Restore previous variables from scopes stack
-		$output->append_code (Generator::emit_scope_pop ($backups));
+		// Generate body evaluation and restore variables
+		$body = $this->body->inject ($constants);
+
+		$requires = array ();
+		$output->append ($body->compile ($generator, $requires));
+		$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
 
 		// Append required volatiles but the ones provided by all assignments
 		$volatiles += array_diff_key ($requires, $provides);
@@ -52,32 +64,17 @@ class LetBlock implements Block
 	public function inject ($constants)
 	{
 		$assignments = array ();
-		$requires = array ();
 
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
-			$value = $value->inject ($constants);
+			$assignments[] = array ($name, $value->inject ($constants));
 
 			unset ($constants[$name]);
-
-			// Assignment can be evaluated, move to known constants
-			if ($value->get_value ($result))
-				$constants[$name] = $result;
-
-			// Assignment can't be computed yet, keep in assignments
-			else
-				$assignments[] = array ($name, $value);
 		}
 
-		$body = $this->body->inject ($constants);
-		$body->compile (Generator::dummy (), $requires);
-
-		if (count ($assignments) === 0 || count ($requires) === 0)
-			return $body;
-
-		return new self ($assignments, $body);
+		return new self ($assignments, $this->body->inject ($constants));
 	}
 
 	public function is_void ()

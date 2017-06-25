@@ -21,17 +21,17 @@ class TestClass
 $preserve = new Deval\Setup ();
 $preserve->style = 'preserve';
 
-// Compile exceptions
-raise_compile ('{{ x y }}', 'but "y" found');
-raise_compile ('{{ x ** y }}', 'but "*" found');
+// Parse exceptions
+raise_parse ('{{ x y }}', 'but "y" found');
+raise_parse ('{{ x ** y }}', 'but "*" found');
 
-// Inject exceptions
-raise_inject ('{{ x }}', array ('x' => array ()), 'cannot be converted to string');
-raise_inject ('{% for i in x %}{{ i }}{% end %}', array ('x' => 1), 'is not iterable');
-raise_inject ('{{ f() }}', array ('f' => 1), 'is not callable');
-raise_inject ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
-raise_inject ('{{ ["SomeClass", "missing"](x) }}', array ('x' => 1), 'is not callable');
-raise_inject ('{{ ["TestClass", "missing"](x) }}', array ('x' => 1), 'is not callable');
+// Compile exceptions
+raise_compile ('{{ x }}', array ('x' => array ()), 'cannot be converted to string');
+raise_compile ('{% for i in x %}{{ i }}{% end %}', array ('x' => 1), 'is not iterable');
+raise_compile ('{{ f() }}', array ('f' => 1), 'is not callable');
+raise_compile ('{{ f() }}', array ('f' => 'i_do_not_exist'), 'is not callable');
+raise_compile ('{{ ["SomeClass", "missing"](x) }}', array ('x' => 1), 'is not callable');
+raise_compile ('{{ ["TestClass", "missing"](x) }}', array ('x' => 1), 'is not callable');
 
 // Render exceptions
 raise_render ('{{ a }}', array (), array (), 'undefined symbol(s) a');

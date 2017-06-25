@@ -19,7 +19,7 @@ class Compiler
 			$path = $base . DIRECTORY_SEPARATOR . $path;
 
 		if (!file_exists ($path))
-			throw new CompileException ($path, 'source file doesn\'t exist');
+			throw new ParseException ($path, 'source file doesn\'t exist');
 
 		array_push (self::$bases, dirname ($path));
 
@@ -49,7 +49,7 @@ class Compiler
 		}
 		catch (\PhpPegJs\SyntaxError $exception)
 		{
-			throw new CompileException ($context, $exception->getMessage () . ' at line ' . $exception->grammarLine . ', character ' . $exception->grammarColumn);
+			throw new ParseException ($context, $exception->getMessage () . ' at line ' . $exception->grammarLine . ', character ' . $exception->grammarColumn);
 		}
 	}
 

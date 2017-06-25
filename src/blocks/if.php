@@ -12,20 +12,33 @@ class IfBlock implements Block
 
 	public function compile ($generator, &$volatiles)
 	{
+		$keyword = 'if';
 		$output = new Output ();
-		$first = true;
+		$static = true;
 
 		foreach ($this->branches as $branch)
 		{
 			list ($condition, $body) = $branch;
 
-			$output->append_code (($first ? 'if' : 'else if ') . '(' . $condition->generate ($generator, $volatiles) . ')');
+			if ($static && $condition->get_value ($result))
+			{
+				if ($result)
+					return $body->compile ($generator, $volatiles);
+
+				continue;
+			}
+
+			$output->append_code ($keyword . '(' . $condition->generate ($generator, $volatiles) . ')');
 			$output->append_code ('{');
 			$output->append ($body->compile ($generator, $volatiles));
 			$output->append_code ('}');
 
-			$first = false;
+			$keyword = 'else if';
+			$static = false;
 		}
+
+		if ($static)
+			return $this->fallback->compile ($generator, $volatiles);
 
 		if (!$this->fallback->is_void ())
 		{
@@ -40,38 +53,16 @@ class IfBlock implements Block
 
 	public function inject ($constants)
 	{
-		// Evaluate conditions to find matching branch if any
-		$remains = array ();
+		$branches = array ();
 
 		foreach ($this->branches as $branch)
 		{
 			list ($condition, $body) = $branch;
 
-			$condition = $condition->inject ($constants);
-
-			if (!$condition->get_value ($result))
-				$remains[] = array ($condition, $body);
-			else if ($result)
-				return $body->inject ($constants);
+			$branches[] = array ($condition->inject ($constants), $body->inject ($constants));
 		}
 
-		$fallback = $this->fallback->inject ($constants);
-
-		// No unevaluated branch remains, return fallback or empty block
-		if (count ($remains) === 0)
-			return $fallback;
-
-		// Inject constants in remaining branch and rebuild block
-		$injects = array ();
-
-		foreach ($remains as $branch)
-		{
-			list ($condition, $body) = $branch;
-
-			$injects[] = array ($condition, $body->inject ($constants));
-		}
-
-		return new self ($injects, $fallback);
+		return new self ($branches, $this->fallback->inject ($constants));
 	}
 
 	public function is_void ()

@@ -11,22 +11,24 @@ class EchoBlock implements Block
 
 	public function compile ($generator, &$volatiles)
 	{
-		return (new Output ())->append_code ('echo ' . $this->value->generate ($generator, $volatiles) . ';');
+		$output = new Output ();
+
+		if ($this->value->get_value ($result))
+		{
+			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
+				throw new CompileException ($result, 'cannot be converted to string');
+
+			$output->append_text ($generator->make_plain ((string)$result));
+		}
+		else
+			$output->append_code ('echo ' . $this->value->generate ($generator, $volatiles) . ';');
+
+		return $output;
 	}
 
 	public function inject ($constants)
 	{
-		$value = $this->value->inject ($constants);
-
-		if ($value->get_value ($result))
-		{
-			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
-				return new self (new ErrorExpression ($result, 'cannot be converted to string'));
-
-			return new PlainBlock ((string)$result);
-		}
-
-		return new self ($value);
+		return new self ($this->value->inject ($constants));
 	}
 
 	public function is_void ()

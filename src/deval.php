@@ -4,17 +4,17 @@ namespace Deval;
 
 class CompileException extends \Exception
 {
-	public function __construct ($context, $message)
+	public function __construct ($value, $message)
 	{
-		parent::__construct ('compile error: ' . $message . ' in "' . $context . '"');
+		parent::__construct ('compile error: "' . var_export ($value, true) . '" ' . $message);
 	}
 }
 
-class InjectException extends \Exception
+class ParseException extends \Exception
 {
-	public function __construct ($value, $message)
+	public function __construct ($context, $message)
 	{
-		parent::__construct ('inject error: "' . var_export ($value, true) . '" ' . $message);
+		parent::__construct ('parse error: ' . $message . ' in "' . $context . '"');
 	}
 }
 

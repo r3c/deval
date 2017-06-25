@@ -74,16 +74,6 @@ class Generator
 		return var_export ($input, true);
 	}
 
-	public static function dummy ()
-	{
-		static $instance;
-
-		if (!isset ($instance))
-			$instance = new self (new Setup ());
-
-		return $instance;
-	}
-
 	private $local;
 	private $trimmer;
 	private $version;
@@ -109,7 +99,7 @@ class Generator
 			foreach (explode (',', $setup->style) as $style)
 			{
 				if (!isset ($trims[$style]))
-					throw new CompileException ('<setup>', 'unknown style "' . $style . '"');
+					throw new ParseException ('<setup>', 'unknown style "' . $style . '"');
 
 				$trimmers[] = $trims[$style];
 			}
@@ -130,7 +120,7 @@ class Generator
 		else if (is_callable ($setup->style))
 			$this->trimmer = $setup->style;
 		else
-			throw new CompileException ('<setup>', 'invalid style, must be either builtin style or callable');
+			throw new ParseException ('<setup>', 'invalid style, must be either builtin style or callable');
 
 		$this->local = 0;
 		$this->version = $setup->version;

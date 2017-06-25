@@ -41,7 +41,7 @@ class InvokeExpression implements Expression
 
 		// Make sure caller is valid before trying to generate code
 		else if (!is_callable ($result))
-			throw new InjectException ($this->caller, 'is not callable');
+			throw new CompileException ($this->caller, 'is not callable');
 
 		// Use array caller syntax if caller is a two-elements array, e.g. "array ('Class', 'method')"
 		else if (is_array ($result) && count ($result) === 2 && is_string ($result[0]) && is_string ($result[1]))
@@ -49,7 +49,7 @@ class InvokeExpression implements Expression
 			$method = new \ReflectionMethod ($result[0], $result[1]);
 
 			if (!$method->isStatic ())
-				throw new InjectException ($this->caller, 'is not a static method');
+				throw new CompileException ($this->caller, 'is not a static method');
 
 			$caller = $result[0] . '::' . $result[1];
 			$direct = true;
@@ -64,7 +64,7 @@ class InvokeExpression implements Expression
 
 		// Otherwise caller is probably a closure and can't be easily serialized
 		else
-			throw new InjectException ($this->caller, 'only strings or arrays can be injected as functions, not closures');
+			throw new CompileException ($this->caller, 'only strings or arrays can be injected as functions, not closures');
 
 		// Hack: PHP versions < 7.0.1 do not support syntax "func()()"
 		if ($direct)

@@ -96,31 +96,12 @@ function raise ($exception, $expect)
 }
 
 /*
-** Ensure source code throw compile exception when compiled.
-** $source:		template source code
-** $message:	expected exception message
-*/
-function raise_compile ($source, $message)
-{
-	try
-	{
-		$renderer = new Deval\StringRenderer ($source);
-
-		assert (false, 'should have raised exception at compilation');
-	}
-	catch (Deval\CompileException $exception)
-	{
-		raise ($exception, $message);
-	}
-}
-
-/*
-** Ensure source code throw inject exception when injected given constants.
+** Ensure source code throw compile exception when generated with given constants.
 ** $source:		template source code
 ** $constants:	injected constants
 ** $message:	expected exception message
 */
-function raise_inject ($source, $constants, $message)
+function raise_compile ($source, $constants, $message)
 {
 	$renderer = new Deval\StringRenderer ($source);
 
@@ -129,9 +110,28 @@ function raise_inject ($source, $constants, $message)
 		$renderer->inject ($constants);
 		$renderer->render ();
 
-		assert (false, 'should have raised exception at injection');
+		assert (false, 'should have raised exception when compiling');
 	}
-	catch (Deval\InjectException $exception)
+	catch (Deval\CompileException $exception)
+	{
+		raise ($exception, $message);
+	}
+}
+
+/*
+** Ensure source code throw parse exception when scanned.
+** $source:		template source code
+** $message:	expected exception message
+*/
+function raise_parse ($source, $message)
+{
+	try
+	{
+		$renderer = new Deval\StringRenderer ($source);
+
+		assert (false, 'should have raised exception when parsing');
+	}
+	catch (Deval\ParseException $exception)
 	{
 		raise ($exception, $message);
 	}
@@ -154,7 +154,7 @@ function raise_render ($source, $constants, $volatiles, $message)
 	{
 		$renderer->render ($volatiles);
 
-		assert (false, 'should have raised exception at rendering');
+		assert (false, 'should have raised exception when rendering');
 	}
 	catch (Deval\RenderException $exception)
 	{

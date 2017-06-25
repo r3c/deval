@@ -27,7 +27,7 @@ class ErrorExpression implements Expression
 
 	public function generate ($generator, &$volatiles)
 	{
-		throw new InjectException ($this->value, $this->message);
+		throw new CompileException ($this->value, $this->message);
 	}
 
 	public function inject ($constants)
