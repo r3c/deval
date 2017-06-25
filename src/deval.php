@@ -333,7 +333,7 @@ class CachedRenderer implements Renderer
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($this->path), PATHINFO_FILENAME) . '_' . md5 ($this->path . ':' . serialize ($this->constants)) . '.php';
 
 		if (!file_exists ($cache) || $this->invalidate)
-			file_put_contents ($cache, $this->source ($names));
+			file_put_contents ($cache, $this->source ($names), LOCK_EX);
 
 		return Evaluator::path ($cache, $volatiles);
 	}
