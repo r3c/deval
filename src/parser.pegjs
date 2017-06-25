@@ -239,7 +239,7 @@ ExpressionPostfixOperator
 			return new \Deval\InvokeExpression ($expression, array ());
 		};
 	}
-	/ "(" head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
+	/ "(" _ head:Expression _ tail:("," _ token:Expression _ { return $token; })* ")"
 	{
 		$arguments = array_merge (array ($head), $tail);
 
@@ -255,7 +255,7 @@ ExpressionPostfixOperator
 			return new \Deval\MemberExpression ($expression, $index);
 		};
 	}
-	/ "." index:Symbol
+	/ "." _ index:Symbol
 	{
 		return function ($expression) use ($index)
 		{
