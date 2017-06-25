@@ -14,6 +14,9 @@ class Generator
 
 	public static function emit_scope_pop ($names)
 	{
+		if (count ($names) < 1)
+			return '';
+
 		return 'list(' . implode (',', array_map (function ($name)
 		{
 			return Generator::emit_symbol ($name);
@@ -22,6 +25,9 @@ class Generator
 
 	public static function emit_scope_push ($names)
 	{
+		if (count ($names) < 1)
+			return '';
+
 		return '$' . self::$state_name . '->scope_push(' . implode (',', array_map (function ($name)
 		{
 			$symbol = Generator::emit_symbol ($name);

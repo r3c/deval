@@ -173,6 +173,7 @@ render_code ('{% let a = x %}{{ a }}{% end %}', make_combinations (array ('x' =>
 render_code ('{% let a = x, b = a %}{{ b }}{% end %}', make_combinations (array ('x' => 'test')), 'test');
 render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations (array ('b' => '1', 'x' => '2')), '12');
 render_code ('{% let a = x %}{{ a }}{% let a = y %}{{ a }}{% end %}{{ a }}{% end %}', make_combinations (array ('x' => 1, 'y' => 2)), '121');
+render_code ('{% let x = a %}{{ x }}{% for x in [a: 2] %}{{ x }}{% end %}{{ x }}{% end %}', make_combinations (array ('a' => 1)), '121');
 
 // Render files
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');

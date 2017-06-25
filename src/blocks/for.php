@@ -15,6 +15,7 @@ class ForBlock implements Block
 
 	public function compile ($generator, &$volatiles)
 	{
+		$backups = $this->key_name !== null ? array ($this->key_name, $this->value_name) : array ($this->value_name);
 		$output = new Output ();
 
 		// Generate loop counter if needed
@@ -23,6 +24,10 @@ class ForBlock implements Block
 		if ($counter !== null)
 			$output->append_code ($counter . '=0;');
 
+		// Backup key and value variables
+		$output->append_code (Generator::emit_scope_push ($backups));
+
+		// Generate for control loop
 		$output->append_code ('foreach(' . $this->source->generate ($generator, $volatiles) . ' as ');
 
 		if ($this->key_name !== null)
@@ -43,13 +48,8 @@ class ForBlock implements Block
 
 		$output->append_code ('}');
 
-		if ($this->key_name !== null)
-			unset ($requires[$this->key_name]);
-
-		unset ($requires[$this->value_name]);
-
-		foreach (array_keys ($requires) as $name)
-			$volatiles[$name] = true;
+		// Restore key and value variables
+		$output->append_code (Generator::emit_scope_pop ($backups));
 
 		// Write empty block if any
 		if ($counter !== null)
@@ -59,6 +59,9 @@ class ForBlock implements Block
 			$output->append ($this->empty->compile ($generator, $volatiles));
 			$output->append_code ('}');
 		}
+
+		// Append required volatiles excepted key and value
+		$volatiles += array_diff_key ($requires, array_flip ($backups));
 
 		return $output;
 	}
