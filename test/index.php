@@ -18,6 +18,9 @@ class TestClass
 	}
 }
 
+$preserve = new Deval\Setup ();
+$preserve->style = 'preserve';
+
 // Compile exceptions
 raise_compile ('{{ x y }}', 'but "y" found');
 raise_compile ('{{ x ** y }}', 'but "*" found');
@@ -51,8 +54,8 @@ render_code ('<%= 5 %>', make_empty (), '<%= 5 %>');
 render_code ('<script language="php"> 6 </script>', make_empty (), '<script language="php"> 6 </script>');
 
 // Render interleaved blocks
-render_code ("A {{ \"B\" }} C", make_empty (), "A B C");
-render_code ("A\n{{ \"B\" }}\nC", make_empty (), "A\nB\nC");
+render_code ("A {{ \"B\" }} C", make_empty (), "A B C", $preserve);
+render_code ("A\n{{ \"B\" }}\nC", make_empty (), "A\nB\nC", $preserve);
 
 // Render constants
 render_code ('{{ null }}', make_empty (), '');
@@ -172,7 +175,7 @@ render_code ('{% let a = x %}{{ a }}{% let a = y %}{{ a }}{% end %}{{ a }}{% end
 
 // Render files
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');
-render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "1\n2\n3");
+render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "123");
 
 // Setup style
 $tests = array

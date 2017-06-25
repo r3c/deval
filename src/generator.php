@@ -73,7 +73,7 @@ class Generator
 		static $instance;
 
 		if (!isset ($instance))
-			$instance = new self (null);
+			$instance = new self (new Setup ());
 
 		return $instance;
 	}
@@ -86,57 +86,48 @@ class Generator
 	{
 		static $trims;
 
-		if ($setup !== null)
+		if (!isset ($trims))
 		{
-			if (!isset ($trims))
+			$trims = array
+			(
+				'collapse'	=> function ($s) { return preg_replace ('/\\s+/mu', ' ', $s); },
+				'deindent'	=> function ($s) { return preg_replace ("/^(?:\n|\r|\n\r|\r\n)[\t ]*|(?:\n|\r|\n\r|\r\n)[\t ]*$/u", '', $s); },
+				'preserve'	=> function ($s) { return $s; }
+			);
+		}
+
+		if (is_string ($setup->style))
+		{
+			$trimmers = array ();
+
+			foreach (explode (',', $setup->style) as $style)
 			{
-				$trims = array
-				(
-					'collapse'	=> function ($s) { return preg_replace ('/\\s+/mu', ' ', $s); },
-					'deindent'	=> function ($s) { return preg_replace ("/^(?:\n|\r|\n\r|\r\n)[\t ]*|(?:\n|\r|\n\r|\r\n)[\t ]*$/u", '', $s); },
-					'preserve'	=> function ($s) { return $s; }
-				);
+				if (!isset ($trims[$style]))
+					throw new CompileException ('<setup>', 'unknown style "' . $style . '"');
+
+				$trimmers[] = $trims[$style];
 			}
 
-			if (is_string ($setup->style))
-			{
-				$trimmers = array ();
-
-				foreach (explode (',', $setup->style) as $style)
-				{
-					if (!isset ($trims[$style]))
-						throw new CompileException ('<setup>', 'unknown style "' . $style . '"');
-
-					$trimmers[] = $trims[$style];
-				}
-
-				if (count ($trimmers) === 1)
-					$this->trimmer = $trimmers[0];
-				else
-				{
-					$this->trimmer = function ($s) use ($trimmers)
-					{
-						foreach ($trimmers as $trimmer)
-							$s = $trimmer ($s);
-
-						return $s;
-					};
-				}
-			}
-			else if (is_callable ($setup->style))
-				$this->trimmer = $setup->style;
+			if (count ($trimmers) === 1)
+				$this->trimmer = $trimmers[0];
 			else
-				throw new CompileException ('<setup>', 'invalid style, must be either builtin style or callable');
+			{
+				$this->trimmer = function ($s) use ($trimmers)
+				{
+					foreach ($trimmers as $trimmer)
+						$s = $trimmer ($s);
 
-			$this->version = $setup->version;
+					return $s;
+				};
+			}
 		}
+		else if (is_callable ($setup->style))
+			$this->trimmer = $setup->style;
 		else
-		{
-			$this->trimmer = function ($s) { return $s; };
-			$this->version = PHP_VERSION;
-		}
+			throw new CompileException ('<setup>', 'invalid style, must be either builtin style or callable');
 
 		$this->local = 0;
+		$this->version = $setup->version;
 	}
 
 	public function emit_local ()

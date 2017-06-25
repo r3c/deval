@@ -320,7 +320,7 @@ class CachedRenderer implements Renderer
 		$this->directory = $directory;
 		$this->invalidate = $invalidate;
 		$this->path = $path;
-		$this->setup = $setup;
+		$this->setup = $setup ?: new Setup ();
 	}
 
 	public function inject ($constants)
@@ -382,7 +382,7 @@ class FileRenderer extends DirectRenderer
 	{
 		Loader::load ();
 
-		parent::__construct (new Compiler (Compiler::parse_file ($path)), $setup);
+		parent::__construct (new Compiler (Compiler::parse_file ($path)), $setup ?: new Setup ());
 	}
 }
 
@@ -392,7 +392,7 @@ class StringRenderer extends DirectRenderer
 	{
 		Loader::load ();
 
-		parent::__construct (new Compiler (Compiler::parse_code ($source)), $setup);
+		parent::__construct (new Compiler (Compiler::parse_code ($source)), $setup ?: new Setup ());
 	}
 }
 
