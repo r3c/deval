@@ -49,7 +49,7 @@ class IfBlock implements Block
 
 			$condition = $condition->inject ($constants);
 
-			if (!$condition->evaluate ($result))
+			if (!$condition->get_value ($result))
 				$remains[] = array ($condition, $body);
 			else if ($result)
 				return $body->inject ($constants);

@@ -14,9 +14,14 @@ class GroupExpression implements Expression
 		return '(' . $this->expression . ')';
 	}
 
-	public function evaluate (&$result)
+	public function get_member ($index, &$result)
 	{
-		return $this->expression->evaluate ($result);
+		return $this->expression->get_member ($index, $result);
+	}
+
+	public function get_value (&$result)
+	{
+		return $this->expression->get_value ($result);
 	}
 
 	public function generate ($generator, &$volatiles)

@@ -14,7 +14,12 @@ class SymbolExpression implements Expression
 		return $this->name;
 	}
 
-	public function evaluate (&$result)
+	public function get_member ($index, &$result)
+	{
+		return false;
+	}
+
+	public function get_value (&$result)
 	{
 		return false;
 	}

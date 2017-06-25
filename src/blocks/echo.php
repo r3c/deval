@@ -18,7 +18,7 @@ class EchoBlock implements Block
 	{
 		$value = $this->value->inject ($constants);
 
-		if ($value->evaluate ($result))
+		if ($value->get_value ($result))
 		{
 			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
 				throw new InjectException ($value, 'cannot be converted to string');

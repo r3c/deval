@@ -68,7 +68,7 @@ class ForBlock implements Block
 		$source = $this->source->inject ($constants);
 
 		// Source can't be evaluated, rebuild block with injected children
-		if (!$source->evaluate ($result))
+		if (!$source->get_value ($result))
 		{
 			// Inject all constants to empty block
 			$empty = $this->empty->inject ($constants);

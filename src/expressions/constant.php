@@ -14,7 +14,12 @@ class ConstantExpression implements Expression
 		return var_export ($this->value, true);
 	}
 
-	public function evaluate (&$result)
+	public function get_member ($index, &$result)
+	{
+		return false;
+	}
+
+	public function get_value (&$result)
 	{
 		$result = $this->value;
 

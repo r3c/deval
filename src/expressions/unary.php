@@ -32,7 +32,12 @@ class UnaryExpression implements Expression
 		return $this->op . $this->value;
 	}
 
-	public function evaluate (&$result)
+	public function get_member ($index, &$result)
+	{
+		return false;
+	}
+
+	public function get_value (&$result)
 	{
 		return false;
 	}
@@ -46,7 +51,7 @@ class UnaryExpression implements Expression
 	{
 		$value = $this->value->inject ($constants);
 
-		if (!$value->evaluate ($result))
+		if (!$value->get_value ($result))
 			return new self ($value, $this->op);
 
 		$callback = $this->callback;

@@ -42,7 +42,12 @@ class BinaryExpression implements Expression
 		return $this->lhs . ' ' . $this->op . ' ' . $this->rhs;
 	}
 
-	public function evaluate (&$result)
+	public function get_member ($index, &$result)
+	{
+		return false;
+	}
+
+	public function get_value (&$result)
 	{
 		return false;
 	}
@@ -57,7 +62,7 @@ class BinaryExpression implements Expression
 		$lhs = $this->lhs->inject ($constants);
 		$rhs = $this->rhs->inject ($constants);
 
-		if (!$lhs->evaluate ($result1) || !$rhs->evaluate ($result2))
+		if (!$lhs->get_value ($result1) || !$rhs->get_value ($result2))
 			return new self ($lhs, $rhs, $this->op);
 
 		$callback = $this->callback;

@@ -15,7 +15,12 @@ class InvokeExpression implements Expression
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
 	}
 
-	public function evaluate (&$result)
+	public function get_member ($index, &$result)
+	{
+		return false;
+	}
+
+	public function get_value (&$result)
 	{
 		return false;
 	}
@@ -28,7 +33,7 @@ class InvokeExpression implements Expression
 			$arguments[] = $argument->generate ($generator, $volatiles);
 
 		// If caller can't be evaluated to a value, generate as an expression
-		if (!$this->caller->evaluate ($result))
+		if (!$this->caller->get_value ($result))
 		{
 			$caller = $this->caller->generate ($generator, $volatiles);
 			$direct = $this->caller instanceof SymbolExpression || $generator->support ('7.0.1');
@@ -79,7 +84,7 @@ class InvokeExpression implements Expression
 		{
 			$argument = $argument->inject ($constants);
 
-			if ($argument->evaluate ($result))
+			if ($argument->get_value ($result))
 				$values[] = $result;
 			else
 				$ready = false;
@@ -88,7 +93,7 @@ class InvokeExpression implements Expression
 		}
 
 		// Invoke and pass return value if caller and arguments were evaluated
-		if ($ready && $caller->evaluate ($result))
+		if ($ready && $caller->get_value ($result))
 		{
 			if (!is_callable ($result))
 				throw new InjectException ($caller, 'is not callable');

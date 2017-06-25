@@ -68,7 +68,7 @@ class LetBlock implements Block
 			unset ($constants[$name]);
 
 			// Assignment can be evaluated, move to known constants
-			if ($value->evaluate ($result))
+			if ($value->get_value ($result))
 				$constants[$name] = $result;
 
 			// Assignment can't be computed yet, keep in assignments
