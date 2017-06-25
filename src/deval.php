@@ -47,7 +47,7 @@ class Builtin
 
 	public static function _builtin_default ($value, $fallback)
 	{
-		return $value ?: $fallback;
+		return $value !== null ? $value : $fallback;
 	}
 
 	public static function _builtin_filter ($items, $predicate)

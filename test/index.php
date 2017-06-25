@@ -198,10 +198,9 @@ foreach ($tests as $style => $expect)
 render_code ('{{ cat(1, 2) }}', make_builtins ('cat'), '12');
 render_code ('{{ cat(1, 2, 3) }}', make_builtins ('cat'), '123');
 render_code ('{{ cat("AB", "CD") }}', make_builtins ('cat'), 'ABCD');
-render_code ('{{ default(0, 5) }}', make_builtins ('default'), '5');
-render_code ('{{ default(1, 5) }}', make_builtins ('default'), '1');
-render_code ('{{ default("", "X") }}', make_builtins ('default'), 'X');
-render_code ('{{ default("Y", "X") }}', make_builtins ('default'), 'Y');
+render_code ('{{ default(null, 5) }}', make_builtins ('default'), '5');
+render_code ('{{ default(0, 5) }}', make_builtins ('default'), '0');
+render_code ('{{ default(1, 6) }}', make_builtins ('default'), '1');
 render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join'), '1,2,3,4');
 render_code ('{{ join(",", filter([1, 2, 3, 4], (v) => v % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
 render_code ('{{ join(",", filter(["a": 1, "b": 2, "c": 3, "d": 4], (v, k) => k < "c")) }}', make_builtins ('filter', 'join'), '1,2');
