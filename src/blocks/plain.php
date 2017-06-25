@@ -28,6 +28,11 @@ class PlainBlock implements Block
 	{
 		return $this;
 	}
+
+	public function wrap ($name)
+	{
+		return $this;
+	}
 }
 
 ?>

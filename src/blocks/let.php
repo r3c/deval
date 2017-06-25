@@ -89,6 +89,11 @@ class LetBlock implements Block
 	{
 		return new self ($this->assignments, $this->body->resolve ($blocks));
 	}
+
+	public function wrap ($name)
+	{
+		return new self ($this->assignments, $this->body->wrap ($name));
+	}
 }
 
 ?>

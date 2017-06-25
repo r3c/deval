@@ -131,6 +131,14 @@ class ForBlock implements Block
 
 		return new self ($this->source, $this->key_name, $this->value_name, $loop, $empty);
 	}
+
+	public function wrap ($name)
+	{
+		$empty = $this->empty->wrap ($name);
+		$loop = $this->loop->wrap ($name);
+
+		return new self ($this->source, $this->key_name, $this->value_name, $loop, $empty);
+	}
 }
 
 ?>

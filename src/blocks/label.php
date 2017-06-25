@@ -31,6 +31,11 @@ class LabelBlock implements Block
 
 		return new VoidBlock ();
 	}
+
+	public function wrap ($name)
+	{
+		return $this;
+	}
 }
 
 ?>

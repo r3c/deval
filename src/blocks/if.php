@@ -88,12 +88,21 @@ class IfBlock implements Block
 	public function resolve ($blocks)
 	{
 		$branches = array ();
-		$fallback = $this->fallback->resolve ($blocks);
 
 		foreach ($this->branches as $branch)
 			$branches[] = array ($branch[0], $branch[1]->resolve ($blocks));
 
-		return new self ($branches, $fallback);
+		return new self ($branches, $this->fallback->resolve ($blocks));
+	}
+
+	public function wrap ($name)
+	{
+		$branches = array ();
+
+		foreach ($this->branches as $branch)
+			$branches[] = array ($branch[0], $branch[1]->wrap ($name));
+
+		return new self ($branches, $this->fallback->wrap ($name));
 	}
 }
 

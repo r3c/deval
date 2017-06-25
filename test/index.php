@@ -175,6 +175,10 @@ render_code ('{% let a = b, b = x %}{{ a }}{{ b }}{% end %}', make_combinations 
 render_code ('{% let a = x %}{{ a }}{% let a = y %}{{ a }}{% end %}{{ a }}{% end %}', make_combinations (array ('x' => 1, 'y' => 2)), '121');
 render_code ('{% let x = a %}{{ x }}{% for x in [a: 2] %}{{ x }}{% end %}{{ x }}{% end %}', make_combinations (array ('a' => 1)), '121');
 
+// Render wrap command
+render_code ('{% wrap length %}{{ "Hello!" }}{% end %}', make_builtins ('length'), '6');
+render_code ('{% wrap length %}{% wrap group %}{{ [1, 1, 2, 3, 3] }}{% end %}{% end %}', make_builtins ('group', 'length'), '3');
+
 // Render files
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');
 render_file ('template/symbol.deval', 'template', make_combinations (array ('x' => 1, 'y' => 2, 'z' => 3)), "123");

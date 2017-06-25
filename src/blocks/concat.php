@@ -55,10 +55,22 @@ class ConcatBlock implements Block
 
 	public function resolve ($blocks)
 	{
-		return new self (array_map (function ($block) use ($blocks)
-		{
-			return $block->resolve ($blocks);
-		}, $this->blocks));
+		$results = array ();
+
+		foreach ($this->blocks as $block)
+			$results[] = $block->resolve ($blocks);
+
+		return new self ($results);
+	}
+
+	public function wrap ($name)
+	{
+		$results = array ();
+
+		foreach ($this->blocks as $block)
+			$results[] = $block->wrap ($name);
+
+		return new self ($results);
 	}
 }
 

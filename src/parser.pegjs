@@ -63,6 +63,7 @@ Command "command block"
 	/ CommandInclude
 	/ CommandLabel
 	/ CommandLet
+	/ CommandWrap
 
 CommandImport "import command"
 	= "import" _ path:Path _ BlockCommandEnd _ blocks:CommandImportBlock* BlockCommandBegin _ "end"
@@ -143,6 +144,12 @@ CommandLetAssignmentsPair "assignment"
 	= name:Symbol _ "=" _ value:Expression
 	{
 		return array ($name, $value);
+	}
+
+CommandWrap "wrap command"
+	= "wrap" _ name:Symbol _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
+	{
+		return $body->wrap ($name);
 	}
 
 Path "path"
