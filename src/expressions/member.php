@@ -4,15 +4,15 @@ namespace Deval;
 
 class MemberExpression implements Expression
 {
-	public function __construct ($source, $index)
+	public function __construct ($source, $offset)
 	{
-		$this->index = $index;
+		$this->offset = $offset;
 		$this->source = $source;
 	}
 
 	public function __toString ()
 	{
-		return $this->source . '[' . $this->index . ']';
+		return $this->source . '[' . $this->offset . ']';
 	}
 
 	public function get_elements (&$elements)
@@ -27,30 +27,31 @@ class MemberExpression implements Expression
 
 	public function generate ($generator, &$volatiles)
 	{
-		$index = $this->index->generate ($generator, $volatiles);
+		$offset = $this->offset->generate ($generator, $volatiles);
 		$source = $this->source->generate ($generator, $volatiles);
 
-		return Generator::emit_member ($source, $index);
+		return Generator::emit_member ($source, $offset);
 	}
 
 	public function inject ($expressions)
 	{
-		$index = $this->index->inject ($expressions);
+		$offset = $this->offset->inject ($expressions);
 		$source = $this->source->inject ($expressions);
 
-		// Try to fetch member from source if index can be evaluated
-		if ($index->get_value ($index_value))
+		// Member can be fetched from source only if offset can be evaluated
+		if ($offset->get_value ($key))
 		{
-			// Resolve to constant value if both source and index can be evaluated
-			if ($source->get_value ($source_value))
-				return new ConstantExpression (Runtime::member ($source_value, $index_value));
+			// Fetch member from parent if source can be evaluated
+			if ($source->get_value ($parent))
+				return new ConstantExpression (Runtime::member ($parent, $key));
 
-			else if ($source->get_elements ($elements) && array_key_exists ($index_value, $elements) && $elements[$index_value]->get_value ($value))
-				return new ConstantExpression ($value);
+			// Otherwise find member in source elements if possible
+			else if ($source->get_elements ($elements) && array_key_exists ($key, $elements))
+				return $elements[$key];
 		}
 
-		// Otherwise return injected source and index
-		return new self ($source, $index);
+		// Otherwise return injected source and offset
+		return new self ($source, $offset);
 	}
 }
 
