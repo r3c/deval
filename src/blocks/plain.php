@@ -29,7 +29,7 @@ class PlainBlock implements Block
 		return $this;
 	}
 
-	public function wrap ($name)
+	public function wrap ($value)
 	{
 		return $this;
 	}

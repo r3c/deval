@@ -147,9 +147,9 @@ CommandLetAssignmentsPair "assignment"
 	}
 
 CommandWrap "wrap command"
-	= "wrap" _ name:Symbol _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
+	= "wrap" _ value:Expression _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
 	{
-		return $body->wrap ($name);
+		return $body->wrap ($value);
 	}
 
 Path "path"

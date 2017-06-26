@@ -86,14 +86,14 @@ class IfBlock implements Block
 		return new self ($branches, $this->fallback->resolve ($blocks));
 	}
 
-	public function wrap ($name)
+	public function wrap ($value)
 	{
 		$branches = array ();
 
 		foreach ($this->branches as $branch)
-			$branches[] = array ($branch[0], $branch[1]->wrap ($name));
+			$branches[] = array ($branch[0], $branch[1]->wrap ($value));
 
-		return new self ($branches, $this->fallback->wrap ($name));
+		return new self ($branches, $this->fallback->wrap ($value));
 	}
 }
 

@@ -178,6 +178,7 @@ render_code ('{% let x = a %}{{ x }}{% for x in [a: 2] %}{{ x }}{% end %}{{ x }}
 // Render wrap command
 render_code ('{% wrap length %}{{ "Hello!" }}{% end %}', make_builtins ('length'), '6');
 render_code ('{% wrap length %}{% wrap group %}{{ [1, 1, 2, 3, 3] }}{% end %}{% end %}', make_builtins ('group', 'length'), '3');
+render_code ('{% wrap php ("strtoupper") %}{{ "World" }}{% end %}', make_builtins ('php'), 'WORLD');
 
 // Render files
 render_file ('template/member.deval', 'template', make_combinations (array ('x' => 0)), '1337');

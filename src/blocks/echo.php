@@ -41,9 +41,9 @@ class EchoBlock implements Block
 		return $this;
 	}
 
-	public function wrap ($name)
+	public function wrap ($value)
 	{
-		return new self (new InvokeExpression (new SymbolExpression ($name), array ($this->value)));
+		return new self (new InvokeExpression ($value, array ($this->value)));
 	}
 }
 

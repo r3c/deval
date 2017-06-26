@@ -63,12 +63,12 @@ class ConcatBlock implements Block
 		return new self ($results);
 	}
 
-	public function wrap ($name)
+	public function wrap ($value)
 	{
 		$results = array ();
 
 		foreach ($this->blocks as $block)
-			$results[] = $block->wrap ($name);
+			$results[] = $block->wrap ($value);
 
 		return new self ($results);
 	}
