@@ -419,10 +419,9 @@ class Runtime
 				return array ($source, $index);
 			else if (property_exists ($source, $index))
 				return $source->$index;
-			else if (isset ($source[$index]))
-				return $source[$index];
 		}
-		else if (isset ($source[$index]))
+
+		if (isset ($source[$index]))
 			return $source[$index];
 
 		return null;

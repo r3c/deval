@@ -19,21 +19,21 @@ class LetBlock implements Block
 
 		foreach ($this->assignments as $assignment)
 		{
-			list ($name, $value) = $assignment;
+			list ($name, $expression) = $assignment;
 
 			// Inject expressions computed from previous assignments
-			$value = $value->inject ($expressions);
+			$expression = $expression->inject ($expressions);
 
 			// Append to expressions if assignment should be evaluated
 			if (true /* FIXME: some smart heuristic */)
-				$expressions[$name] = $value;
+				$expressions[$name] = $expression;
 
 			// Or generate dynamic assignment otherwise
 			else
 			{
 				// Generate evaluation code for current variable
 				$requires = array ();
-				$assignments->append_code (Generator::emit_symbol ($name) . '=' . $value->generate ($generator, $requires) . ';');
+				$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator, $requires) . ';');
 
 				// Append required volatiles but the ones provided by previous assignments
 				$volatiles += array_diff_key ($requires, $provides);

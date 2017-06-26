@@ -12,8 +12,9 @@ class EchoBlock implements Block
 	public function compile ($generator, &$volatiles)
 	{
 		$output = new Output ();
+		$value = $this->value->inject (array ());
 
-		if ($this->value->get_value ($result))
+		if ($value->get_value ($result))
 		{
 			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
 				throw new CompileException ($result, 'cannot be converted to string');
@@ -21,7 +22,7 @@ class EchoBlock implements Block
 			$output->append_text ($generator->make_plain ((string)$result));
 		}
 		else
-			$output->append_code ('echo ' . $this->value->generate ($generator, $volatiles) . ';');
+			$output->append_code ('echo ' . $value->generate ($generator, $volatiles) . ';');
 
 		return $output;
 	}

@@ -21,6 +21,8 @@ class IfBlock implements Block
 			list ($condition, $body) = $branch;
 
 			// Conditions can be statically evaluated if previous ones were too
+			$condition = $condition->inject (array ());
+
 			if ($static && $condition->get_value ($result))
 			{
 				if ($result)

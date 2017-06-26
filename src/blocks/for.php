@@ -16,9 +16,10 @@ class ForBlock implements Block
 	public function compile ($generator, &$volatiles)
 	{
 		$output = new Output ();
+		$source = $this->source->inject (array ());
 
 		// Unroll loop if elements can be enumerated
-		if ($this->source->get_elements ($elements))
+		if ($source->get_elements ($elements))
 		{
 			$empty = true;
 
@@ -58,7 +59,7 @@ class ForBlock implements Block
 			$output->append_code (Generator::emit_scope_push ($backups));
 
 			// Generate for control loop
-			$output->append_code ('foreach(' . $this->source->generate ($generator, $volatiles) . ' as ');
+			$output->append_code ('foreach(' . $source->generate ($generator, $volatiles) . ' as ');
 
 			if ($this->key_name !== null)
 				$output->append_code (Generator::emit_symbol ($this->key_name) . '=>' . Generator::emit_symbol ($this->value_name));

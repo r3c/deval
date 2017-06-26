@@ -22,11 +22,7 @@ class MemberExpression implements Expression
 
 	public function get_value (&$value)
 	{
-		return
-			$this->index->get_value ($index) &&
-			$this->source->get_elements ($elements) &&
-			isset ($elements[$index]) &&
-			$elements[$index]->get_value ($value);
+		return false;
 	}
 
 	public function generate ($generator, &$volatiles)
@@ -42,9 +38,16 @@ class MemberExpression implements Expression
 		$index = $this->index->inject ($expressions);
 		$source = $this->source->inject ($expressions);
 
-		// Resolve to constant value if both source and index were evaluated
-		if ($index->get_value ($index_result) && $source->get_value ($source_result))
-			return new ConstantExpression (Runtime::member ($source_result, $index_result));
+		// Try to fetch member from source if index can be evaluated
+		if ($index->get_value ($index_value))
+		{
+			// Resolve to constant value if both source and index can be evaluated
+			if ($source->get_value ($source_value))
+				return new ConstantExpression (Runtime::member ($source_value, $index_value));
+
+			else if ($source->get_elements ($elements) && array_key_exists ($index_value, $elements) && $elements[$index_value]->get_value ($value))
+				return new ConstantExpression ($value);
+		}
 
 		// Otherwise return injected source and index
 		return new self ($source, $index);

@@ -7,6 +7,8 @@ header ('Content-Type: text/plain');
 
 class TestClass
 {
+	public $instance_field = 1;
+
 	public function instance_method ()
 	{
 		return 42;
@@ -125,6 +127,7 @@ render_code ('{{ [1][0] }}', make_empty (), '1');
 render_code ('{{ a[0] }}', make_combinations (array ('a' => array (7))), '7');
 render_code ('{{ [2, 9, 3][x] }}', make_combinations (array ('x' => 1)), '9');
 render_code ('{{ a[x][y] }}', make_combinations (array ('a' => array (0, 0, array (0, 5)), 'x' => 2, 'y' => 1)), '5');
+render_code ('{{ obj.instance_field }}', make_combinations (array ('obj' => new TestClass ())), '1');
 
 // Render unary expressions
 render_code ('{{ -3 }}', make_empty (), '-3');
