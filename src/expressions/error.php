@@ -30,7 +30,7 @@ class ErrorExpression implements Expression
 		throw new CompileException ($this->value, $this->message);
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		return $this;
 	}

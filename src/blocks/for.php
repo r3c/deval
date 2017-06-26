@@ -24,29 +24,20 @@ class ForBlock implements Block
 
 			foreach ($elements as $key => $element)
 			{
-				$constants = array ();
 				$empty = false;
+				$expressions = array ();
 
 				// Inject key as constant if specified
 				if ($this->key_name !== null)
-					$constants[$this->key_name] = $key;
+					$expressions[$this->key_name] = new ConstantExpression ($key);
 
-				// Inject value as constant if evaluated
-				if ($element->get_value ($value))
-				{
-					$constants[$this->value_name] = $value;
-					$block = $this->loop->inject ($constants);
-				}
+				// Inject value
+				$expressions[$this->value_name] = $element;
 
-				// Or wrap loop inside assignment otherwise
-				else
-				{
-					$assignments = array (array ($this->value_name, $element));
-					$block = new LetBlock ($assignments, $this->loop->inject ($constants));
-				}
+				// Compile and append current iteration to output
+				$iteration = $this->loop->inject ($expressions);
 
-				// Append current block to output
-				$output->append ($block->compile ($generator, $volatiles));
+				$output->append ($iteration->compile ($generator, $volatiles));
 			}
 
 			if ($empty)
@@ -106,21 +97,21 @@ class ForBlock implements Block
 		return $output;
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		// Inject constants into source and empty block
-		$empty = $this->empty->inject ($constants);
-		$source = $this->source->inject ($constants);
+		// Inject expressions into source and empty block
+		$empty = $this->empty->inject ($expressions);
+		$source = $this->source->inject ($expressions);
 
-		// Remove key and value from constants before injecting into loop
+		// Remove key and value from expressions before injecting into loop
 		if ($this->key_name !== null)
-			unset ($constants[$this->key_name]);
+			unset ($expressions[$this->key_name]);
 
-		unset ($constants[$this->value_name]);
+		unset ($expressions[$this->value_name]);
 
-		$loop = $this->loop->inject ($constants);
+		$loop = $this->loop->inject ($expressions);
 
-		// Rebuild block with injected constants
+		// Rebuild block with injected expressions
 		return new self ($source, $this->key_name, $this->value_name, $loop, $empty);
 	}
 

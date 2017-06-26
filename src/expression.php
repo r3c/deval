@@ -8,7 +8,7 @@ interface Expression
 	public function get_elements (&$elements);
 	public function get_value (&$value);
 	public function generate ($generator, &$volatiles);
-	public function inject ($constants);
+	public function inject ($expressions);
 }
 
 ?>

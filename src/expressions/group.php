@@ -29,9 +29,9 @@ class GroupExpression implements Expression
 		return '(' . $this->expression->generate ($generator, $volatiles) . ')';
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		return new self ($this->expression->inject ($constants));
+		return new self ($this->expression->inject ($expressions));
 	}
 }
 

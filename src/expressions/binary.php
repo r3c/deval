@@ -57,10 +57,10 @@ class BinaryExpression implements Expression
 		return $this->lhs->generate ($generator, $volatiles) . $this->op . $this->rhs->generate ($generator, $volatiles);
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		$lhs = $this->lhs->inject ($constants);
-		$rhs = $this->rhs->inject ($constants);
+		$lhs = $this->lhs->inject ($expressions);
+		$rhs = $this->rhs->inject ($expressions);
 
 		if (!$lhs->get_value ($result1) || !$rhs->get_value ($result2))
 			return new self ($lhs, $rhs, $this->op);

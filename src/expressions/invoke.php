@@ -73,16 +73,16 @@ class InvokeExpression implements Expression
 			return '\\call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		$arguments = array ();
-		$caller = $this->caller->inject ($constants);
+		$caller = $this->caller->inject ($expressions);
 		$ready = true;
 		$values = array ();
 
 		foreach ($this->arguments as $argument)
 		{
-			$argument = $argument->inject ($constants);
+			$argument = $argument->inject ($expressions);
 
 			if ($argument->get_value ($result))
 				$values[] = $result;

@@ -14,7 +14,7 @@ class PlainBlock implements Block
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		return $this;
 	}

@@ -26,9 +26,9 @@ class EchoBlock implements Block
 		return $output;
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		return new self ($this->value->inject ($constants));
+		return new self ($this->value->inject ($expressions));
 	}
 
 	public function is_void ()

@@ -47,9 +47,9 @@ class UnaryExpression implements Expression
 		return $this->op . $this->value->generate ($generator, $volatiles);
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		$value = $this->value->inject ($constants);
+		$value = $this->value->inject ($expressions);
 
 		if (!$value->get_value ($result))
 			return new self ($value, $this->op);

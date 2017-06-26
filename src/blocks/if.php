@@ -20,6 +20,7 @@ class IfBlock implements Block
 		{
 			list ($condition, $body) = $branch;
 
+			// Conditions can be statically evaluated if previous ones were too
 			if ($static && $condition->get_value ($result))
 			{
 				if ($result)
@@ -28,6 +29,7 @@ class IfBlock implements Block
 				continue;
 			}
 
+			// First non-static condition triggers dynamic code generation
 			$output->append_code ($keyword . '(' . $condition->generate ($generator, $volatiles) . ')');
 			$output->append_code ('{');
 			$output->append ($body->compile ($generator, $volatiles));
@@ -37,9 +39,11 @@ class IfBlock implements Block
 			$static = false;
 		}
 
+		// Output fallback if conditions were static and evaluated to false
 		if ($static)
 			return $this->fallback->compile ($generator, $volatiles);
 
+		// Otherwise generate dynamic fallback code
 		if (!$this->fallback->is_void ())
 		{
 			$output->append_code ('else');
@@ -51,7 +55,7 @@ class IfBlock implements Block
 		return $output;
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		$branches = array ();
 
@@ -59,10 +63,10 @@ class IfBlock implements Block
 		{
 			list ($condition, $body) = $branch;
 
-			$branches[] = array ($condition->inject ($constants), $body->inject ($constants));
+			$branches[] = array ($condition->inject ($expressions), $body->inject ($expressions));
 		}
 
-		return new self ($branches, $this->fallback->inject ($constants));
+		return new self ($branches, $this->fallback->inject ($expressions));
 	}
 
 	public function is_void ()

@@ -37,10 +37,10 @@ class MemberExpression implements Expression
 		return Generator::emit_member ($source, $index);
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		$index = $this->index->inject ($constants);
-		$source = $this->source->inject ($constants);
+		$index = $this->index->inject ($expressions);
+		$source = $this->source->inject ($expressions);
 
 		// Resolve to constant value if both source and index were evaluated
 		if ($index->get_value ($index_result) && $source->get_value ($source_result))

@@ -31,10 +31,10 @@ class SymbolExpression implements Expression
 		return Generator::emit_symbol ($this->name);
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		if (array_key_exists ($this->name, $constants))
-			return new ConstantExpression ($constants[$this->name]);
+		if (array_key_exists ($this->name, $expressions))
+			return $expressions[$this->name];
 
 		return $this;
 	}

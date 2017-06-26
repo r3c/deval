@@ -22,12 +22,12 @@ class ConcatBlock implements Block
 		return $output;
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		$blocks = array ();
 
 		foreach ($this->blocks as $block)
-			$blocks[] = $block->inject ($constants);
+			$blocks[] = $block->inject ($expressions);
 
 		switch (count ($blocks))
 		{

@@ -9,7 +9,7 @@ class VoidBlock implements Block
 		return new Output ();
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		return $this;
 	}

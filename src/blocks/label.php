@@ -14,7 +14,7 @@ class LabelBlock implements Block
 		throw new \Exception ('cannot compile label block');
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		throw new \Exception ('cannot inject label block');
 	}

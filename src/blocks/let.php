@@ -14,19 +14,19 @@ class LetBlock implements Block
 	{
 		// Evalulate or generate code for assignment variables
 		$assignments = new Output ();
-		$constants = array ();
+		$expressions = array ();
 		$provides = array ();
 
 		foreach ($this->assignments as $assignment)
 		{
 			list ($name, $value) = $assignment;
 
-			// Inject constants computed from previous assignments
-			$value = $value->inject ($constants);
+			// Inject expressions computed from previous assignments
+			$value = $value->inject ($expressions);
 
-			// Append to constants if assignment can be evaluated
-			if ($value->get_value ($result))
-				$constants[$name] = $result;
+			// Append to expressions if assignment should be evaluated
+			if (true /* FIXME: some smart heuristic */)
+				$expressions[$name] = $value;
 
 			// Or generate dynamic assignment otherwise
 			else
@@ -49,7 +49,7 @@ class LetBlock implements Block
 		$output->append ($assignments);
 
 		// Generate body evaluation and restore variables
-		$body = $this->body->inject ($constants);
+		$body = $this->body->inject ($expressions);
 
 		$requires = array ();
 		$output->append ($body->compile ($generator, $requires));
@@ -61,7 +61,7 @@ class LetBlock implements Block
 		return $output;
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		$assignments = array ();
 
@@ -69,12 +69,12 @@ class LetBlock implements Block
 		{
 			list ($name, $value) = $assignment;
 
-			$assignments[] = array ($name, $value->inject ($constants));
+			$assignments[] = array ($name, $value->inject ($expressions));
 
-			unset ($constants[$name]);
+			unset ($expressions[$name]);
 		}
 
-		return new self ($assignments, $this->body->inject ($constants));
+		return new self ($assignments, $this->body->inject ($expressions));
 	}
 
 	public function is_void ()

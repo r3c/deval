@@ -62,7 +62,7 @@ class ArrayExpression implements Expression
 		return 'array(' . (string)substr ($source, 1) . ')';
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
 		$elements = array ();
 		$ready = true;
@@ -73,9 +73,9 @@ class ArrayExpression implements Expression
 			list ($key, $value) = $element;
 
 			if ($key !== null)
-				$key = $key->inject ($constants);
+				$key = $key->inject ($expressions);
 
-			$value = $value->inject ($constants);
+			$value = $value->inject ($expressions);
 
 			if (!$value->get_value ($value_result))
 				$ready = false;

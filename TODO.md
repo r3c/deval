@@ -6,7 +6,6 @@ TODO
 
 - Support ternary operator
 - Support builtin syntax for defering an expression
-- Implement variable aliasing
 
 DONE
 ----
@@ -23,3 +22,4 @@ DONE
 - Support both arrays and strings for concatenation operator "."
 - Allow specifying multiple trimmers in configuration
 - Implement {% wrap callback %}{% end %} block
+- Implement variable aliasing

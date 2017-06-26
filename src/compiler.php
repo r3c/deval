@@ -75,7 +75,12 @@ class Compiler
 
 	public function inject ($constants)
 	{
-		$this->block = $this->block->inject ($constants);
+		$expressions = array ();
+
+		foreach ($constants as $name => $value)
+			$expressions[$name] = new ConstantExpression ($value);
+
+		$this->block = $this->block->inject ($expressions);
 	}
 }
 

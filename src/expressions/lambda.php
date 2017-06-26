@@ -46,9 +46,9 @@ class LambdaExpression implements Expression
 			'{return ' . $body . ';}';
 	}
 
-	public function inject ($constants)
+	public function inject ($expressions)
 	{
-		return new self ($this->names, $this->body->inject ($constants));
+		return new self ($this->names, $this->body->inject ($expressions));
 	}
 }
 
