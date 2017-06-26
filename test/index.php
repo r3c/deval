@@ -222,6 +222,8 @@ render_code ('{{ length("Hello!") }}', make_builtins ('length'), '6');
 render_code ('{{ length([7, 8, 9]) }}', make_builtins ('length'), '3');
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
+render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
+render_code ('{{ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ slice("1234", -3) }}', make_builtins ('slice'), '234');

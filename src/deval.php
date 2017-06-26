@@ -121,9 +121,21 @@ class Builtin
 		return array_map ($apply, $items);
 	}
 
-	public static function _builtin_php ($name)
+	public static function _builtin_php ($symbol)
 	{
-		return $name;
+		switch (substr ($symbol, 0, 1))
+		{
+			case '#':
+				return constant ((string)substr ($symbol, 1));
+
+			case '$':
+				$name = (string)substr ($symbol, 1);
+
+				return isset ($GLOBALS[$name]) ? $GLOBALS[$name] : null;
+
+			default:
+				return $symbol;
+		}
 	}
 
 	public static function _builtin_slice ($input, $offset, $count = null)
