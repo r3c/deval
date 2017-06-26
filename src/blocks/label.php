@@ -9,7 +9,7 @@ class LabelBlock implements Block
 		$this->name = $name;
 	}
 
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		throw new \Exception ('cannot compile label block');
 	}
@@ -32,7 +32,7 @@ class LabelBlock implements Block
 		return new VoidBlock ();
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
 		return $this;
 	}

@@ -62,9 +62,9 @@ class Compiler
 
 	public function compile ($setup, &$names)
 	{
-		$volatiles = array ();
-		$source = $this->block->compile (new Generator ($setup), $volatiles);
-		$names = array_keys ($volatiles);
+		$variables = array ();
+		$source = $this->block->compile (new Generator ($setup), $variables);
+		$names = array_keys ($variables);
 
 		$output = new Output ();
 		$output->append_code (Generator::emit_state ($names));

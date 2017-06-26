@@ -25,7 +25,7 @@ function combinations ($k, $n, $candidates = array ())
 ** Generate all possible (constants, variables) partitions pairs with given
 ** builtin functions.
 ** *:		builtin function names
-** return:	(constants, volatiles) pairs array
+** return:	(constants, variables) pairs array
 */
 function make_builtins ()
 {
@@ -33,31 +33,31 @@ function make_builtins ()
 }
 
 /*
-** Generate all possible (constants, volatiles) partition pairs from given
-** variables array.
-** $variables:	key => value variables array
-** return:		(constants, volatiles) pairs array
+** Generate all possible (constants, variables) partition pairs from given
+** pairs array.
+** $pairs:	key => value pairs array
+** return:	(constants, variables) pairs array
 */
-function make_combinations ($variables)
+function make_combinations ($pairs)
 {
 	$results = array ();
 
-	for ($i = count ($variables); $i >= 0; --$i)
+	for ($i = count ($pairs); $i >= 0; --$i)
 	{
-		foreach (combinations ($i, count ($variables)) as $combination)
+		foreach (combinations ($i, count ($pairs)) as $combination)
 		{
 			$constants = array ();
-			$volatiles = array ();
+			$variables = array ();
 
-			foreach (array_keys ($variables) as $j => $key)
+			foreach (array_keys ($pairs) as $j => $key)
 			{
 				if ($combination[$j])
-					$constants[$key] = $variables[$key];
+					$constants[$key] = $pairs[$key];
 				else
-					$volatiles[$key] = $variables[$key];
+					$variables[$key] = $pairs[$key];
 			}
 
-			$results[] = array ($constants, $volatiles);
+			$results[] = array ($constants, $variables);
 		}
 	}
 
@@ -74,13 +74,13 @@ function make_empty ()
 }
 
 /*
-** Wrap variables in a ((constants, empty), (empty, volatiles)) array.
-** $variables:	key => value variables array
-** return:		two-pairs array
+** Wrap pairs in a ((constants, empty), (empty, variables)) array.
+** $pairs:	key => value pairs array
+** return:	two-pairs array
 */
-function make_slices ($variables)
+function make_slices ($pairs)
 {
-	return array (array ($variables, array ()), array (array (), $variables));
+	return array (array ($pairs, array ()), array (array (), $pairs));
 }
 
 /*
@@ -139,20 +139,20 @@ function raise_parse ($source, $message)
 
 /*
 ** Ensure source code throw render exception when injected given constants and
-** volatiles.
+** variables.
 ** $source:		template source code
 ** $constants:	injected constants
-** $volatiles:	injected volatiles
+** $variables:	injected variables
 ** $message:	expected exception message
 */
-function raise_render ($source, $constants, $volatiles, $message)
+function raise_render ($source, $constants, $variables, $message)
 {
 	$renderer = new Deval\StringRenderer ($source);
 	$renderer->inject ($constants);
 
 	try
 	{
-		$renderer->render ($volatiles);
+		$renderer->render ($variables);
 
 		assert (false, 'should have raised exception when rendering');
 	}
@@ -164,29 +164,29 @@ function raise_render ($source, $constants, $volatiles, $message)
 
 /*
 ** Run tests using given renderers constructor and set of
-** (constants, volatiles) variable pairs.
+** (constants, variables) pairs array.
 ** $constructor:	renderers constructor
-** $pairs:			(constants, volatiles) variable pairs
+** $pairs:			(constants, variables) pairs array
 ** $expect:			expected rendered string
 */
 function render ($constructor, $pairs, $expect)
 {
 	foreach ($pairs as $pair)
 	{
-		list ($constants, $volatiles) = $pair;
+		list ($constants, $variables) = $pair;
 
 		foreach ($constructor () as $renderer)
 		{
 			$renderer->inject ($constants);
 
-			$names_expect = array_keys ($volatiles);
+			$names_expect = array_keys ($variables);
 			$names_result = array ();
 
 			$renderer->source ($names_result);
 
-			assert (count (array_diff ($names_result, $names_expect)) === 0, 'invalid detected volatiles: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
+			assert (count (array_diff ($names_result, $names_expect)) === 0, 'invalid detected variables: ' . var_export ($names_result, true) . ' !== ' . var_export ($names_expect, true));
 
-			$result = $renderer->render ($volatiles);
+			$result = $renderer->render ($variables);
 
 			assert ($result === $expect, 'invalid rendered output: ' . var_export ($result, true) . ' !== ' . var_export ($expect, true));
 		}
@@ -195,9 +195,9 @@ function render ($constructor, $pairs, $expect)
 
 /*
 ** Run tests on code-based renderers using given source code and set of
-** (constants, volatiles) variable pairs.
+** (constants, variables) pairs array.
 ** $source:	template source code
-** $pairs:	(constants, volatiles) variable pairs
+** $pairs:	(constants, variables) pairs array
 ** $expect:	expected rendered string
 ** $setup:	compiler setup
 */
@@ -214,10 +214,10 @@ function render_code ($source, $pairs, $expect, $setup = null)
 
 /*
 ** Run tests on file-based renderers using given template path and set of
-** (constants, volatiles) variable pairs.
+** (constants, variables) pairs array.
 ** $path:		template file path
 ** $directory:	caching directory
-** $pairs:		(constants, volatiles) variable pairs
+** $pairs:		(constants, variables) pairs array
 ** $expect:		expected rendered string
 ** $setup:	compiler setup
 */
@@ -227,7 +227,7 @@ function render_file ($path, $directory, $pairs, $expect, $setup = null)
 	{
 		return array
 		(
-			new Deval\CachedRenderer ($path, $directory, $setup, true),
+			new Deval\CachingRenderer ($path, $directory, $setup, true),
 			new Deval\FileRenderer ($path, $setup)
 		);
 	}, $pairs, $expect, $setup);

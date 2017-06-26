@@ -34,7 +34,7 @@ class ConstantExpression implements Expression
 		return true;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
 		return Generator::emit_value ($this->value);
 	}

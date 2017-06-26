@@ -52,9 +52,9 @@ class BinaryExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
-		return $this->lhs->generate ($generator, $volatiles) . $this->op . $this->rhs->generate ($generator, $volatiles);
+		return $this->lhs->generate ($generator, $variables) . $this->op . $this->rhs->generate ($generator, $variables);
 	}
 
 	public function inject ($expressions)

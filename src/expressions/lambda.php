@@ -25,14 +25,14 @@ class LambdaExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
-		// Generate body, split volatiles into parameters and external uses
+		// Generate body, split variables into parameters and external uses
 		$requires = array ();
 		$body = $this->body->generate ($generator, $requires);
 
 		$captures = array_diff_key ($requires, array_flip ($this->names));
-		$volatiles += $captures;
+		$variables += $captures;
 
 		// Generate lambda code
 		$emit_symbol = function ($name) use ($generator) { return $generator->emit_symbol ($name); };

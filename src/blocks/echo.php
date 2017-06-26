@@ -9,7 +9,7 @@ class EchoBlock implements Block
 		$this->value = $value;
 	}
 
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		$output = new Output ();
 		$value = $this->value->inject (array ());
@@ -22,7 +22,7 @@ class EchoBlock implements Block
 			$output->append_text ($generator->make_plain ((string)$result));
 		}
 		else
-			$output->append_code ('echo ' . $value->generate ($generator, $volatiles) . ';');
+			$output->append_code ('echo ' . $value->generate ($generator, $variables) . ';');
 
 		return $output;
 	}
@@ -42,9 +42,9 @@ class EchoBlock implements Block
 		return $this;
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
-		return new self (new InvokeExpression ($value, array ($this->value)));
+		return new self (new InvokeExpression ($caller, array ($this->value)));
 	}
 }
 

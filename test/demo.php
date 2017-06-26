@@ -105,7 +105,7 @@
 $builtin = isset ($_GET['builtin']) ? (string)$_GET['builtin'] : '';
 $constants = isset ($_GET['constants']) ? (array)json_decode ($_GET['constants'], true) : array ('greeting' => 'Hello');
 $template = isset ($_GET['template']) ? (string)$_GET['template'] : '{{ greeting }}, {{ subject }}!';
-$volatiles = isset ($_GET['volatiles']) ? (array)json_decode ($_GET['volatiles'], true) : array ('subject' => 'World');
+$variables = isset ($_GET['variables']) ? (array)json_decode ($_GET['variables'], true) : array ('subject' => 'World');
 
 ?>
 		<div class="window">
@@ -120,8 +120,8 @@ $volatiles = isset ($_GET['volatiles']) ? (array)json_decode ($_GET['volatiles']
 					<input type="text" name="constants" value="<?php echo htmlspecialchars (json_encode ((object)$constants)); ?>" />
 				</div>
 				<div class="field">
-					<label for="volatiles">Volatile key/value pairs (as a JSON object):</label>
-					<input type="text" name="volatiles" value="<?php echo htmlspecialchars (json_encode ((object)$volatiles)); ?>" />
+					<label for="variables">Variable key/value pairs (as a JSON object):</label>
+					<input type="text" name="variables" value="<?php echo htmlspecialchars (json_encode ((object)$variables)); ?>" />
 				</div>
 				<div class="field">
 					<label for="builtin">Inject additional builtin functions:</label>
@@ -167,7 +167,7 @@ if ($template !== '')
 
 			try
 			{
-				$output = $renderer->render ($volatiles);
+				$output = $renderer->render ($variables);
 			}
 			catch (Exception $exception)
 			{
@@ -188,7 +188,7 @@ if ($template !== '')
 				<pre><?php echo htmlspecialchars ($source1); ?></pre>
 				<p>Generated code after injecting constants:</p>
 				<pre><?php echo htmlspecialchars ($source2); ?></pre>
-				<p>Execution result with injected volatiles:</p>
+				<p>Execution result with injected variables:</p>
 				<pre><?php echo htmlspecialchars ($output); ?></pre>
 			</div>
 		</div>

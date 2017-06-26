@@ -42,9 +42,9 @@ class UnaryExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
-		return $this->op . $this->value->generate ($generator, $volatiles);
+		return $this->op . $this->value->generate ($generator, $variables);
 	}
 
 	public function inject ($expressions)

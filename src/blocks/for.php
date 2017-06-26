@@ -13,7 +13,7 @@ class ForBlock implements Block
 		$this->value_name = $value_name;
 	}
 
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		$output = new Output ();
 		$source = $this->source->inject (array ());
@@ -32,17 +32,17 @@ class ForBlock implements Block
 				if ($this->key_name !== null)
 					$expressions[$this->key_name] = new ConstantExpression ($key);
 
-				// Inject value
+				// Inject value expression
 				$expressions[$this->value_name] = $element;
 
 				// Compile and append current iteration to output
 				$iteration = $this->loop->inject ($expressions);
 
-				$output->append ($iteration->compile ($generator, $volatiles));
+				$output->append ($iteration->compile ($generator, $variables));
 			}
 
 			if ($empty)
-				$output->append ($this->empty->compile ($generator, $volatiles));
+				$output->append ($this->empty->compile ($generator, $variables));
 		}
 
 		// Or generate dynamic loop code otherwise
@@ -59,7 +59,7 @@ class ForBlock implements Block
 			$output->append_code (Generator::emit_scope_push ($backups));
 
 			// Generate for control loop
-			$output->append_code ('foreach(' . $source->generate ($generator, $volatiles) . ' as ');
+			$output->append_code ('foreach(' . $source->generate ($generator, $variables) . ' as ');
 
 			if ($this->key_name !== null)
 				$output->append_code (Generator::emit_symbol ($this->key_name) . '=>' . Generator::emit_symbol ($this->value_name));
@@ -68,7 +68,7 @@ class ForBlock implements Block
 
 			$output->append_code (')');
 
-			// Write loop and merge inner volatiles into parent
+			// Write loop and merge inner variables into parent
 			$requires = array ();
 
 			$output->append_code ('{');
@@ -87,12 +87,12 @@ class ForBlock implements Block
 			{
 				$output->append_code ('if(' . $counter . '==0)');
 				$output->append_code ('{');
-				$output->append ($this->empty->compile ($generator, $volatiles));
+				$output->append ($this->empty->compile ($generator, $variables));
 				$output->append_code ('}');
 			}
 
-			// Append required volatiles excepted key and value
-			$volatiles += array_diff_key ($requires, array_flip ($backups));
+			// Append required variables excepted key and value
+			$variables += array_diff_key ($requires, array_flip ($backups));
 		}
 
 		return $output;
@@ -129,10 +129,10 @@ class ForBlock implements Block
 		return new self ($this->source, $this->key_name, $this->value_name, $loop, $empty);
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
-		$empty = $this->empty->wrap ($value);
-		$loop = $this->loop->wrap ($value);
+		$empty = $this->empty->wrap ($caller);
+		$loop = $this->loop->wrap ($caller);
 
 		return new self ($this->source, $this->key_name, $this->value_name, $loop, $empty);
 	}

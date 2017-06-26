@@ -24,9 +24,9 @@ class GroupExpression implements Expression
 		return $this->expression->get_value ($value);
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
-		return '(' . $this->expression->generate ($generator, $volatiles) . ')';
+		return '(' . $this->expression->generate ($generator, $variables) . ')';
 	}
 
 	public function inject ($expressions)

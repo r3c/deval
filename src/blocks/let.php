@@ -10,7 +10,7 @@ class LetBlock implements Block
 		$this->body = $body;
 	}
 
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		// Evalulate or generate code for assignment variables
 		$assignments = new Output ();
@@ -35,8 +35,8 @@ class LetBlock implements Block
 				$requires = array ();
 				$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator, $requires) . ';');
 
-				// Append required volatiles but the ones provided by previous assignments
-				$volatiles += array_diff_key ($requires, $provides);
+				// Append required variables but the ones provided by previous assignments
+				$variables += array_diff_key ($requires, $provides);
 
 				// Mark variable as available for next assignments
 				$provides[$name] = true;
@@ -55,8 +55,8 @@ class LetBlock implements Block
 		$output->append ($body->compile ($generator, $requires));
 		$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
 
-		// Append required volatiles but the ones provided by all assignments
-		$volatiles += array_diff_key ($requires, $provides);
+		// Append required variables but the ones provided by all assignments
+		$variables += array_diff_key ($requires, $provides);
 
 		return $output;
 	}
@@ -67,9 +67,9 @@ class LetBlock implements Block
 
 		foreach ($this->assignments as $assignment)
 		{
-			list ($name, $value) = $assignment;
+			list ($name, $expression) = $assignment;
 
-			$assignments[] = array ($name, $value->inject ($expressions));
+			$assignments[] = array ($name, $expression->inject ($expressions));
 
 			unset ($expressions[$name]);
 		}
@@ -87,9 +87,9 @@ class LetBlock implements Block
 		return new self ($this->assignments, $this->body->resolve ($blocks));
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
-		return new self ($this->assignments, $this->body->wrap ($value));
+		return new self ($this->assignments, $this->body->wrap ($caller));
 	}
 }
 

@@ -4,7 +4,7 @@ namespace Deval;
 
 class VoidBlock implements Block
 {
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		return new Output ();
 	}
@@ -24,7 +24,7 @@ class VoidBlock implements Block
 		return $this;
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
 		return $this;
 	}

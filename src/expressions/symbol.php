@@ -24,9 +24,9 @@ class SymbolExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
-		$volatiles[$this->name] = true;
+		$variables[$this->name] = true;
 
 		return Generator::emit_symbol ($this->name);
 	}

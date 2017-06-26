@@ -9,7 +9,7 @@ class PlainBlock implements Block
 		$this->text = $text;
 	}
 
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
 	}
@@ -29,7 +29,7 @@ class PlainBlock implements Block
 		return $this;
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
 		return $this;
 	}

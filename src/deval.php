@@ -314,11 +314,11 @@ class Loader
 interface Renderer
 {
 	public function inject ($constants);
-	public function render ($volatiles = array ());
+	public function render ($variables = array ());
 	public function source (&$names = null);
 }
 
-class CachedRenderer implements Renderer
+class CachingRenderer implements Renderer
 {
 	private $constants;
 	private $directory;
@@ -340,14 +340,14 @@ class CachedRenderer implements Renderer
 		$this->constants += $constants;
 	}
 
-	public function render ($volatiles = array ())
+	public function render ($variables = array ())
 	{
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($this->path), PATHINFO_FILENAME) . '_' . md5 ($this->path . ':' . serialize ($this->constants)) . '.php';
 
 		if (!file_exists ($cache) || $this->invalidate)
 			file_put_contents ($cache, $this->source ($names), LOCK_EX);
 
-		return Evaluator::path ($cache, $volatiles);
+		return Evaluator::path ($cache, $variables);
 	}
 
 	public function source (&$names = null)
@@ -377,9 +377,9 @@ class DirectRenderer implements Renderer
 		$this->compiler->inject ($constants);
 	}
 
-	public function render ($volatiles = array ())
+	public function render ($variables = array ())
 	{
-		return Evaluator::code ($this->source ($names), $volatiles);
+		return Evaluator::code ($this->source ($names), $variables);
 	}
 
 	public function source (&$names = null)
@@ -410,18 +410,18 @@ class StringRenderer extends DirectRenderer
 
 class Runtime
 {
-	public static function member ($source, $index)
+	public static function member ($parent, $key)
 	{
-		if (is_object ($source))
+		if (is_object ($parent))
 		{
-			if (method_exists ($source, $index))
-				return array ($source, $index);
-			else if (property_exists ($source, $index))
-				return $source->$index;
+			if (method_exists ($parent, $key))
+				return array ($parent, $key);
+			else if (property_exists ($parent, $key))
+				return $parent->$key;
 		}
 
-		if (isset ($source[$index]))
-			return $source[$index];
+		if (isset ($parent[$key]))
+			return $parent[$key];
 
 		return null;
 	}

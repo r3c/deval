@@ -43,7 +43,7 @@ class ArrayExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
 		$source = '';
 
@@ -51,10 +51,10 @@ class ArrayExpression implements Expression
 		{
 			list ($e_key, $e_value) = $element;
 
-			$value = $e_value->generate ($generator, $volatiles);
+			$value = $e_value->generate ($generator, $variables);
 
 			if ($e_key !== null)
-				$source .= ',' . $e_key->generate ($generator, $volatiles) . '=>' . $value;
+				$source .= ',' . $e_key->generate ($generator, $variables) . '=>' . $value;
 			else
 				$source .= ',' . $value;
 		}

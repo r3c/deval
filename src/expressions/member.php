@@ -25,10 +25,10 @@ class MemberExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
-		$offset = $this->offset->generate ($generator, $volatiles);
-		$source = $this->source->generate ($generator, $volatiles);
+		$offset = $this->offset->generate ($generator, $variables);
+		$source = $this->source->generate ($generator, $variables);
 
 		return Generator::emit_member ($source, $offset);
 	}

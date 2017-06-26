@@ -9,15 +9,15 @@ class ConcatBlock implements Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile ($generator, &$volatiles)
+	public function compile ($generator, &$variables)
 	{
 		if (count ($this->blocks) < 1)
 			return new Output ();
 
-		$output = $this->blocks[0]->compile ($generator, $volatiles);
+		$output = $this->blocks[0]->compile ($generator, $variables);
 
 		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$output->append ($this->blocks[$i]->compile ($generator, $volatiles));
+			$output->append ($this->blocks[$i]->compile ($generator, $variables));
 
 		return $output;
 	}
@@ -63,12 +63,12 @@ class ConcatBlock implements Block
 		return new self ($results);
 	}
 
-	public function wrap ($value)
+	public function wrap ($caller)
 	{
 		$results = array ();
 
 		foreach ($this->blocks as $block)
-			$results[] = $block->wrap ($value);
+			$results[] = $block->wrap ($caller);
 
 		return new self ($results);
 	}

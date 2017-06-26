@@ -25,17 +25,17 @@ class InvokeExpression implements Expression
 		return false;
 	}
 
-	public function generate ($generator, &$volatiles)
+	public function generate ($generator, &$variables)
 	{
 		$arguments = array ();
 
 		foreach ($this->arguments as $argument)
-			$arguments[] = $argument->generate ($generator, $volatiles);
+			$arguments[] = $argument->generate ($generator, $variables);
 
 		// If caller can't be evaluated to a value, generate as an expression
 		if (!$this->caller->get_value ($result))
 		{
-			$caller = $this->caller->generate ($generator, $volatiles);
+			$caller = $this->caller->generate ($generator, $variables);
 			$direct = $this->caller instanceof SymbolExpression || $generator->support ('7.0.1');
 		}
 
