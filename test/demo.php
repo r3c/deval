@@ -140,28 +140,45 @@ require '../src/deval.php';
 
 if ($template !== '')
 {
+	$exception = null;
+
 	try
 	{
 		$renderer = new Deval\StringRenderer ($template);
 		$source1 = $renderer->source ();
 
-		switch ($builtin)
+		try
 		{
-			case 'deval':
-				$renderer->inject (Deval\Builtin::deval ());
+			switch ($builtin)
+			{
+				case 'deval':
+					$renderer->inject (Deval\Builtin::deval ());
 
-				break;
+					break;
 
-			case 'php':
-				$renderer->inject (Deval\Builtin::php ());
+				case 'php':
+					$renderer->inject (Deval\Builtin::php ());
 
-				break;
+					break;
+			}
+
+			$renderer->inject ($constants);
+			$source2 = $renderer->source ();
+
+			try
+			{
+				$output = $renderer->render ($volatiles);
+			}
+			catch (Exception $exception)
+			{
+				$output = 'n/a (rendering failed)';
+			}
 		}
-
-		$renderer->inject ($constants);
-		$source2 = $renderer->source ();
-
-		$output = $renderer->render ($volatiles);
+		catch (Exception $exception)
+		{
+			$source2 = 'n/a (injection failed)';
+			$output = 'n/a (injection failed)';
+		}
 
 ?>
 		<div class="window">
@@ -179,6 +196,13 @@ if ($template !== '')
 
 	}
 	catch (Exception $exception)
+	{
+		$source1 = 'n/a (parsing failed)';
+		$source2 = 'n/a (parsing failed)';
+		$output = 'n/a (parsing failed)';
+	}
+
+	if ($exception !== null)
 	{
 
 ?>
