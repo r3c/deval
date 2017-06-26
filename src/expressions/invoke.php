@@ -96,7 +96,7 @@ class InvokeExpression implements Expression
 		if ($ready && $caller->get_value ($result))
 		{
 			if (!is_callable ($result))
-				return new ErrorExpression ($result, 'is not callable');
+				throw new CompileException ($caller, 'is not callable');
 
 			return new ConstantExpression (call_user_func_array ($result, $values));
 		}
