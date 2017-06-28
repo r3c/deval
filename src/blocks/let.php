@@ -59,11 +59,6 @@ class LetBlock implements Block
 		return $output;
 	}
 
-	public function is_void ()
-	{
-		return $this->body->is_void ();
-	}
-
 	public function resolve ($blocks)
 	{
 		return new self ($this->assignments, $this->body->resolve ($blocks));

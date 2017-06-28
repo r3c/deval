@@ -22,17 +22,6 @@ class ConcatBlock implements Block
 		return $output;
 	}
 
-	public function is_void ()
-	{
-		foreach ($this->blocks as $block)
-		{
-			if (!$block->is_void ())
-				return false;
-		}
-
-		return true;
-	}
-
 	public function resolve ($blocks)
 	{
 		$results = array ();

@@ -46,26 +46,17 @@ class IfBlock implements Block
 			return $this->fallback->compile ($generator, $expressions, $variables);
 
 		// Otherwise generate dynamic fallback code
-		if (!$this->fallback->is_void ())
+		$fallback = $this->fallback->compile ($generator, $expressions, $variables);
+
+		if ($fallback->has_data ())
 		{
 			$output->append_code ('else');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($generator, $expressions, $variables));
+			$output->append ($fallback);
 			$output->append_code ('}');
 		}
 
 		return $output;
-	}
-
-	public function is_void ()
-	{
-		foreach ($this->branches as $branch)
-		{
-			if (!$branch->is_void ())
-				return false;
-		}
-
-		return $this->fallback->is_void ();
 	}
 
 	public function resolve ($blocks)

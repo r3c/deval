@@ -14,11 +14,6 @@ class LabelBlock implements Block
 		throw new \Exception ('cannot compile label block');
 	}
 
-	public function is_void ()
-	{
-		return true;
-	}
-
 	public function resolve ($blocks)
 	{
 		if (isset ($blocks[$this->name]))

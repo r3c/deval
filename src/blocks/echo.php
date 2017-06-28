@@ -27,11 +27,6 @@ class EchoBlock implements Block
 		return $output;
 	}
 
-	public function is_void ()
-	{
-		return $this->body->is_void ();
-	}
-
 	public function resolve ($blocks)
 	{
 		return $this;

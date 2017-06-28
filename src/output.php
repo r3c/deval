@@ -54,6 +54,11 @@ class Output
 		return $this->append ($other);
 	}
 
+	public function has_data ()
+	{
+		return count ($this->snippets) !== 0;
+	}
+
 	public function source ()
 	{
 		$is_code = false;

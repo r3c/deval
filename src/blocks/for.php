@@ -46,11 +46,15 @@ class ForBlock implements Block
 		// Or generate dynamic loop code otherwise
 		else
 		{
-			// Generate loop counter if needed
-			$counter = $this->empty->is_void () ? null : $generator->emit_local ();
+			// Generate loop counter if empty block contains instructions
+			$empty = $this->empty->compile ($generator, $expressions, $variables);
 
-			if ($counter !== null)
+			if ($empty->has_data ())
+			{
+				$counter = $generator->emit_local ();
+
 				$output->append_code ($counter . '=0;');
+			}
 
 			// Backup key and value variables
 			$provides = array ($this->value_name => null);
@@ -82,7 +86,7 @@ class ForBlock implements Block
 			$output->append_code ('{');
 			$output->append ($this->loop->compile ($generator, $iterations, $requires));
 
-			if ($counter !== null)
+			if ($empty->has_data ())
 				$output->append_code ('++' . $counter . ';');
 
 			$output->append_code ('}');
@@ -90,12 +94,12 @@ class ForBlock implements Block
 			// Restore key and value variables
 			$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
 
-			// Write empty block if any
-			if ($counter !== null)
+			// Write empty block if it contains instructions
+			if ($empty->has_data ())
 			{
 				$output->append_code ('if(' . $counter . '==0)');
 				$output->append_code ('{');
-				$output->append ($this->empty->compile ($generator, $expressions, $variables));
+				$output->append ($empty);
 				$output->append_code ('}');
 			}
 
@@ -104,11 +108,6 @@ class ForBlock implements Block
 		}
 
 		return $output;
-	}
-
-	public function is_void ()
-	{
-		return $this->empty->is_void () && $this->loop->is_void ();
 	}
 
 	public function resolve ($blocks)

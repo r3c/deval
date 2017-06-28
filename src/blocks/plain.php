@@ -14,11 +14,6 @@ class PlainBlock implements Block
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
 	}
 
-	public function is_void ()
-	{
-		return false;
-	}
-
 	public function resolve ($blocks)
 	{
 		return $this;
