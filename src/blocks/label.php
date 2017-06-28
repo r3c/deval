@@ -9,14 +9,9 @@ class LabelBlock implements Block
 		$this->name = $name;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		throw new \Exception ('cannot compile label block');
-	}
-
-	public function inject ($expressions)
-	{
-		throw new \Exception ('cannot inject label block');
 	}
 
 	public function is_void ()

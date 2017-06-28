@@ -13,10 +13,10 @@ class ForBlock implements Block
 		$this->value_name = $value_name;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		$output = new Output ();
-		$source = $this->source->inject (array ());
+		$source = $this->source->inject ($expressions);
 
 		// Unroll loop if elements can be enumerated
 		if ($source->get_elements ($elements))
@@ -26,37 +26,39 @@ class ForBlock implements Block
 			foreach ($elements as $key => $element)
 			{
 				$empty = false;
-				$expressions = array ();
+				$iterations = $expressions;
 
 				// Inject key as constant if specified
 				if ($this->key_name !== null)
-					$expressions[$this->key_name] = new ConstantExpression ($key);
+					$iterations[$this->key_name] = new ConstantExpression ($key);
 
 				// Inject value expression
-				$expressions[$this->value_name] = $element;
+				$iterations[$this->value_name] = $element;
 
 				// Compile and append current iteration to output
-				$iteration = $this->loop->inject ($expressions);
-
-				$output->append ($iteration->compile ($generator, $variables));
+				$output->append ($this->loop->compile ($generator, $iterations, $variables));
 			}
 
 			if ($empty)
-				$output->append ($this->empty->compile ($generator, $variables));
+				$output->append ($this->empty->compile ($generator, $expressions, $variables));
 		}
 
 		// Or generate dynamic loop code otherwise
 		else
 		{
-			$backups = $this->key_name !== null ? array ($this->key_name, $this->value_name) : array ($this->value_name);
+			// Generate loop counter if needed
 			$counter = $this->empty->is_void () ? null : $generator->emit_local ();
 
-			// Generate loop counter if needed
 			if ($counter !== null)
 				$output->append_code ($counter . '=0;');
 
 			// Backup key and value variables
-			$output->append_code (Generator::emit_scope_push ($backups));
+			$provides = array ($this->value_name => null);
+
+			if ($this->key_name !== null)
+				$provides[$this->key_name] = null;
+
+			$output->append_code (Generator::emit_scope_push (array_keys ($provides)));
 
 			// Generate for control loop
 			$output->append_code ('foreach(' . $source->generate ($generator, $variables) . ' as ');
@@ -68,11 +70,17 @@ class ForBlock implements Block
 
 			$output->append_code (')');
 
-			// Write loop and merge inner variables into parent
+			// Remove loop variables from expressions and compile inner loop
+			$iterations = $expressions;
 			$requires = array ();
 
+			if ($this->key_name !== null)
+				unset ($iterations[$this->key_name]);
+
+			unset ($iterations[$this->value_name]);
+
 			$output->append_code ('{');
-			$output->append ($this->loop->compile ($generator, $requires));
+			$output->append ($this->loop->compile ($generator, $iterations, $requires));
 
 			if ($counter !== null)
 				$output->append_code ('++' . $counter . ';');
@@ -80,40 +88,22 @@ class ForBlock implements Block
 			$output->append_code ('}');
 
 			// Restore key and value variables
-			$output->append_code (Generator::emit_scope_pop ($backups));
+			$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
 
 			// Write empty block if any
 			if ($counter !== null)
 			{
 				$output->append_code ('if(' . $counter . '==0)');
 				$output->append_code ('{');
-				$output->append ($this->empty->compile ($generator, $variables));
+				$output->append ($this->empty->compile ($generator, $expressions, $variables));
 				$output->append_code ('}');
 			}
 
 			// Append required variables excepted key and value
-			$variables += array_diff_key ($requires, array_flip ($backups));
+			$variables += array_diff_key ($requires, $provides);
 		}
 
 		return $output;
-	}
-
-	public function inject ($expressions)
-	{
-		// Inject expressions into source and empty block
-		$empty = $this->empty->inject ($expressions);
-		$source = $this->source->inject ($expressions);
-
-		// Remove key and value from expressions before injecting into loop
-		if ($this->key_name !== null)
-			unset ($expressions[$this->key_name]);
-
-		unset ($expressions[$this->value_name]);
-
-		$loop = $this->loop->inject ($expressions);
-
-		// Rebuild block with injected expressions
-		return new self ($source, $this->key_name, $this->value_name, $loop, $empty);
 	}
 
 	public function is_void ()

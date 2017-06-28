@@ -10,7 +10,7 @@ class IfBlock implements Block
 		$this->fallback = $fallback;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		$keyword = 'if';
 		$output = new Output ();
@@ -21,12 +21,12 @@ class IfBlock implements Block
 			list ($condition, $body) = $branch;
 
 			// Conditions can be statically evaluated if previous ones were too
-			$condition = $condition->inject (array ());
+			$condition = $condition->inject ($expressions);
 
 			if ($static && $condition->get_value ($result))
 			{
 				if ($result)
-					return $body->compile ($generator, $variables);
+					return $body->compile ($generator, $expressions, $variables);
 
 				continue;
 			}
@@ -34,7 +34,7 @@ class IfBlock implements Block
 			// First non-static condition triggers dynamic code generation
 			$output->append_code ($keyword . '(' . $condition->generate ($generator, $variables) . ')');
 			$output->append_code ('{');
-			$output->append ($body->compile ($generator, $variables));
+			$output->append ($body->compile ($generator, $expressions, $variables));
 			$output->append_code ('}');
 
 			$keyword = 'else if';
@@ -43,32 +43,18 @@ class IfBlock implements Block
 
 		// Output fallback if conditions were static and evaluated to false
 		if ($static)
-			return $this->fallback->compile ($generator, $variables);
+			return $this->fallback->compile ($generator, $expressions, $variables);
 
 		// Otherwise generate dynamic fallback code
 		if (!$this->fallback->is_void ())
 		{
 			$output->append_code ('else');
 			$output->append_code ('{');
-			$output->append ($this->fallback->compile ($generator, $variables));
+			$output->append ($this->fallback->compile ($generator, $expressions, $variables));
 			$output->append_code ('}');
 		}
 
 		return $output;
-	}
-
-	public function inject ($expressions)
-	{
-		$branches = array ();
-
-		foreach ($this->branches as $branch)
-		{
-			list ($condition, $body) = $branch;
-
-			$branches[] = array ($condition->inject ($expressions), $body->inject ($expressions));
-		}
-
-		return new self ($branches, $this->fallback->inject ($expressions));
 	}
 
 	public function is_void ()

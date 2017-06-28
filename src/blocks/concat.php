@@ -9,37 +9,17 @@ class ConcatBlock implements Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		if (count ($this->blocks) < 1)
 			return new Output ();
 
-		$output = $this->blocks[0]->compile ($generator, $variables);
+		$output = $this->blocks[0]->compile ($generator, $expressions, $variables);
 
 		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$output->append ($this->blocks[$i]->compile ($generator, $variables));
+			$output->append ($this->blocks[$i]->compile ($generator, $expressions, $variables));
 
 		return $output;
-	}
-
-	public function inject ($expressions)
-	{
-		$blocks = array ();
-
-		foreach ($this->blocks as $block)
-			$blocks[] = $block->inject ($expressions);
-
-		switch (count ($blocks))
-		{
-			case 0:
-				return new VoidBlock ();
-
-			case 1:
-				return $blocks[0];
-
-			default:
-				return new self ($blocks);
-		}
 	}
 
 	public function is_void ()

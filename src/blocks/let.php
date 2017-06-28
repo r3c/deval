@@ -10,11 +10,10 @@ class LetBlock implements Block
 		$this->body = $body;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		// Evalulate or generate code for assignment variables
 		$assignments = new Output ();
-		$expressions = array ();
 		$provides = array ();
 
 		foreach ($this->assignments as $assignment)
@@ -49,32 +48,15 @@ class LetBlock implements Block
 		$output->append ($assignments);
 
 		// Generate body evaluation and restore variables
-		$body = $this->body->inject ($expressions);
-
 		$requires = array ();
-		$output->append ($body->compile ($generator, $requires));
+
+		$output->append ($this->body->compile ($generator, $expressions, $requires));
 		$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
 
 		// Append required variables but the ones provided by all assignments
 		$variables += array_diff_key ($requires, $provides);
 
 		return $output;
-	}
-
-	public function inject ($expressions)
-	{
-		$assignments = array ();
-
-		foreach ($this->assignments as $assignment)
-		{
-			list ($name, $expression) = $assignment;
-
-			$assignments[] = array ($name, $expression->inject ($expressions));
-
-			unset ($expressions[$name]);
-		}
-
-		return new self ($assignments, $this->body->inject ($expressions));
 	}
 
 	public function is_void ()

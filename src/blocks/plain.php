@@ -9,14 +9,9 @@ class PlainBlock implements Block
 		$this->text = $text;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
-	}
-
-	public function inject ($expressions)
-	{
-		return $this;
 	}
 
 	public function is_void ()

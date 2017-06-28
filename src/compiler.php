@@ -6,6 +6,8 @@ class Compiler
 {
 	private static $bases = array ();
 
+	private $expressions = array ();
+
 	public static function parse_code ($source, $blocks = array ())
 	{
 		return self::parse ('<source>', $source, $blocks);
@@ -63,7 +65,7 @@ class Compiler
 	public function compile ($setup, &$names)
 	{
 		$variables = array ();
-		$source = $this->block->compile (new Generator ($setup), $variables);
+		$source = $this->block->compile (new Generator ($setup), $this->expressions, $variables);
 		$names = array_keys ($variables);
 
 		$output = new Output ();
@@ -75,12 +77,8 @@ class Compiler
 
 	public function inject ($constants)
 	{
-		$expressions = array ();
-
 		foreach ($constants as $name => $value)
-			$expressions[$name] = new ConstantExpression ($value);
-
-		$this->block = $this->block->inject ($expressions);
+			$this->expressions[$name] = new ConstantExpression ($value);
 	}
 }
 

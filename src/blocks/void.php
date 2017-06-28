@@ -4,14 +4,9 @@ namespace Deval;
 
 class VoidBlock implements Block
 {
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		return new Output ();
-	}
-
-	public function inject ($expressions)
-	{
-		return $this;
 	}
 
 	public function is_void ()

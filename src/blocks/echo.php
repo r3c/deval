@@ -9,10 +9,10 @@ class EchoBlock implements Block
 		$this->value = $value;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator, $expressions, &$variables)
 	{
 		$output = new Output ();
-		$value = $this->value->inject (array ());
+		$value = $this->value->inject ($expressions);
 
 		if ($value->get_value ($result))
 		{
@@ -25,11 +25,6 @@ class EchoBlock implements Block
 			$output->append_code ('echo ' . $value->generate ($generator, $variables) . ';');
 
 		return $output;
-	}
-
-	public function inject ($expressions)
-	{
-		return new self ($this->value->inject ($expressions));
 	}
 
 	public function is_void ()
