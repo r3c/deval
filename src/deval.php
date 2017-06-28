@@ -184,7 +184,7 @@ class Builtin
 		return null;
 	}
 
-	public static function _builtin_when ($condition, $true = true, $false = false)
+	public static function _builtin_when ($condition, $true = true, $false = null)
 	{
 		return $condition ? $true : $false;
 	}
