@@ -134,9 +134,14 @@ class Builtin
 				return constant ((string)substr ($symbol, 1));
 
 			case '$':
-				$name = (string)substr ($symbol, 1);
+				$parts = explode ('::', (string)substr ($symbol, 1), 2);
 
-				return isset ($GLOBALS[$name]) ? $GLOBALS[$name] : null;
+				if (count ($parts) < 2)
+					return isset ($GLOBALS[$parts[0]]) ? $GLOBALS[$parts[0]] : null;
+
+				$vars = get_class_vars ($parts[0]);
+
+				return isset ($vars[$parts[1]]) ? $vars[$parts[1]] : null;
 
 			default:
 				return $symbol;

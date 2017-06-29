@@ -9,6 +9,8 @@ class TestClass
 {
 	public $instance_field = 1;
 
+	public static $static_field = 2;
+
 	public function instance_method ()
 	{
 		return 42;
@@ -241,8 +243,10 @@ render_code ('{{ length("Hello!") }}', make_builtins ('length'), '6');
 render_code ('{{ length([7, 8, 9]) }}', make_builtins ('length'), '3');
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
-render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
 render_code ('{{ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);
+render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
+render_code ('{{ php("$TestClass::instance_field") }}', make_builtins ('php'), '1');
+render_code ('{{ php("$TestClass::static_field") }}', make_builtins ('php'), '2');
 render_code ('{{ default(slice(null, 1), "null") }}', make_builtins ('default', 'slice'), 'null');
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
