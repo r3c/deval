@@ -423,7 +423,7 @@ class Runtime
 	{
 		if (is_object ($parent))
 		{
-			if (method_exists ($parent, $key))
+			if (is_callable (array ($parent, $key)))
 				return array ($parent, $key);
 			else if (property_exists ($parent, $key))
 				return $parent->$key;
