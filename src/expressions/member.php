@@ -47,7 +47,7 @@ class MemberExpression implements Expression
 
 			// Otherwise find member in source elements if possible
 			else if ($source->get_elements ($elements) && array_key_exists ($key, $elements))
-				return $elements[$key];
+				return new GroupExpression ($elements[$key]);
 		}
 
 		// Otherwise return injected source and offset

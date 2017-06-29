@@ -34,7 +34,7 @@ class SymbolExpression implements Expression
 	public function inject ($expressions)
 	{
 		if (array_key_exists ($this->name, $expressions))
-			return $expressions[$this->name];
+			return new GroupExpression ($expressions[$this->name]);
 
 		return $this;
 	}
