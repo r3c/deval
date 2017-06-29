@@ -28,7 +28,7 @@ class RenderException extends \Exception
 
 class Builtin
 {
-	public static function _builtin_cat ()
+	public static function _cat ()
 	{
 		$args = func_get_args ();
 
@@ -45,17 +45,17 @@ class Builtin
 		return $buffer;
 	}
 
-	public static function _builtin_default ($value, $fallback)
+	public static function _default ($value, $fallback)
 	{
 		return $value !== null ? $value : $fallback;
 	}
 
-	public static function _builtin_filter ($items, $predicate)
+	public static function _filter ($items, $predicate)
 	{
 		return array_filter ($items, $predicate, ARRAY_FILTER_USE_BOTH);
 	}
 
-	public static function _builtin_find ($items, $predicate = null)
+	public static function _find ($items, $predicate = null)
 	{
 		if ($predicate === null)
 			return each ($items);
@@ -69,12 +69,12 @@ class Builtin
 		return null;
 	}
 
-	public static function _builtin_flip ($items)
+	public static function _flip ($items)
 	{
 		return array_flip ($items);
 	}
 
-	public static function _builtin_group ($items, $get_key = null, $get_value = null, $merge = null)
+	public static function _group ($items, $get_key = null, $get_value = null, $merge = null)
 	{
 		if ($get_key === null)
 			$get_key = function ($v) { return $v; };
@@ -101,17 +101,17 @@ class Builtin
 		return $groups;
 	}
 
-	public static function _builtin_join ($items, $separator = '')
+	public static function _join ($items, $separator = '')
 	{
 		return implode ($separator, $items);
 	}
 
-	public static function _builtin_keys ($items)
+	public static function _keys ($items)
 	{
 		return array_keys ($items);
 	}
 
-	public static function _builtin_length ($input)
+	public static function _length ($input)
 	{
 		if ($input === null)
 			return null;
@@ -121,12 +121,12 @@ class Builtin
 			return strlen ((string)$input);
 	}
 
-	public static function _builtin_map ($items, $apply)
+	public static function _map ($items, $apply)
 	{
 		return array_map ($apply, $items);
 	}
 
-	public static function _builtin_php ($symbol)
+	public static function _php ($symbol)
 	{
 		switch (substr ($symbol, 0, 1))
 		{
@@ -143,7 +143,7 @@ class Builtin
 		}
 	}
 
-	public static function _builtin_slice ($input, $offset, $count = null)
+	public static function _slice ($input, $offset, $count = null)
 	{
 		if ($input === null)
 			return null;
@@ -163,7 +163,7 @@ class Builtin
 		}
 	}
 
-	public static function _builtin_sort ($items, $compare = null)
+	public static function _sort ($items, $compare = null)
 	{
 		if ($compare !== null)
 			uasort ($items, $compare);
@@ -173,7 +173,7 @@ class Builtin
 		return $items;
 	}
 
-	public static function _builtin_split ($string, $separator, $limit = null)
+	public static function _split ($string, $separator, $limit = null)
 	{
 		if ($limit !== null)
 			return explode ($separator, $string, $limit);
@@ -181,17 +181,17 @@ class Builtin
 		return explode ($separator, $string);
 	}
 
-	public static function _builtin_values ($items)
+	public static function _values ($items)
 	{
 		return array_values ($items);
 	}
 
-	public static function _builtin_void ()
+	public static function _void ()
 	{
 		return null;
 	}
 
-	public static function _builtin_zip ($keys, $values)
+	public static function _zip ($keys, $values)
 	{
 		return array_combine ($keys, $values);
 	}
@@ -222,7 +222,7 @@ class Builtin
 
 		return array_combine ($names, array_map (function ($name) use ($class)
 		{
-			return array ($class, '_builtin_' . $name);
+			return array ($class, '_' . $name);
 		}, $names));
 	}
 
