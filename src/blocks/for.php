@@ -51,7 +51,7 @@ class ForBlock implements Block
 
 			if ($empty->has_data ())
 			{
-				$counter = $generator->emit_local ();
+				$counter = $generator->emit_unique ();
 
 				$output->append_code ($counter . '=0;');
 			}

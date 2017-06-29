@@ -4,8 +4,14 @@ namespace Deval;
 
 class Generator
 {
-	private static $input_name = '_deval_input';
-	private static $state_name = '_deval_state';
+	private static $input_name = '_d_input';
+	private static $local_name = '_d_local';
+	private static $state_name = '_d_state';
+
+	public static function emit_local ()
+	{
+		return '$' . self::$local_name;
+	}
 
 	public static function emit_member ($source, $index)
 	{
@@ -45,7 +51,7 @@ class Generator
 
 	public static function emit_symbol ($name)
 	{
-		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name) || $name === self::$input_name || $name === self::$state_name)
+		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name) || $name === self::$input_name || $name === self::$local_name || $name === self::$state_name)
 			throw new RenderException ('invalid symbol name ' . $name);
 
 		return '$' . $name;
@@ -74,8 +80,8 @@ class Generator
 		return var_export ($input, true);
 	}
 
-	private $local;
 	private $trimmer;
+	private $unique;
 	private $version;
 
 	public function __construct ($setup)
@@ -122,13 +128,13 @@ class Generator
 		else
 			throw new ParseException ('<setup>', 'invalid style, must be either builtin style or callable');
 
-		$this->local = 0;
+		$this->unique = 0;
 		$this->version = $setup->version;
 	}
 
-	public function emit_local ()
+	public function emit_unique ()
 	{
-		return '$' . self::$state_name . '->_' . $this->local++;
+		return '$' . self::$state_name . '->_' . $this->unique++;
 	}
 
 	public function make_plain ($text)

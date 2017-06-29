@@ -43,8 +43,9 @@ raise_compile ('{{ ["TestClass", "missing"](x) }}', array ('x' => 1), 'is not ca
 // Render exceptions
 raise_render ('{{ a }}', array (), array (), 'undefined symbol(s) a');
 raise_render ('{{ a }}{% let a = 1 %}{% end %}', array (), array (), 'undefined symbol(s) a');
-raise_render ('{{ _deval_input }}', array (), array ('_deval_input' => 0), 'invalid symbol name _deval_input');
-raise_render ('{{ _deval_state }}', array (), array ('_deval_state' => 0), 'invalid symbol name _deval_state');
+raise_render ('{{ _d_input }}', array (), array ('_d_input' => 0), 'invalid symbol name');
+raise_render ('{{ _d_local }}', array (), array ('_d_local' => 0), 'invalid symbol name');
+raise_render ('{{ _d_state }}', array (), array ('_d_state' => 0), 'invalid symbol name');
 
 // Render plain texts
 render_code ('lol', make_empty (), 'lol');

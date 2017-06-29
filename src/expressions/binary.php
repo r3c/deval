@@ -20,7 +20,7 @@ class BinaryExpression implements Expression
 				),
 				'&&'	=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '?' . $rhs . ':' . $lhs; },
+					function ($lhs, $rhs) { return '(' . Generator::emit_local () . '=' . $lhs . ')?' . $rhs . ':' . Generator::emit_local (); },
 					function ($lhs) { return !$lhs; },
 					function ($lhs, $rhs) { return $lhs ? $rhs : $lhs; }
 				),
