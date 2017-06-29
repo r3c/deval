@@ -227,12 +227,14 @@ render_code ('{{ join(",", group([1, 1, 3, 3])) }}', make_builtins ('group', 'jo
 render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2)) }}', make_builtins ('group', 'join'), '2,4');
 render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2, (v1, v2) => v1 + v2)) }}', make_builtins ('group', 'join'), '8,12');
 render_code ('{{ join(",", keys([1: 0, 2: 0, 3: 0])) }}', make_builtins ('join', 'keys'), '1,2,3');
+render_code ('{{ default(length(null), "null") }}', make_builtins ('default', 'length'), 'null');
 render_code ('{{ length("Hello!") }}', make_builtins ('length'), '6');
 render_code ('{{ length([7, 8, 9]) }}', make_builtins ('length'), '3');
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
 render_code ('{{ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);
+render_code ('{{ default(slice(null, 1), "null") }}', make_builtins ('default', 'slice'), 'null');
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ slice("1234", -3) }}', make_builtins ('slice'), '234');

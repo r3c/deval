@@ -113,7 +113,12 @@ class Builtin
 
 	public static function _builtin_length ($input)
 	{
-		return is_array ($input) ? count ($input) : strlen ((string)$input);
+		if ($input === null)
+			return null;
+		else if (is_array ($input))
+			return count ($input);
+		else
+			return strlen ((string)$input);
 	}
 
 	public static function _builtin_map ($items, $apply)
@@ -140,7 +145,9 @@ class Builtin
 
 	public static function _builtin_slice ($input, $offset, $count = null)
 	{
-		if (is_array ($input))
+		if ($input === null)
+			return null;
+		else if (is_array ($input))
 		{
 			if ($count !== null)
 				return array_slice ($input, $offset, $count);
