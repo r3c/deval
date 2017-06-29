@@ -23,8 +23,8 @@ class LetBlock implements Block
 			// Inject expressions computed from previous assignments
 			$expression = $expression->inject ($expressions);
 
-			// Inline expression if used once or zero times
-			if ($this->body->count_symbol ($name) < 2)
+			// Inline expression if constant or used at most once
+			if ($expression->get_value ($unused) || $this->body->count_symbol ($name) < 2)
 				$expressions[$name] = $expression;
 
 			// Generate assignment code otherwise

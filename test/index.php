@@ -20,7 +20,7 @@ class TestClass
 	}
 }
 
-function fail ()
+function crash ()
 {
 	assert (false, 'function should not have been called');
 }
@@ -92,10 +92,10 @@ render_code ('{{ a / b }}', make_combinations (array ('a' => 6, 'b' => 3)), '2')
 render_code ('{{ a % b }}', make_combinations (array ('a' => 4, 'b' => 3)), '1');
 render_code ('{{ a && b }}', make_combinations (array ('a' => 1, 'b' => 0)), '0');
 render_code ('{{ a && b }}', make_combinations (array ('a' => 1, 'b' => 2)), '2');
-render_code ('{{ x && fail () }}', make_slices (array ('fail' => 'fail', 'x' => 0)), '0');
+render_code ('{{ x && crash () }}', make_slices (array ('crash' => 'crash', 'x' => 0)), '0');
 render_code ('{{ a || b }}', make_combinations (array ('a' => 0, 'b' => 0)), '0');
 render_code ('{{ a || b }}', make_combinations (array ('a' => 1, 'b' => 0)), '1');
-render_code ('{{ x || fail () }}', make_slices (array ('fail' => 'fail', 'x' => 1)), '1');
+render_code ('{{ x || crash () }}', make_slices (array ('crash' => 'crash', 'x' => 1)), '1');
 render_code ('{{ a == b }}', make_combinations (array ('a' => 0, 'b' => 1)), '');
 render_code ('{{ a == b }}', make_combinations (array ('a' => 0, 'b' => 0)), '1');
 render_code ('{{ a == b }}', make_combinations (array ('a' => 0, 'b' => '0')), '');
@@ -257,5 +257,13 @@ render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 's
 render_code ('{% let x = [1: "a", 2: "b", 3: "c"] %}{{ join(",", keys(values(x))) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values'), '0,1,2:a,b,c');
 render_code ('{{ void() }}', make_builtins ('void'), '');
 render_code ('{% let x = zip(["a", "b", "c"], [0, 1, 2]) %}{{ join(",", keys(x)) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values', 'zip'), 'a,b,c:0,1,2');
+
+// Rendering optimizations
+render_code ('{% let c = false %}{% if c %}{{ crash }}{% end %}{{ c }}{% end %}', make_empty (), ''); // Dead code elimination
+
+// Source code generation
+source_code ('{% let v = f() %}{{ v }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0)); // Non-constant expression used once should be inlined
+source_code ('{% let v = f() %}{{ v }}{{ v }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 6)); // Non-constant expression used twice should not be inlined
+source_code ('{% let v = 42 %}{{ v }}{{ v }}{% end %}', array (), array ('/42/' => 2, '/\\$v/' => 0)); // Constant expression used twice should be inlined
 
 ?>

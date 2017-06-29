@@ -233,4 +233,31 @@ function render_file ($path, $directory, $pairs, $expect, $setup = null)
 	}, $pairs, $expect, $setup);
 }
 
+function source ($constructor, $constants, $expects)
+{
+	foreach ($constructor () as $renderer)
+	{
+		$renderer->inject ($constants);
+		$source = $renderer->source ($requires);
+
+		foreach ($expects as $pattern => $expect)
+		{
+			$count = preg_match_all ($pattern, $source, $matches);
+
+			assert ($count === $expect, 'expected ' . $expect . ' matches for pattern ' . $pattern . ' but found ' . $count . ' in ' . var_export ($source, true));
+		}
+	}
+}
+
+function source_code ($source, $constants, $expects, $setup = null)
+{
+	source (function () use ($setup, $source)
+	{
+		return array
+		(
+			new Deval\StringRenderer ($source, $setup)
+		);
+	}, $constants, $expects, $setup);
+}
+
 ?>
