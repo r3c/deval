@@ -4,7 +4,7 @@ namespace Deval;
 
 class UnaryExpression implements Expression
 {
-	public function __construct ($value, $op)
+	public function __construct ($operator, $operand)
 	{
 		static $callbacks;
 
@@ -19,22 +19,22 @@ class UnaryExpression implements Expression
 			);
 		}
 
-		if (!isset ($callbacks[$op]))
+		if (!isset ($callbacks[$operator]))
 			throw new \Exception ('undefined unary operator');
 
-		$this->callback = $callbacks[$op];
-		$this->op = $op;
-		$this->value = $value;
+		$this->callback = $callbacks[$operator];
+		$this->operand = $operand;
+		$this->operator = $operator;
 	}
 
 	public function __toString ()
 	{
-		return $this->op . $this->value;
+		return $this->operator . $this->operand;
 	}
 
 	public function count_symbol ($name)
 	{
-		return $this->value->count_symbol ($name);
+		return $this->operand->count_symbol ($name);
 	}
 
 	public function get_elements (&$elements)
@@ -49,19 +49,19 @@ class UnaryExpression implements Expression
 
 	public function generate ($generator, &$variables)
 	{
-		return $this->op . $this->value->generate ($generator, $variables);
+		return $this->operator . $this->operand->generate ($generator, $variables);
 	}
 
 	public function inject ($expressions)
 	{
-		$value = $this->value->inject ($expressions);
+		$operand = $this->operand->inject ($expressions);
 
-		if (!$value->get_value ($result))
-			return new self ($value, $this->op);
+		if (!$operand->get_value ($value))
+			return new self ($this->operator, $operand);
 
 		$callback = $this->callback;
 
-		return new ConstantExpression ($callback ($result));
+		return new ConstantExpression ($callback ($value));
 	}
 }
 

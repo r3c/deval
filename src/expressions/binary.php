@@ -4,7 +4,7 @@ namespace Deval;
 
 class BinaryExpression implements Expression
 {
-	public function __construct ($lhs, $rhs, $op)
+	public function __construct ($operator, $lhs, $rhs)
 	{
 		static $callbacks;
 
@@ -93,22 +93,22 @@ class BinaryExpression implements Expression
 			);
 		}
 
-		if (!isset ($callbacks[$op]))
+		if (!isset ($callbacks[$operator]))
 			throw new \Exception ('undefined binary operator');
 
-		list ($emit, $early, $lazy) = $callbacks[$op];
+		list ($emit, $early, $lazy) = $callbacks[$operator];
 
 		$this->early = $early;
 		$this->emit = $emit;
 		$this->lazy = $lazy;
 		$this->lhs = $lhs;
-		$this->op = $op;
+		$this->operator = $operator;
 		$this->rhs = $rhs;
 	}
 
 	public function __toString ()
 	{
-		return $this->lhs . ' ' . $this->op . ' ' . $this->rhs;
+		return $this->lhs . ' ' . $this->operator . ' ' . $this->rhs;
 	}
 
 	public function count_symbol ($name)
@@ -139,7 +139,7 @@ class BinaryExpression implements Expression
 		$lhs = $this->lhs->inject ($expressions);
 
 		if (!$lhs->get_value ($lhs_result))
-			return new self ($lhs, $this->rhs->inject ($expressions), $this->op);
+			return new self ($this->operator, $lhs, $this->rhs->inject ($expressions));
 		else if ($early !== null && $early ($lhs_result))
 			return new ConstantExpression ($lhs_result);
 		else
@@ -148,7 +148,7 @@ class BinaryExpression implements Expression
 			$rhs = $this->rhs->inject ($expressions);
 
 			if (!$rhs->get_value ($rhs_result))
-				return new self ($lhs, $rhs, $this->op);
+				return new self ($this->operator, $lhs, $rhs);
 			else
 				return new ConstantExpression ($lazy ($lhs_result, $rhs_result));
 		}

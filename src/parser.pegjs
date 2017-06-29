@@ -176,21 +176,21 @@ Expression
 ExpressionBooleanOr
 	= lhs:ExpressionBooleanAnd _ "||" _ rhs:ExpressionBooleanOr
 	{
-		return new \Deval\BinaryExpression ($lhs, $rhs, '||');
+		return new \Deval\BinaryExpression ('||', $lhs, $rhs);
 	}
 	/ ExpressionBooleanAnd
 
 ExpressionBooleanAnd
 	= lhs:ExpressionCompare _ "&&" _ rhs:ExpressionBooleanAnd
 	{
-		return new \Deval\BinaryExpression ($lhs, $rhs, '&&');
+		return new \Deval\BinaryExpression ('&&', $lhs, $rhs);
 	}
 	/ ExpressionCompare
 
 ExpressionCompare
-	= lhs:ExpressionMathAdd _ op:ExpressionCompareOperator _ rhs:ExpressionCompare
+	= lhs:ExpressionMathAdd _ operator:ExpressionCompareOperator _ rhs:ExpressionCompare
 	{
-		return new \Deval\BinaryExpression ($lhs, $rhs, $op);
+		return new \Deval\BinaryExpression ($operator, $lhs, $rhs);
 	}
 	/ ExpressionMathAdd
 
@@ -203,9 +203,9 @@ ExpressionCompareOperator
 	/ "<"
 
 ExpressionMathAdd
-	= lhs:ExpressionMathMul _ op:ExpressionMathAddOperator _ rhs:ExpressionMathAdd
+	= lhs:ExpressionMathMul _ operator:ExpressionMathAddOperator _ rhs:ExpressionMathAdd
 	{
-		return new \Deval\BinaryExpression ($lhs, $rhs, $op);
+		return new \Deval\BinaryExpression ($operator, $lhs, $rhs);
 	}
 	/ ExpressionMathMul
 
@@ -214,9 +214,9 @@ ExpressionMathAddOperator
 	/ "-"
 
 ExpressionMathMul
-	= lhs:ExpressionPrefix _ op:ExpressionMathMulOperator _ rhs:ExpressionMathMul
+	= lhs:ExpressionPrefix _ operator:ExpressionMathMulOperator _ rhs:ExpressionMathMul
 	{
-		return new \Deval\BinaryExpression ($lhs, $rhs, $op);
+		return new \Deval\BinaryExpression ($operator, $lhs, $rhs);
 	}
 	/ ExpressionPrefix
 
@@ -226,9 +226,9 @@ ExpressionMathMulOperator
 	/ "%"
 
 ExpressionPrefix
-	= operator:ExpressionPrefixOperator _ expression:ExpressionPrefix
+	= operator:ExpressionPrefixOperator _ operand:ExpressionPrefix
 	{
-		return new \Deval\UnaryExpression ($expression, $operator);
+		return new \Deval\UnaryExpression ($operator, $operand);
 	}
 	/ ExpressionPostfix
 

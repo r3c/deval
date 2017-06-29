@@ -94,8 +94,8 @@ class InvokeExpression implements Expression
 		{
 			$argument = $argument->inject ($expressions);
 
-			if ($argument->get_value ($result))
-				$values[] = $result;
+			if ($argument->get_value ($value))
+				$values[] = $value;
 			else
 				$ready = false;
 
@@ -103,12 +103,12 @@ class InvokeExpression implements Expression
 		}
 
 		// Invoke and pass return value if caller and arguments were evaluated
-		if ($ready && $caller->get_value ($result))
+		if ($ready && $caller->get_value ($value))
 		{
-			if (!is_callable ($result))
+			if (!is_callable ($value))
 				throw new CompileException ($caller, 'is not callable');
 
-			return new ConstantExpression (call_user_func_array ($result, $values));
+			return new ConstantExpression (call_user_func_array ($value, $values));
 		}
 
 		// Otherwise return injected caller and arguments
