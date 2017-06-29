@@ -14,6 +14,11 @@ class ConstantExpression implements Expression
 		return var_export ($this->value, true);
 	}
 
+	public function count_symbol ($name)
+	{
+		return 0;
+	}
+
 	public function get_elements (&$elements)
 	{
 		$elements = array ();

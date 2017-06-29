@@ -15,6 +15,16 @@ class InvokeExpression implements Expression
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
 	}
 
+	public function count_symbol ($name)
+	{
+		$count = $this->caller->count_symbol ($name);
+
+		foreach ($this->arguments as $argument)
+			$count += $argument->count_symbol ($name);
+
+		return $count;
+	}
+
 	public function get_elements (&$elements)
 	{
 		return false;

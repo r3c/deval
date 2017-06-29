@@ -32,6 +32,11 @@ class UnaryExpression implements Expression
 		return $this->op . $this->value;
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->value->count_symbol ($name);
+	}
+
 	public function get_elements (&$elements)
 	{
 		return false;

@@ -14,6 +14,11 @@ class LabelBlock implements Block
 		throw new \Exception ('cannot compile label block');
 	}
 
+	public function count_symbol ($name)
+	{
+		return 0;
+	}
+
 	public function resolve ($blocks)
 	{
 		if (isset ($blocks[$this->name]))

@@ -22,6 +22,16 @@ class ConcatBlock implements Block
 		return $output;
 	}
 
+	public function count_symbol ($name)
+	{
+		$count = 0;
+
+		foreach ($this->blocks as $block)
+			$count += $block->count_symbol ($name);
+
+		return $count;
+	}
+
 	public function resolve ($blocks)
 	{
 		$results = array ();

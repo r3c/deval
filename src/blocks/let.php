@@ -23,11 +23,11 @@ class LetBlock implements Block
 			// Inject expressions computed from previous assignments
 			$expression = $expression->inject ($expressions);
 
-			// Append to expressions if assignment should be evaluated
-			if (true /* FIXME: some smart heuristic */)
+			// Inline expression if used once or zero times
+			if ($this->body->count_symbol ($name) < 2)
 				$expressions[$name] = $expression;
 
-			// Or generate dynamic assignment otherwise
+			// Generate assignment code otherwise
 			else
 			{
 				// Generate evaluation code for current variable
@@ -57,6 +57,16 @@ class LetBlock implements Block
 		$variables += array_diff_key ($requires, $provides);
 
 		return $output;
+	}
+
+	public function count_symbol ($name)
+	{
+		$count = $this->body->count_symbol ($name);
+
+		foreach ($this->assignments as $assignment)
+			$count += $assignment[1]->count_symbol ($name);
+
+		return $count;
 	}
 
 	public function resolve ($blocks)

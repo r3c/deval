@@ -15,6 +15,11 @@ class MemberExpression implements Expression
 		return $this->source . '[' . $this->offset . ']';
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->offset->count_symbol ($name) + $this->source->count_symbol ($name);
+	}
+
 	public function get_elements (&$elements)
 	{
 		return false;

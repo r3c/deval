@@ -14,6 +14,11 @@ class GroupExpression implements Expression
 		return '(' . $this->expression . ')';
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->expression->count_symbol ($name);
+	}
+
 	public function get_elements (&$elements)
 	{
 		return $this->expression->get_elements ($elements);

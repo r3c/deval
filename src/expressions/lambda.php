@@ -15,6 +15,11 @@ class LambdaExpression implements Expression
 		return '(' . implode (', ', $this->names) . ') => ' . $this->body;
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->body->count_symbol ($name);
+	}
+
 	public function get_elements (&$elements)
 	{
 		return false;

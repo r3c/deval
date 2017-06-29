@@ -9,6 +9,11 @@ class VoidBlock implements Block
 		return new Output ();
 	}
 
+	public function count_symbol ($name)
+	{
+		return 0;
+	}
+
 	public function resolve ($blocks)
 	{
 		return $this;

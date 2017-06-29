@@ -14,6 +14,11 @@ class SymbolExpression implements Expression
 		return $this->name;
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->name === $name ? 1 : 0;
+	}
+
 	public function get_elements (&$elements)
 	{
 		return false;

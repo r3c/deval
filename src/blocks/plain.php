@@ -14,6 +14,11 @@ class PlainBlock implements Block
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
 	}
 
+	public function count_symbol ($name)
+	{
+		return 0;
+	}
+
 	public function resolve ($blocks)
 	{
 		return $this;

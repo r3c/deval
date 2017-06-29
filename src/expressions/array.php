@@ -14,6 +14,21 @@ class ArrayExpression implements Expression
 		return '[' . implode (', ', array_map (function ($e) { return ($e[0] !== null ? $e[0] . ': ' : '') . $e[1]; }, $this->elements)) . ']';
 	}
 
+	public function count_symbol ($name)
+	{
+		$count = 0;
+
+		foreach ($this->elements as $element)
+		{
+			if ($element[0] !== null)
+				$count += $element[0]->count_symbol ($name);
+
+			$count += $element[1]->count_symbol ($name);
+		}
+
+		return $count;
+	}
+
 	public function get_elements (&$elements)
 	{
 		$elements = array ();

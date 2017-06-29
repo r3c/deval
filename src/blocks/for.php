@@ -110,6 +110,11 @@ class ForBlock implements Block
 		return $output;
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->empty->count_symbol ($name) + $this->loop->count_symbol ($name) + $this->source->count_symbol ($name);
+	}
+
 	public function resolve ($blocks)
 	{
 		$empty = $this->empty->resolve ($blocks);

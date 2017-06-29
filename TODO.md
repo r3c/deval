@@ -5,7 +5,6 @@ TODO
 ----
 
 - Support builtin syntax for defering an expression
-- Do not alias variables when used more than once
 
 DONE
 ----
@@ -24,3 +23,4 @@ DONE
 - Implement {% wrap callback %}{% end %} block
 - Implement variable aliasing
 - Support ternary operator
+- Do not inline variables when used more than once

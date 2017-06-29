@@ -59,6 +59,16 @@ class IfBlock implements Block
 		return $output;
 	}
 
+	public function count_symbol ($name)
+	{
+		$count = $this->fallback->count_symbol ($name);
+
+		foreach ($this->branches as $branch)
+			$count += $branch[0]->count_symbol ($name) + $branch[1]->count_symbol ($name);
+
+		return $count;
+	}
+
 	public function resolve ($blocks)
 	{
 		$branches = array ();

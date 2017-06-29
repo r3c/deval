@@ -27,6 +27,11 @@ class EchoBlock implements Block
 		return $output;
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->value->count_symbol ($name);
+	}
+
 	public function resolve ($blocks)
 	{
 		return $this;

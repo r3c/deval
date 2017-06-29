@@ -111,6 +111,11 @@ class BinaryExpression implements Expression
 		return $this->lhs . ' ' . $this->op . ' ' . $this->rhs;
 	}
 
+	public function count_symbol ($name)
+	{
+		return $this->lhs->count_symbol ($name) + $this->rhs->count_symbol ($name);
+	}
+
 	public function get_elements (&$elements)
 	{
 		return false;
