@@ -20,6 +20,11 @@ class TestClass
 	}
 }
 
+function fail ()
+{
+	assert (false, 'function should not have been called');
+}
+
 $preserve = new Deval\Setup ();
 $preserve->style = 'preserve';
 
@@ -79,31 +84,34 @@ render_code ('{{ int }}', make_combinations (array ('int' => 3)), '3');
 render_code ('{{ str }}', make_combinations (array ('str' => 'value')), 'value');
 
 // Render binary expressions
-render_code ('{{ 1 + 1 }}', make_empty (), '2');
-render_code ('{{ x + 1 }}', make_combinations (array ('x' => '5')), '6');
-render_code ('{{ 2 - 1 }}', make_empty (), '1');
-render_code ('{{ 2 * 2 }}', make_empty (), '4');
-render_code ('{{ 6 / 3 }}', make_empty (), '2');
-render_code ('{{ 4 % 3 }}', make_empty (), '1');
-render_code ('{{ 1 && 0 }}', make_empty (), '');
-render_code ('{{ 1 && 2 }}', make_empty (), '1');
-render_code ('{{ 0 || 0 }}', make_empty (), '');
-render_code ('{{ 1 || 0 }}', make_empty (), '1');
-render_code ('{{ 0 == 1 }}', make_empty (), '');
-render_code ('{{ 0 == 0 }}', make_empty (), '1');
-render_code ('{{ 0 == "0" }}', make_empty (), '');
-render_code ('{{ 0 != 1 }}', make_empty (), '1');
-render_code ('{{ 0 != 0 }}', make_empty (), '');
-render_code ('{{ 0 != "0" }}', make_empty (), '1');
-render_code ('{{ 0 > 0 }}', make_empty (), '');
-render_code ('{{ 1 > 0 }}', make_empty (), '1');
-render_code ('{{ 0 >= 0 }}', make_empty (), '1');
-render_code ('{{ 1 >= 0 }}', make_empty (), '1');
-render_code ('{{ 0 < 0 }}', make_empty (), '');
-render_code ('{{ 0 < 1 }}', make_empty (), '1');
-render_code ('{{ 0 <= 0 }}', make_empty (), '1');
-render_code ('{{ 0 <= 1 }}', make_empty (), '1');
+render_code ('{{ a + b }}', make_combinations (array ('a' => 1, 'b' => 1)), '2');
+render_code ('{{ a - b }}', make_combinations (array ('a' => 2, 'b' => 1)), '1');
+render_code ('{{ a * b }}', make_combinations (array ('a' => 2, 'b' => 2)), '4');
+render_code ('{{ a / b }}', make_combinations (array ('a' => 6, 'b' => 3)), '2');
+render_code ('{{ a % b }}', make_combinations (array ('a' => 4, 'b' => 3)), '1');
+render_code ('{{ a && b }}', make_combinations (array ('a' => 1, 'b' => 0)), '0');
+render_code ('{{ a && b }}', make_combinations (array ('a' => 1, 'b' => 2)), '2');
+render_code ('{{ x && fail () }}', make_slices (array ('fail' => 'fail', 'x' => 0)), '0');
+render_code ('{{ a || b }}', make_combinations (array ('a' => 0, 'b' => 0)), '0');
+render_code ('{{ a || b }}', make_combinations (array ('a' => 1, 'b' => 0)), '1');
+render_code ('{{ x || fail () }}', make_slices (array ('fail' => 'fail', 'x' => 1)), '1');
+render_code ('{{ a == b }}', make_combinations (array ('a' => 0, 'b' => 1)), '');
+render_code ('{{ a == b }}', make_combinations (array ('a' => 0, 'b' => 0)), '1');
+render_code ('{{ a == b }}', make_combinations (array ('a' => 0, 'b' => '0')), '');
+render_code ('{{ a != b }}', make_combinations (array ('a' => 0, 'b' => 1)), '1');
+render_code ('{{ a != b }}', make_combinations (array ('a' => 0, 'b' => 0)), '');
+render_code ('{{ a != b }}', make_combinations (array ('a' => 0, 'b' => '1')), '1');
+render_code ('{{ a > b }}', make_combinations (array ('a' => 0, 'b' => 0)), '');
+render_code ('{{ a > b }}', make_combinations (array ('a' => 1, 'b' => 0)), '1');
+render_code ('{{ a >= b }}', make_combinations (array ('a' => 0, 'b' => 0)), '1');
+render_code ('{{ a >= b }}', make_combinations (array ('a' => 1, 'b' => 0)), '1');
+render_code ('{{ a < b }}', make_combinations (array ('a' => 0, 'b' => 0)), '');
+render_code ('{{ a < b }}', make_combinations (array ('a' => 0, 'b' => 1)), '1');
+render_code ('{{ a <= b }}', make_combinations (array ('a' => 0, 'b' => 0)), '1');
+render_code ('{{ a <= b }}', make_combinations (array ('a' => 0, 'b' => 1)), '1');
 render_code ('{{ (x - 1) * 10 }}', make_combinations (array ('x' => '1')), '0');
+render_code ('{{ a && b || c }}', make_combinations (array ('a' => 0, 'b' => 'true', 'c' => 'false')), 'false');
+render_code ('{{ a && b || c }}', make_combinations (array ('a' => 1, 'b' => 'true', 'c' => 'false')), 'true');
 
 // Render invoke expressions
 render_code ('{{ one() }}', make_combinations (array ('one' => function () { return 1; })), '1');

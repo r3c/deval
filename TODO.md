@@ -4,8 +4,8 @@ Deval TODO list
 TODO
 ----
 
-- Support ternary operator
 - Support builtin syntax for defering an expression
+- Do not alias variables when used more than once
 
 DONE
 ----
@@ -23,3 +23,4 @@ DONE
 - Allow specifying multiple trimmers in configuration
 - Implement {% wrap callback %}{% end %} block
 - Implement variable aliasing
+- Support ternary operator

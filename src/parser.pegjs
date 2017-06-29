@@ -171,36 +171,42 @@ Symbol "symbol"
 // Expression tree
 
 Expression
-	= value:ExpressionBooleanOr
+	= ExpressionBooleanOr
 
 ExpressionBooleanOr
-	= lhs:ExpressionBooleanAnd _ "||" _ rhs:ExpressionBooleanOr { return new \Deval\BinaryExpression ($lhs, $rhs, '||'); }
+	= lhs:ExpressionBooleanAnd _ "||" _ rhs:ExpressionBooleanOr
+	{
+		return new \Deval\BinaryExpression ($lhs, $rhs, '||');
+	}
 	/ ExpressionBooleanAnd
 
 ExpressionBooleanAnd
-	= lhs:ExpressionCompare _ "&&" _ rhs:ExpressionBooleanAnd { return new \Deval\BinaryExpression ($lhs, $rhs, '&&'); }
+	= lhs:ExpressionCompare _ "&&" _ rhs:ExpressionBooleanAnd
+	{
+		return new \Deval\BinaryExpression ($lhs, $rhs, '&&');
+	}
 	/ ExpressionCompare
 
 ExpressionCompare
-	= lhs:ExpressionMathAdd _ op:ExpressionCompareOperator _ rhs:ExpressionCompare { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
+	= lhs:ExpressionMathAdd _ op:ExpressionCompareOperator _ rhs:ExpressionCompare
+	{
+		return new \Deval\BinaryExpression ($lhs, $rhs, $op);
+	}
 	/ ExpressionMathAdd
 
 ExpressionCompareOperator
 	= "=="
-	{
-		return "===";
-	}
 	/ "!="
-	{
-		return "!==";
-	}
 	/ ">="
 	/ ">"
 	/ "<="
 	/ "<"
 
 ExpressionMathAdd
-	= lhs:ExpressionMathMul _ op:ExpressionMathAddOperator _ rhs:ExpressionMathAdd { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
+	= lhs:ExpressionMathMul _ op:ExpressionMathAddOperator _ rhs:ExpressionMathAdd
+	{
+		return new \Deval\BinaryExpression ($lhs, $rhs, $op);
+	}
 	/ ExpressionMathMul
 
 ExpressionMathAddOperator
@@ -208,7 +214,10 @@ ExpressionMathAddOperator
 	/ "-"
 
 ExpressionMathMul
-	= lhs:ExpressionPrefix _ op:ExpressionMathMulOperator _ rhs:ExpressionMathMul { return new \Deval\BinaryExpression ($lhs, $rhs, $op); }
+	= lhs:ExpressionPrefix _ op:ExpressionMathMulOperator _ rhs:ExpressionMathMul
+	{
+		return new \Deval\BinaryExpression ($lhs, $rhs, $op);
+	}
 	/ ExpressionPrefix
 
 ExpressionMathMulOperator

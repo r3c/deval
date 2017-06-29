@@ -12,26 +12,95 @@ class BinaryExpression implements Expression
 		{
 			$callbacks = array
 			(
-				'%'		=> function ($lhs, $rhs) { return $lhs % $rhs; },
-				'&&'	=> function ($lhs, $rhs) { return $lhs && $rhs; },
-				'==='	=> function ($lhs, $rhs) { return $lhs === $rhs; },
-				'!=='	=> function ($lhs, $rhs) { return $lhs !== $rhs; },
-				'>'		=> function ($lhs, $rhs) { return $lhs > $rhs; },
-				'>='	=> function ($lhs, $rhs) { return $lhs >= $rhs; },
-				'<'		=> function ($lhs, $rhs) { return $lhs < $rhs; },
-				'<='	=> function ($lhs, $rhs) { return $lhs <= $rhs; },
-				'*'		=> function ($lhs, $rhs) { return $lhs * $rhs; },
-				'+'		=> function ($lhs, $rhs) { return $lhs + $rhs; },
-				'-'		=> function ($lhs, $rhs) { return $lhs - $rhs; },
-				'/'		=> function ($lhs, $rhs) { return $lhs / $rhs; },
-				'||'	=> function ($lhs, $rhs) { return $lhs || $rhs; }
+				'%'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '%' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs % $rhs; }
+				),
+				'&&'	=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '?' . $rhs . ':' . $lhs; },
+					function ($lhs) { return !$lhs; },
+					function ($lhs, $rhs) { return $lhs ? $rhs : $lhs; }
+				),
+				'=='	=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '===' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs === $rhs; }
+				),
+				'!='	=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '!==' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs !== $rhs; }
+				),
+				'>'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '>' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs > $rhs; }
+				),
+				'>='	=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '>=' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs >= $rhs; }
+				),
+				'<'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '<' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs < $rhs; }
+				),
+				'<='	=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '<=' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs <= $rhs; }
+				),
+				'*'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '*' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs * $rhs; }
+				),
+				'+'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '+' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs + $rhs; }
+				),
+				'-'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '-' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs - $rhs; }
+				),
+				'/'		=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '/' . $rhs; },
+					null,
+					function ($lhs, $rhs) { return $lhs / $rhs; }
+				),
+				'||'	=> array
+				(
+					function ($lhs, $rhs) { return $lhs . '?:' . $rhs; },
+					function ($lhs) { return !!$lhs; },
+					function ($lhs, $rhs) { return $lhs ?: $rhs; }
+				)
 			);
 		}
 
 		if (!isset ($callbacks[$op]))
 			throw new \Exception ('undefined binary operator');
 
-		$this->callback = $callbacks[$op];
+		list ($emit, $early, $lazy) = $callbacks[$op];
+
+		$this->early = $early;
+		$this->emit = $emit;
+		$this->lazy = $lazy;
 		$this->lhs = $lhs;
 		$this->op = $op;
 		$this->rhs = $rhs;
@@ -54,20 +123,30 @@ class BinaryExpression implements Expression
 
 	public function generate ($generator, &$variables)
 	{
-		return $this->lhs->generate ($generator, $variables) . $this->op . $this->rhs->generate ($generator, $variables);
+		$emit = $this->emit;
+
+		return '(' . $emit ($this->lhs->generate ($generator, $variables), $this->rhs->generate ($generator, $variables)) . ')';
 	}
 
 	public function inject ($expressions)
 	{
+		$early = $this->early;
 		$lhs = $this->lhs->inject ($expressions);
-		$rhs = $this->rhs->inject ($expressions);
 
-		if (!$lhs->get_value ($result1) || !$rhs->get_value ($result2))
-			return new self ($lhs, $rhs, $this->op);
+		if (!$lhs->get_value ($lhs_result))
+			return new self ($lhs, $this->rhs->inject ($expressions), $this->op);
+		else if ($early !== null && $early ($lhs_result))
+			return new ConstantExpression ($lhs_result);
+		else
+		{
+			$lazy = $this->lazy;
+			$rhs = $this->rhs->inject ($expressions);
 
-		$callback = $this->callback;
-
-		return new ConstantExpression ($callback ($result1, $result2));		
+			if (!$rhs->get_value ($rhs_result))
+				return new self ($lhs, $rhs, $this->op);
+			else
+				return new ConstantExpression ($lazy ($lhs_result, $rhs_result));
+		}
 	}
 }
 
