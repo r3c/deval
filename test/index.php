@@ -228,6 +228,7 @@ render_code ('{{ default(null, 5) }}', make_builtins ('default'), '5');
 render_code ('{{ default(0, 5) }}', make_builtins ('default'), '0');
 render_code ('{{ default(1, 6) }}', make_builtins ('default'), '1');
 render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join'), '1,2,3,4');
+render_code ('{{ join(",", filter([1, 0, 0, 1])) }}', make_builtins ('filter', 'join'), '1,1');
 render_code ('{{ join(",", filter([1, 2, 3, 4], (v) => v % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
 render_code ('{{ join(",", filter(["a": 1, "b": 2, "c": 3, "d": 4], (v, k) => k < "c")) }}', make_builtins ('filter', 'join'), '1,2');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"]) %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '2:two');

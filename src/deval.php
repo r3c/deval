@@ -50,8 +50,11 @@ class Builtin
 		return $value !== null ? $value : $fallback;
 	}
 
-	public static function _filter ($items, $predicate)
+	public static function _filter ($items, $predicate = null)
 	{
+		if ($predicate === null)
+			$predicate = function ($v) { return $v; };
+
 		return array_filter ($items, $predicate, ARRAY_FILTER_USE_BOTH);
 	}
 
