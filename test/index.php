@@ -255,8 +255,6 @@ render_code ('{{ join(",", sort([4, 2, 3, 1])) }}', make_builtins ('join', 'sort
 render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 'split'), '1,2,3,4');
 render_code ('{% let x = [1: "a", 2: "b", 3: "c"] %}{{ join(",", keys(values(x))) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values'), '0,1,2:a,b,c');
 render_code ('{{ void() }}', make_builtins ('void'), '');
-render_code ('{{ when(1 == 1, "OK", "KO") }}', make_builtins ('when'), 'OK');
-render_code ('{{ when("A" == "B", "KO", "OK") }}', make_builtins ('when'), 'OK');
 render_code ('{% let x = zip(["a", "b", "c"], [0, 1, 2]) %}{{ join(",", keys(x)) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values', 'zip'), 'a,b,c:0,1,2');
 
 ?>

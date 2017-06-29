@@ -191,11 +191,6 @@ class Builtin
 		return null;
 	}
 
-	public static function _builtin_when ($condition, $true = true, $false = null)
-	{
-		return $condition ? $true : $false;
-	}
-
 	public static function _builtin_zip ($keys, $values)
 	{
 		return array_combine ($keys, $values);
@@ -222,7 +217,6 @@ class Builtin
 			'split',
 			'values',
 			'void',
-			'when',
 			'zip'
 		);
 
