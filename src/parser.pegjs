@@ -174,23 +174,32 @@ Expression
 	= ExpressionBooleanOr
 
 ExpressionBooleanOr
-	= lhs:ExpressionBooleanAnd _ "||" _ rhs:ExpressionBooleanOr
+	= head:ExpressionBooleanAnd tail:(_ "||" _ rhs:ExpressionBooleanOr { return $rhs; })*
 	{
-		return new \Deval\BinaryExpression ('||', $lhs, $rhs);
+		return array_reduce ($tail, function ($lhs, $rhs)
+		{
+			return new \Deval\BinaryExpression ('||', $lhs, $rhs);
+		}, $head);
 	}
 	/ ExpressionBooleanAnd
 
 ExpressionBooleanAnd
-	= lhs:ExpressionCompare _ "&&" _ rhs:ExpressionBooleanAnd
+	= head:ExpressionCompare tail:(_ "&&" _ rhs:ExpressionBooleanAnd { return $rhs; })*
 	{
-		return new \Deval\BinaryExpression ('&&', $lhs, $rhs);
+		return array_reduce ($tail, function ($lhs, $rhs)
+		{
+			return new \Deval\BinaryExpression ('&&', $lhs, $rhs);
+		}, $head);
 	}
 	/ ExpressionCompare
 
 ExpressionCompare
-	= lhs:ExpressionMathAdd _ operator:ExpressionCompareOperator _ rhs:ExpressionCompare
+	= head:ExpressionMathAdd tail:(_ operator:ExpressionCompareOperator _ next:ExpressionCompare { return array ($operator, $next); })*
 	{
-		return new \Deval\BinaryExpression ($operator, $lhs, $rhs);
+		return array_reduce ($tail, function ($lhs, $next)
+		{
+			return new \Deval\BinaryExpression ($next[0], $lhs, $next[1]);
+		}, $head);
 	}
 	/ ExpressionMathAdd
 
@@ -203,9 +212,12 @@ ExpressionCompareOperator
 	/ "<"
 
 ExpressionMathAdd
-	= lhs:ExpressionMathMul _ operator:ExpressionMathAddOperator _ rhs:ExpressionMathAdd
+	= head:ExpressionMathMul tail:(_ operator:ExpressionMathAddOperator _ next:ExpressionMathMul { return array ($operator, $next); })*
 	{
-		return new \Deval\BinaryExpression ($operator, $lhs, $rhs);
+		return array_reduce ($tail, function ($lhs, $next)
+		{
+			return new \Deval\BinaryExpression ($next[0], $lhs, $next[1]);
+		}, $head);
 	}
 	/ ExpressionMathMul
 
@@ -214,9 +226,12 @@ ExpressionMathAddOperator
 	/ "-"
 
 ExpressionMathMul
-	= lhs:ExpressionPrefix _ operator:ExpressionMathMulOperator _ rhs:ExpressionMathMul
+	= head:ExpressionPrefix tail:(_ operator:ExpressionMathMulOperator _ next:ExpressionPrefix { return array ($operator, $next); })*
 	{
-		return new \Deval\BinaryExpression ($operator, $lhs, $rhs);
+		return array_reduce ($tail, function ($lhs, $next)
+		{
+			return new \Deval\BinaryExpression ($next[0], $lhs, $next[1]);
+		}, $head);
 	}
 	/ ExpressionPrefix
 

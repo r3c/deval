@@ -89,8 +89,10 @@ render_code ('{{ str }}', make_combinations (array ('str' => 'value')), 'value')
 // Render binary expressions
 render_code ('{{ a + b }}', make_combinations (array ('a' => 1, 'b' => 1)), '2');
 render_code ('{{ a - b }}', make_combinations (array ('a' => 2, 'b' => 1)), '1');
+render_code ('{{ a - b + c }}', make_combinations (array ('a' => 1, 'b' => 2, 'c' => 3)), '2');
 render_code ('{{ a * b }}', make_combinations (array ('a' => 2, 'b' => 2)), '4');
 render_code ('{{ a / b }}', make_combinations (array ('a' => 6, 'b' => 3)), '2');
+render_code ('{{ a / b * c }}', make_combinations (array ('a' => 4, 'b' => 1, 'c' => 2)), '8');
 render_code ('{{ a % b }}', make_combinations (array ('a' => 4, 'b' => 3)), '1');
 render_code ('{{ a && b }}', make_combinations (array ('a' => 1, 'b' => 0)), '0');
 render_code ('{{ a && b }}', make_combinations (array ('a' => 1, 'b' => 2)), '2');
