@@ -257,9 +257,12 @@ render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVE
 render_code ('{{ php("$TestClass::instance_field") }}', make_builtins ('php'), '1');
 render_code ('{{ php("$TestClass::static_field") }}', make_builtins ('php'), '2');
 render_code ('{{ default(slice(null, 1), "null") }}', make_builtins ('default', 'slice'), 'null');
+render_code ('{{ join(",", range(1, 1)) }}', make_builtins ('join', 'range'), '1');
+render_code ('{{ join(",", range(1, 1, -1)) }}', make_builtins ('join', 'range'), '1');
 render_code ('{{ join(",", range(1, 3)) }}', make_builtins ('join', 'range'), '1,2,3');
-//render_code ('{{ join(",", range(4, 3)) }}', make_builtins ('join', 'range'), ''); // PHP's range function returns 4,3 even when specifying a step of 1
 render_code ('{{ join(",", range(1, 5, 2)) }}', make_builtins ('join', 'range'), '1,3,5');
+render_code ('{{ join(",", range(4, 3)) }}', make_builtins ('join', 'range'), '');
+render_code ('{{ join(",", range(4, 0, -2)) }}', make_builtins ('join', 'range'), '4,2,0');
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ slice("1234", -3) }}', make_builtins ('slice'), '234');

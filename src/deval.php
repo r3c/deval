@@ -163,6 +163,9 @@ class Builtin
 
 	public static function _range ($start, $stop, $step = 1)
 	{
+		if ((int)$start !== (int)$stop && ($start < $stop) !== ($step > 0))
+			return array ();
+
 		return range ((int)$start, (int)$stop, (int)$step);
 	}
 
