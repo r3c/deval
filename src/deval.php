@@ -129,6 +129,16 @@ class Builtin
 		return array_map ($apply, $items);
 	}
 
+	public static function _max ()
+	{
+		return call_user_func_array ('max', func_get_args ());
+	}
+
+	public static function _min ()
+	{
+		return call_user_func_array ('min', func_get_args ());
+	}
+
 	public static function _php ($symbol)
 	{
 		switch (mb_substr ($symbol, 0, 1))
@@ -149,6 +159,11 @@ class Builtin
 			default:
 				return $symbol;
 		}
+	}
+
+	public static function _range ($start, $stop, $step = 1)
+	{
+		return range ((int)$start, (int)$stop, (int)$step);
 	}
 
 	public static function _slice ($input, $offset, $count = null)
@@ -219,7 +234,10 @@ class Builtin
 			'keys',
 			'length',
 			'map',
+			'max',
+			'min',
 			'php',
+			'range',
 			'slice',
 			'sort',
 			'split',

@@ -243,12 +243,23 @@ render_code ('{{ default(length(null), "null") }}', make_builtins ('default', 'l
 render_code ('{{ length("Hello!") }}', make_builtins ('length'), '6');
 render_code ('{{ length([7, 8, 9]) }}', make_builtins ('length'), '3');
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
+render_code ('{{ max(1, 3) }}', make_builtins ('max'), '3');
+render_code ('{{ max([1, 3]) }}', make_builtins ('max'), '3');
+render_code ('{{ max(7, 3) }}', make_builtins ('max'), '7');
+render_code ('{{ max([7, 3]) }}', make_builtins ('max'), '7');
+render_code ('{{ min(1, 3) }}', make_builtins ('min'), '1');
+render_code ('{{ min([1, 3]) }}', make_builtins ('min'), '1');
+render_code ('{{ min(7, 3) }}', make_builtins ('min'), '3');
+render_code ('{{ min([7, 3]) }}', make_builtins ('min'), '3');
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);
 render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
 render_code ('{{ php("$TestClass::instance_field") }}', make_builtins ('php'), '1');
 render_code ('{{ php("$TestClass::static_field") }}', make_builtins ('php'), '2');
 render_code ('{{ default(slice(null, 1), "null") }}', make_builtins ('default', 'slice'), 'null');
+render_code ('{{ join(",", range(1, 3)) }}', make_builtins ('join', 'range'), '1,2,3');
+//render_code ('{{ join(",", range(4, 3)) }}', make_builtins ('join', 'range'), ''); // PHP's range function returns 4,3 even when specifying a step of 1
+render_code ('{{ join(",", range(1, 5, 2)) }}', make_builtins ('join', 'range'), '1,3,5');
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ slice("1234", -3) }}', make_builtins ('slice'), '234');
