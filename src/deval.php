@@ -121,7 +121,7 @@ class Builtin
 		else if (is_array ($input))
 			return count ($input);
 		else
-			return strlen ((string)$input);
+			return mb_strlen ((string)$input);
 	}
 
 	public static function _map ($items, $apply)
@@ -131,13 +131,13 @@ class Builtin
 
 	public static function _php ($symbol)
 	{
-		switch (substr ($symbol, 0, 1))
+		switch (mb_substr ($symbol, 0, 1))
 		{
 			case '#':
-				return constant ((string)substr ($symbol, 1));
+				return constant ((string)mb_substr ($symbol, 1));
 
 			case '$':
-				$parts = explode ('::', (string)substr ($symbol, 1), 2);
+				$parts = explode ('::', (string)mb_substr ($symbol, 1), 2);
 
 				if (count ($parts) < 2)
 					return isset ($GLOBALS[$parts[0]]) ? $GLOBALS[$parts[0]] : null;
@@ -165,9 +165,9 @@ class Builtin
 		else
 		{
 			if ($count !== null)
-				return substr ((string)$input, $offset, $count);
+				return mb_substr ((string)$input, $offset, $count);
 
-			return substr ((string)$input, $offset);
+			return mb_substr ((string)$input, $offset);
 		}
 	}
 
