@@ -7,6 +7,8 @@ header ('Content-Type: text/plain');
 
 class TestClass
 {
+	const CONSTANT_VALUE = 42;
+
 	public $instance_field = 1;
 
 	public static $static_field = 2;
@@ -286,9 +288,10 @@ render_code ('{{ min([7, 3]) }}', make_builtins ('min'), '3');
 
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);
+render_code ('{{ php("TestClass::#CONSTANT_VALUE") }}', make_builtins ('php'), '42');
 render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
-render_code ('{{ php("$TestClass::instance_field") }}', make_builtins ('php'), '1');
-render_code ('{{ php("$TestClass::static_field") }}', make_builtins ('php'), '2');
+render_code ('{{ php("TestClass::$instance_field") }}', make_builtins ('php'), '1');
+render_code ('{{ php("TestClass::$static_field") }}', make_builtins ('php'), '2');
 
 render_code ('{{ default(slice(null, 1), "null") }}', make_builtins ('default', 'slice'), 'null');
 

@@ -161,23 +161,27 @@ class Builtin
 
 	public static function _php ($symbol)
 	{
-		switch (mb_substr ($symbol, 0, 1))
+		if (!preg_match ('/^(([0-9A-Z\\\\_a-z]+)::)?([#$])?([0-9A-Z_a-z]+)$/', $symbol, $match))
+			throw new RenderException ('invalid symbol "' . $symbol . '" passed to php() builtin');
+
+		switch ($match[3])
 		{
 			case '#':
-				return constant ((string)mb_substr ($symbol, 1));
+				return constant ($match[1] . $match[4]);
 
 			case '$':
-				$parts = explode ('::', (string)mb_substr ($symbol, 1), 2);
+				$class = $match[2];
+				$name = $match[4];
 
-				if (count ($parts) < 2)
-					return isset ($GLOBALS[$parts[0]]) ? $GLOBALS[$parts[0]] : null;
+				if ($class === '')
+					return isset ($GLOBALS[$name]) ? $GLOBALS[$name] : null;
 
-				$vars = get_class_vars ($parts[0]);
+				$vars = get_class_vars ($class);
 
-				return isset ($vars[$parts[1]]) ? $vars[$parts[1]] : null;
+				return isset ($vars[$name]) ? $vars[$name] : null;
 
 			default:
-				return $symbol;
+				return $match[0];
 		}
 	}
 
