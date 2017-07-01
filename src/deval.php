@@ -440,22 +440,6 @@ class StringRenderer extends DirectRenderer
 
 class Runtime
 {
-	public static function member ($parent, $key)
-	{
-		if (is_object ($parent))
-		{
-			if (is_callable (array ($parent, $key)))
-				return array ($parent, $key);
-			else if (property_exists ($parent, $key))
-				return $parent->$key;
-		}
-
-		if (isset ($parent[$key]))
-			return $parent[$key];
-
-		return null;
-	}
-
 	private $scopes = array ();
 
 	public function __construct ($required, &$provided)
@@ -481,6 +465,29 @@ class Setup
 {
 	public $style = 'deindent';
 	public $version = PHP_VERSION;
+}
+
+/*
+** Membership function used to access member by key from parent instance.
+** $parent:	parent array or object
+** $key:	member key
+** return:	member value or null if not found
+*/
+function m ($parent, $key)
+{
+	if (is_object ($parent))
+	{
+		if (is_callable (array ($parent, $key)))
+			return array ($parent, $key);
+		else if (property_exists ($parent, $key))
+			return $parent->$key;
+		else if ($parent instanceof \ArrayAccess)
+			return $parent[$key];
+	}
+	else if (isset ($parent[$key]))
+		return $parent[$key];
+
+	return null;
 }
 
 ?>

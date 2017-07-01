@@ -48,7 +48,7 @@ class MemberExpression implements Expression
 		{
 			// Fetch member from parent if source can be evaluated
 			if ($source->get_value ($parent))
-				return new ConstantExpression (Runtime::member ($parent, $key));
+				return new ConstantExpression (m ($parent, $key));
 
 			// Otherwise find member in source elements if possible
 			else if ($source->get_elements ($elements) && array_key_exists ($key, $elements))

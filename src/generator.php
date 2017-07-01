@@ -15,7 +15,7 @@ class Generator
 
 	public static function emit_member ($source, $index)
 	{
-		return '\\' . __NAMESPACE__ . '\\Runtime::member(' . $source . ',' . $index . ')';
+		return '\\' . __NAMESPACE__ . '\\m(' . $source . ',' . $index . ')';
 	}
 
 	public static function emit_scope_pop ($names)
