@@ -28,6 +28,21 @@ class RenderException extends \Exception
 
 class Builtin
 {
+	public static function _array ()
+	{
+		$array = array ();
+
+		foreach (func_get_args () as $value)
+			$array = array_merge ($array, (array)$value);
+
+		return $array;
+	}
+
+	public static function _bool ($value)
+	{
+		return (bool)$value;
+	}
+
 	public static function _cat ()
 	{
 		$args = func_get_args ();
@@ -102,6 +117,11 @@ class Builtin
 		}
 
 		return $groups;
+	}
+
+	public static function _int ($value)
+	{
+		return (int)$value;
 	}
 
 	public static function _join ($items, $separator = '')
@@ -207,6 +227,11 @@ class Builtin
 		return explode ($separator, $string);
 	}
 
+	public static function _str ($value)
+	{
+		return (string)$value;
+	}
+
 	public static function _values ($items)
 	{
 		return array_values ($items);
@@ -227,12 +252,15 @@ class Builtin
 		$class = '\\' . get_class ();
 		$names = array
 		(
+			'array',
+			'bool',
 			'cat',
 			'default',
 			'filter',
 			'find',
 			'flip',
 			'group',
+			'int',
 			'join',
 			'keys',
 			'length',
@@ -244,6 +272,7 @@ class Builtin
 			'slice',
 			'sort',
 			'split',
+			'str',
 			'values',
 			'void',
 			'zip'

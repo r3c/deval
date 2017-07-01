@@ -223,48 +223,82 @@ foreach ($tests as $style => $expect)
 }
 
 // Invoke builtins
+render_code ('{{ join(",", array(true, false, true)) }}', make_builtins ('array', 'join'), '1,,1');
+render_code ('{{ join(",", array(0, 1, 5)) }}', make_builtins ('array', 'join'), '0,1,5');
+render_code ('{{ join(",", array("a", "b", "c")) }}', make_builtins ('array', 'join'), 'a,b,c');
+render_code ('{{ join(",", array([1, 2])) }}', make_builtins ('array', 'join'), '1,2');
+render_code ('{{ join(",", array([1, 2], [3, 4])) }}', make_builtins ('array', 'join'), '1,2,3,4');
+
+render_code ('{{ bool(false) }}', make_builtins ('bool'), '');
+render_code ('{{ bool(true) }}', make_builtins ('bool'), '1');
+render_code ('{{ bool(5) }}', make_builtins ('bool'), '1');
+render_code ('{{ bool("") }}', make_builtins ('bool'), '');
+render_code ('{{ bool("test") }}', make_builtins ('bool'), '1');
+render_code ('{{ bool([]) }}', make_builtins ('bool'), '');
+render_code ('{{ bool([1]) }}', make_builtins ('bool'), '1');
+
 render_code ('{{ cat(1, 2) }}', make_builtins ('cat'), '12');
 render_code ('{{ cat(1, 2, 3) }}', make_builtins ('cat'), '123');
 render_code ('{{ cat("AB", "CD") }}', make_builtins ('cat'), 'ABCD');
+render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join'), '1,2,3,4');
+
 render_code ('{{ default(null, 5) }}', make_builtins ('default'), '5');
 render_code ('{{ default(0, 5) }}', make_builtins ('default'), '0');
 render_code ('{{ default(1, 6) }}', make_builtins ('default'), '1');
-render_code ('{{ join(",", cat([1, 2], [3, 4])) }}', make_builtins ('cat', 'join'), '1,2,3,4');
+
 render_code ('{{ join(",", filter([1, 0, 0, 1])) }}', make_builtins ('filter', 'join'), '1,1');
 render_code ('{{ join(",", filter([1, 2, 3, 4], (v) => v % 2 == 0)) }}', make_builtins ('filter', 'join'), '2,4');
 render_code ('{{ join(",", filter(["a": 1, "b": 2, "c": 3, "d": 4], (v, k) => k < "c")) }}', make_builtins ('filter', 'join'), '1,2');
+
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"]) %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '2:two');
 render_code ('{% let pair = find([2: "two", 4: "four", 6: "six"], (v) => v == "four") %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), '4:four');
 render_code ('{% let pair = find(["a": 1, "b": 2, "c": 3], (v, k) => k == "b") %}{{ pair[0] }}:{{ pair[1] }}{% end %}', make_builtins ('find'), 'b:2');
+
 render_code ('{{ join(",", flip(["a": 0, "b": 1, "c": 2])) }}', make_builtins ('flip', 'join'),  'a,b,c');
+
 render_code ('{{ join(",", group([1, 1, 3, 3])) }}', make_builtins ('group', 'join'), '1,3');
 render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2)) }}', make_builtins ('group', 'join'), '2,4');
 render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2, (v1, v2) => v1 + v2)) }}', make_builtins ('group', 'join'), '8,12');
+
+render_code ('{{ int(false) }}', make_builtins ('int'), '0');
+render_code ('{{ int(true) }}', make_builtins ('int'), '1');
+render_code ('{{ int(5) }}', make_builtins ('int'), '5');
+render_code ('{{ int("") }}', make_builtins ('int'), '0');
+render_code ('{{ int("test") }}', make_builtins ('int'), '0');
+
 render_code ('{{ join(",", keys([1: 0, 2: 0, 3: 0])) }}', make_builtins ('join', 'keys'), '1,2,3');
+
 render_code ('{{ default(length(null), "null") }}', make_builtins ('default', 'length'), 'null');
 render_code ('{{ length("Hello!") }}', make_builtins ('length'), '6');
 render_code ('{{ length([7, 8, 9]) }}', make_builtins ('length'), '3');
+
 render_code ('{{ join(",", map([1, 2, 3, 4], (i) => i * 2)) }}', make_builtins ('join', 'map'), '2,4,6,8');
+
 render_code ('{{ max(1, 3) }}', make_builtins ('max'), '3');
 render_code ('{{ max([1, 3]) }}', make_builtins ('max'), '3');
 render_code ('{{ max(7, 3) }}', make_builtins ('max'), '7');
 render_code ('{{ max([7, 3]) }}', make_builtins ('max'), '7');
+
 render_code ('{{ min(1, 3) }}', make_builtins ('min'), '1');
 render_code ('{{ min([1, 3]) }}', make_builtins ('min'), '1');
 render_code ('{{ min(7, 3) }}', make_builtins ('min'), '3');
 render_code ('{{ min([7, 3]) }}', make_builtins ('min'), '3');
+
 render_code ('{{ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);
 render_code ('{{ php("$_SERVER")["PHP_SELF"] }}', make_builtins ('php'), $_SERVER['PHP_SELF']);
 render_code ('{{ php("$TestClass::instance_field") }}', make_builtins ('php'), '1');
 render_code ('{{ php("$TestClass::static_field") }}', make_builtins ('php'), '2');
+
 render_code ('{{ default(slice(null, 1), "null") }}', make_builtins ('default', 'slice'), 'null');
+
 render_code ('{{ join(",", range(1, 1)) }}', make_builtins ('join', 'range'), '1');
 render_code ('{{ join(",", range(1, 1, -1)) }}', make_builtins ('join', 'range'), '1');
 render_code ('{{ join(",", range(1, 3)) }}', make_builtins ('join', 'range'), '1,2,3');
 render_code ('{{ join(",", range(1, 5, 2)) }}', make_builtins ('join', 'range'), '1,3,5');
 render_code ('{{ join(",", range(4, 3)) }}', make_builtins ('join', 'range'), '');
 render_code ('{{ join(",", range(4, 0, -2)) }}', make_builtins ('join', 'range'), '4,2,0');
+
 render_code ('{{ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ slice("1234", -3) }}', make_builtins ('slice'), '234');
@@ -273,10 +307,21 @@ render_code ('{{ join(",", slice([1, 2, 3, 4], 1)) }}', make_builtins ('join', '
 render_code ('{{ join(",", slice([1, 2, 3, 4], 1, 2)) }}', make_builtins ('join', 'slice'), '2,3');
 render_code ('{{ join(",", slice([1, 2, 3, 4], -3)) }}', make_builtins ('join', 'slice'), '2,3,4');
 render_code ('{{ join(",", slice([1, 2, 3, 4], -3, 2)) }}', make_builtins ('join', 'slice'), '2,3');
+
 render_code ('{{ join(",", sort([4, 2, 3, 1])) }}', make_builtins ('join', 'sort'), '1,2,3,4');
+
 render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 'split'), '1,2,3,4');
+
+render_code ('{{ str(false) }}', make_builtins ('str'), '');
+render_code ('{{ str(true) }}', make_builtins ('str'), '1');
+render_code ('{{ str(5) }}', make_builtins ('str'), '5');
+render_code ('{{ str("") }}', make_builtins ('str'), '');
+render_code ('{{ str("test") }}', make_builtins ('str'), 'test');
+
 render_code ('{% let x = [1: "a", 2: "b", 3: "c"] %}{{ join(",", keys(values(x))) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values'), '0,1,2:a,b,c');
+
 render_code ('{{ void() }}', make_builtins ('void'), '');
+
 render_code ('{% let x = zip(["a", "b", "c"], [0, 1, 2]) %}{{ join(",", keys(x)) }}:{{ join(",", values(x)) }}{% end %}', make_builtins ('join', 'keys', 'values', 'zip'), 'a,b,c:0,1,2');
 
 // Rendering optimizations
