@@ -1,1 +1,1 @@
-{{ a }}{% label first %}{{ b }}{% label second %}{{ c }}
+{{ $ a }}{{ label first }}{{ $ b }}{{ label second }}{{ $ c }}

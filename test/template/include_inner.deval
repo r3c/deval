@@ -1,1 +1,1 @@
-{{ inner_x }}{{ inner_y }}
+{{ $ inner_x }}{{ $ inner_y }}

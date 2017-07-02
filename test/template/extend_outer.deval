@@ -1,1 +1,1 @@
-{% let a = 1, b = 2, c = 3 %}{% extend extend_inner.deval %}{% block first %}{{ first }}{% block second %}{{ second }}{% end %}{% end %}
+{{ let a = 1, b = 2, c = 3 }}{{ extend extend_inner.deval }}{{ block first }}{{ $ first }}{{ block second }}{{ $ second }}{{ end }}{{ end }}

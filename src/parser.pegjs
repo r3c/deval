@@ -13,20 +13,19 @@ Content
 // Block tree
 
 Block
-	= BlockCommandBegin _ command:Command _ BlockCommandEnd { return $command; }
-	/ BlockEchoBegin _ expression:Expression _ BlockEchoEnd { return new \Deval\EchoBlock ($expression); }
-	/ plain:Plain { return new \Deval\PlainBlock ($plain); }
+	= BlockBegin _ command:Command _ BlockEnd
+	{
+		return $command;
+	}
+	/ plain:Plain
+	{
+		return new \Deval\PlainBlock ($plain);
+	}
 
-BlockCommandBegin
-	= "{%"
-
-BlockCommandEnd
-	= "%}"
-
-BlockEchoBegin
+BlockBegin
 	= "{{"
 
-BlockEchoEnd
+BlockEnd
 	= "}}"
 
 _ "ignore"
@@ -47,7 +46,7 @@ Plain
 	}
 
 PlainCharacter
-	= brace:"{" char:([^\\{%] / PlainEscape)
+	= brace:"{" char:[^{]
 	{
 		return $brace . $char;
 	}
@@ -55,19 +54,13 @@ PlainCharacter
 	{
 		return $brace;
 	}
-	/ [^\\{]
-	/ PlainEscape
-
-PlainEscape
-	= "\\" char:("\\" / "{" / "%")
-	{
-		return $char;
-	}
+	/ [^{]
 
 // Command tree
 
 Command "command block"
-	= CommandExtend
+	= CommandEcho
+	/ CommandExtend
 	/ CommandFor
 	/ CommandIf
 	/ CommandInclude
@@ -75,8 +68,14 @@ Command "command block"
 	/ CommandLet
 	/ CommandWrap
 
+CommandEcho "echo command"
+	= "$" _ expression:Expression
+	{
+		return new \Deval\EchoBlock ($expression);
+	}
+
 CommandExtend "extend command"
-	= "extend" _ path:Path _ BlockCommandEnd _ blocks:CommandExtendBlock* BlockCommandBegin _ "end"
+	= "extend" _ path:Path _ BlockEnd _ blocks:CommandExtendBlock* BlockBegin _ "end"
 	{
 		$bodies = array_map (function ($b) { return $b[1]; }, $blocks);
 		$names = array_map (function ($b) { return $b[0]; }, $blocks);
@@ -85,19 +84,19 @@ CommandExtend "extend command"
 	}
 
 CommandExtendBlock
-	= BlockCommandBegin _ "block" _ name:Symbol _ BlockCommandEnd body:Content
+	= BlockBegin _ "block" _ name:Symbol _ BlockEnd body:Content
 	{
 		return array ($name, $body);
 	}
 
 CommandFor "for command"
-	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockCommandEnd loop:Content empty:CommandForEmpty? BlockCommandBegin _ "end"
+	= "for" _ key:CommandForKey? value:Symbol _ "in" _ source:Expression _ BlockEnd loop:Content empty:CommandForEmpty? BlockBegin _ "end"
 	{
 		return new \Deval\ForBlock ($source, $key, $value, $loop, $empty ?: new \Deval\VoidBlock ());
 	}
 
 CommandForEmpty
-	= BlockCommandBegin _ "empty" _ BlockCommandEnd body:Content
+	= BlockBegin _ "empty" _ BlockEnd body:Content
 	{
 		return $body;
 	}
@@ -109,19 +108,19 @@ CommandForKey
 	}
 
 CommandIf "if command"
-	= "if" _ condition:Expression _ BlockCommandEnd body:Content branches:CommandIfElseif* fallback:CommandIfElse? BlockCommandBegin _ "end"
+	= "if" _ condition:Expression _ BlockEnd body:Content branches:CommandIfElseif* fallback:CommandIfElse? BlockBegin _ "end"
 	{
 		return new \Deval\IfBlock (array_merge (array (array ($condition, $body)), $branches), $fallback ?: new \Deval\VoidBlock ());
 	}
 
 CommandIfElseif
-	= BlockCommandBegin _ "else" _ "if" _ condition:Expression _ BlockCommandEnd body:Content
+	= BlockBegin _ "else" _ "if" _ condition:Expression _ BlockEnd body:Content
 	{
 		return array ($condition, $body);
 	}
 
 CommandIfElse
-	= BlockCommandBegin _ "else" _ BlockCommandEnd body:Content
+	= BlockBegin _ "else" _ BlockEnd body:Content
 	{
 		return $body;
 	}
@@ -139,7 +138,7 @@ CommandLabel
 	}
 
 CommandLet "let command"
-	= "let" _ assignments:CommandLetAssignments _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
+	= "let" _ assignments:CommandLetAssignments _ BlockEnd body:Content BlockBegin _ "end"
 	{
 		return new \Deval\LetBlock ($assignments, $body);
 	}
@@ -157,7 +156,7 @@ CommandLetAssignmentsPair "assignment"
 	}
 
 CommandWrap "wrap command"
-	= "wrap" _ value:Expression _ BlockCommandEnd body:Content BlockCommandBegin _ "end"
+	= "wrap" _ value:Expression _ BlockEnd body:Content BlockBegin _ "end"
 	{
 		return $body->wrap ($value);
 	}

@@ -104,7 +104,7 @@
 
 $builtin = isset ($_GET['builtin']) ? (string)$_GET['builtin'] : '';
 $constants = isset ($_GET['constants']) ? (array)json_decode ($_GET['constants'], true) : array ('greeting' => 'Hello');
-$template = isset ($_GET['template']) ? (string)$_GET['template'] : '{{ greeting }}, {{ subject }}!';
+$template = isset ($_GET['template']) ? (string)$_GET['template'] : '{{ $ greeting }}, {{ $ subject }}!';
 $variables = isset ($_GET['variables']) ? (array)json_decode ($_GET['variables'], true) : array ('subject' => 'World');
 
 ?>
