@@ -387,7 +387,7 @@ interface Renderer
 	public function source (&$names = null);
 }
 
-class CachingRenderer implements Renderer
+class CacheRenderer implements Renderer
 {
 	private $constants;
 	private $directory;

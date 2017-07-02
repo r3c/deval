@@ -216,7 +216,7 @@ function render_code ($source, $pairs, $expect, $setup = null)
 ** Run tests on file-based renderers using given template path and set of
 ** (constants, variables) pairs array.
 ** $path:		template file path
-** $directory:	caching directory
+** $directory:	cache directory
 ** $pairs:		(constants, variables) pairs array
 ** $expect:		expected rendered string
 ** $setup:	compiler setup
@@ -227,7 +227,7 @@ function render_file ($path, $directory, $pairs, $expect, $setup = null)
 	{
 		return array
 		(
-			new Deval\CachingRenderer ($path, $directory, $setup, true),
+			new Deval\CacheRenderer ($path, $directory, $setup, true),
 			new Deval\FileRenderer ($path, $setup)
 		);
 	}, $pairs, $expect, $setup);
