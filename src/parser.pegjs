@@ -29,8 +29,14 @@ BlockEchoBegin
 BlockEchoEnd
 	= "}}"
 
-_ "whitespace"
-	= [ \t\n\r]*
+_ "ignore"
+	= (Comment / Blank)*
+
+Comment
+	= "/*" [^*]* "*"+ ([^/*] [^*]* "*"+)* "/"
+
+Blank "blank"
+	= [ \t\n\r]
 
 // Plain text tree
 

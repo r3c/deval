@@ -65,6 +65,10 @@ render_code ('<% 4 %>', make_empty (), '<% 4 %>');
 render_code ('<%= 5 %>', make_empty (), '<%= 5 %>');
 render_code ('<script language="php"> 6 </script>', make_empty (), '<script language="php"> 6 </script>');
 
+// Render comments
+render_code ('{{ /* one */ 1 }}', make_empty (), '1');
+render_code ('{{ 2 /* two */ }}', make_empty (), '2');
+
 // Render interleaved blocks
 render_code ("A {{ \"B\" }} C", make_empty (), "A B C", $preserve);
 render_code ("A\n{{ \"B\" }}\nC", make_empty (), "A\nB\nC", $preserve);
@@ -331,8 +335,8 @@ render_code ('{% let x = zip(["a", "b", "c"], [0, 1, 2]) %}{{ join(",", keys(x))
 render_code ('{% let c = false %}{% if c %}{{ crash }}{% end %}{{ c }}{% end %}', make_empty (), ''); // Dead code elimination
 
 // Source code generation
-source_code ('{% let v = f() %}{{ v }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0)); // Non-constant expression used once should be inlined
-source_code ('{% let v = f() %}{{ v }}{{ v }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 6)); // Non-constant expression used twice should not be inlined
-source_code ('{% let v = 42 %}{{ v }}{{ v }}{% end %}', array (), array ('/42/' => 2, '/\\$v/' => 0)); // Constant expression used twice should be inlined
+source_code ('{% let v = f() %}{{ v /* non-constant but used once, should be inlined */ }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0));
+source_code ('{% let v = f() %}{{ v }}{{ v /* non-constant used twice, should not be inlined */ }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 6));
+source_code ('{% let v = 42 %}{{ v }}{{ v /* constant used twiec, should be inlined */ }}{% end %}', array (), array ('/42/' => 2, '/\\$v/' => 0));
 
 ?>
