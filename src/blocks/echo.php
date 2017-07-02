@@ -4,32 +4,36 @@ namespace Deval;
 
 class EchoBlock implements Block
 {
-	public function __construct ($value)
+	public function __construct ($expression)
 	{
-		$this->value = $value;
+		$this->expression = $expression;
 	}
 
-	public function compile ($generator, $expressions, &$variables)
+	public function compile ($generator, &$variables)
 	{
 		$output = new Output ();
-		$value = $this->value->inject ($expressions);
 
-		if ($value->get_value ($result))
+		if ($this->expression->get_value ($value))
 		{
-			if ($result !== null && !is_scalar ($result) && (!is_object ($result) || !method_exists ($result, '__toString')))
-				throw new CompileException ($result, 'cannot be converted to string');
+			if ($value !== null && !is_scalar ($value) && (!is_object ($value) || !method_exists ($value, '__toString')))
+				throw new CompileException ($value, 'cannot be converted to string');
 
-			$output->append_text ($generator->make_plain ((string)$result));
+			$output->append_text ($generator->make_plain ((string)$value));
 		}
 		else
-			$output->append_code ('echo ' . $value->generate ($generator, $variables) . ';');
+			$output->append_code ('echo ' . $this->expression->generate ($generator, $variables) . ';');
 
 		return $output;
 	}
 
 	public function count_symbol ($name)
 	{
-		return $this->value->count_symbol ($name);
+		return $this->expression->count_symbol ($name);
+	}
+
+	public function inject ($invariants)
+	{
+		return new self ($this->expression->inject ($invariants));
 	}
 
 	public function resolve ($blocks)
@@ -39,7 +43,7 @@ class EchoBlock implements Block
 
 	public function wrap ($caller)
 	{
-		return new self (new InvokeExpression ($caller, array ($this->value)));
+		return new self (new InvokeExpression ($caller, array ($this->expression)));
 	}
 }
 

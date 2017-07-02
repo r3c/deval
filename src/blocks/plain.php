@@ -9,7 +9,7 @@ class PlainBlock implements Block
 		$this->text = $text;
 	}
 
-	public function compile ($generator, $expressions, &$variables)
+	public function compile ($generator, &$variables)
 	{
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
 	}
@@ -17,6 +17,11 @@ class PlainBlock implements Block
 	public function count_symbol ($name)
 	{
 		return 0;
+	}
+
+	public function inject ($invariants)
+	{
+		return $this;
 	}
 
 	public function resolve ($blocks)

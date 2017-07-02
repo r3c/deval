@@ -64,8 +64,10 @@ class Compiler
 
 	public function compile ($setup, &$names)
 	{
+		$block = $this->block->inject ($this->expressions);
+
 		$variables = array ();
-		$source = $this->block->compile (new Generator ($setup), $this->expressions, $variables);
+		$source = $block->compile (new Generator ($setup), $variables);
 		$names = array_keys ($variables);
 
 		$output = new Output ();

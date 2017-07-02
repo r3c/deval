@@ -51,9 +51,9 @@ class LambdaExpression implements Expression
 			'{return ' . $body . ';}';
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
-		return new self ($this->names, $this->body->inject ($expressions));
+		return new self ($this->names, $this->body->inject ($invariants));
 	}
 }
 

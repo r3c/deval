@@ -10,43 +10,24 @@ class IfBlock implements Block
 		$this->fallback = $fallback;
 	}
 
-	public function compile ($generator, $expressions, &$variables)
+	public function compile ($generator, &$variables)
 	{
 		$keyword = 'if';
 		$output = new Output ();
-		$static = true;
 
 		foreach ($this->branches as $branch)
 		{
 			list ($condition, $body) = $branch;
 
-			// Conditions can be statically evaluated if previous ones were too
-			$condition = $condition->inject ($expressions);
-
-			if ($static && $condition->get_value ($result))
-			{
-				if ($result)
-					return $body->compile ($generator, $expressions, $variables);
-
-				continue;
-			}
-
-			// First non-static condition triggers dynamic code generation
 			$output->append_code ($keyword . '(' . $condition->generate ($generator, $variables) . ')');
 			$output->append_code ('{');
-			$output->append ($body->compile ($generator, $expressions, $variables));
+			$output->append ($body->compile ($generator, $variables));
 			$output->append_code ('}');
 
 			$keyword = 'else if';
-			$static = false;
 		}
 
-		// Output fallback if conditions were static and evaluated to false
-		if ($static)
-			return $this->fallback->compile ($generator, $expressions, $variables);
-
-		// Otherwise generate dynamic fallback code
-		$fallback = $this->fallback->compile ($generator, $expressions, $variables);
+		$fallback = $this->fallback->compile ($generator, $variables);
 
 		if ($fallback->has_data ())
 		{
@@ -67,6 +48,40 @@ class IfBlock implements Block
 			$count += $branch[0]->count_symbol ($name) + $branch[1]->count_symbol ($name);
 
 		return $count;
+	}
+
+	public function inject ($invariants)
+	{
+		$static = true;
+
+		foreach ($this->branches as $branch)
+		{
+			list ($condition, $body) = $branch;
+
+			// Conditions can be statically evaluated if previous ones were too
+			$condition = $condition->inject ($invariants);
+
+			if ($static && $condition->get_value ($value))
+			{
+				if ($value)
+					return $body->inject ($invariants);
+
+				continue;
+			}
+
+			// First non-static condition requires branches reconstruction
+			$branches[] = array ($condition, $body->inject ($invariants));
+			$static = false;
+		}
+
+		$fallback = $this->fallback->inject ($invariants);
+
+		// Use fallback if conditions were all static and evaluated to false
+		if ($static)
+			return $fallback;
+
+		// Otherwise rebuild command with injected branches and fallback
+		return new self ($branches, $fallback);
 	}
 
 	public function resolve ($blocks)

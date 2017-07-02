@@ -36,10 +36,10 @@ class SymbolExpression implements Expression
 		return Generator::emit_symbol ($this->name);
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
-		if (array_key_exists ($this->name, $expressions))
-			return new GroupExpression ($expressions[$this->name]);
+		if (array_key_exists ($this->name, $invariants))
+			return new GroupExpression ($invariants[$this->name]);
 
 		return $this;
 	}

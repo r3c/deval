@@ -52,9 +52,9 @@ class UnaryExpression implements Expression
 		return $this->operator . $this->operand->generate ($generator, $variables);
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
-		$operand = $this->operand->inject ($expressions);
+		$operand = $this->operand->inject ($invariants);
 
 		if (!$operand->get_value ($value))
 			return new self ($this->operator, $operand);

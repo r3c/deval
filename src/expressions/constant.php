@@ -44,7 +44,7 @@ class ConstantExpression implements Expression
 		return Generator::emit_value ($this->value);
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
 		return $this;
 	}

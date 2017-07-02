@@ -9,15 +9,15 @@ class ConcatBlock implements Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile ($generator, $expressions, &$variables)
+	public function compile ($generator, &$variables)
 	{
 		if (count ($this->blocks) < 1)
 			return new Output ();
 
-		$output = $this->blocks[0]->compile ($generator, $expressions, $variables);
+		$output = $this->blocks[0]->compile ($generator, $variables);
 
 		for ($i = 1; $i < count ($this->blocks); ++$i)
-			$output->append ($this->blocks[$i]->compile ($generator, $expressions, $variables));
+			$output->append ($this->blocks[$i]->compile ($generator, $variables));
 
 		return $output;
 	}
@@ -32,24 +32,38 @@ class ConcatBlock implements Block
 		return $count;
 	}
 
+	public function inject ($invariants)
+	{
+		return $this->map (function ($block) use (&$invariants)
+		{
+			return $block->inject ($invariants);
+		});
+	}
+
 	public function resolve ($blocks)
 	{
-		$results = array ();
-
-		foreach ($this->blocks as $block)
-			$results[] = $block->resolve ($blocks);
-
-		return new self ($results);
+		return $this->map (function ($block) use (&$blocks)
+		{
+			return $block->resolve ($blocks);
+		});
 	}
 
 	public function wrap ($caller)
 	{
-		$results = array ();
+		return $this->map (function ($block) use (&$caller)
+		{
+			return $block->wrap ($caller);
+		});
+	}
+
+	private function map ($apply)
+	{
+		$blocks = array ();
 
 		foreach ($this->blocks as $block)
-			$results[] = $block->wrap ($caller);
+			$blocks[] = $apply ($block);
 
-		return new self ($results);
+		return new self ($blocks);
 	}
 }
 

@@ -133,19 +133,19 @@ class BinaryExpression implements Expression
 		return '(' . $emit ($this->lhs->generate ($generator, $variables), $this->rhs->generate ($generator, $variables)) . ')';
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
 		$early = $this->early;
-		$lhs = $this->lhs->inject ($expressions);
+		$lhs = $this->lhs->inject ($invariants);
 
 		if (!$lhs->get_value ($lhs_result))
-			return new self ($this->operator, $lhs, $this->rhs->inject ($expressions));
+			return new self ($this->operator, $lhs, $this->rhs->inject ($invariants));
 		else if ($early !== null && $early ($lhs_result))
 			return new ConstantExpression ($lhs_result);
 		else
 		{
 			$lazy = $this->lazy;
-			$rhs = $this->rhs->inject ($expressions);
+			$rhs = $this->rhs->inject ($invariants);
 
 			if (!$rhs->get_value ($rhs_result))
 				return new self ($this->operator, $lhs, $rhs);

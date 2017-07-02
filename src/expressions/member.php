@@ -38,10 +38,10 @@ class MemberExpression implements Expression
 		return Generator::emit_member ($source, $offset);
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
-		$offset = $this->offset->inject ($expressions);
-		$source = $this->source->inject ($expressions);
+		$offset = $this->offset->inject ($invariants);
+		$source = $this->source->inject ($invariants);
 
 		// Member can be fetched from source only if offset can be evaluated
 		if ($offset->get_value ($key))

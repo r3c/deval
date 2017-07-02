@@ -34,9 +34,9 @@ class GroupExpression implements Expression
 		return '(' . $this->expression->generate ($generator, $variables) . ')';
 	}
 
-	public function inject ($expressions)
+	public function inject ($invariants)
 	{
-		return new self ($this->expression->inject ($expressions));
+		return new self ($this->expression->inject ($invariants));
 	}
 }
 
