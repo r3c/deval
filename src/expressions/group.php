@@ -19,16 +19,6 @@ class GroupExpression implements Expression
 		return $this->expression->count_symbol ($name);
 	}
 
-	public function get_elements (&$elements)
-	{
-		return $this->expression->get_elements ($elements);
-	}
-
-	public function get_value (&$value)
-	{
-		return $this->expression->get_value ($value);
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		return '(' . $this->expression->generate ($generator, $variables) . ')';
@@ -37,6 +27,16 @@ class GroupExpression implements Expression
 	public function inject ($invariants)
 	{
 		return new self ($this->expression->inject ($invariants));
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return $this->expression->try_enumerate ($elements);
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return $this->expression->try_evaluate ($value);
 	}
 }
 

@@ -13,7 +13,7 @@ class EchoBlock implements Block
 	{
 		$output = new Output ();
 
-		if ($this->expression->get_value ($value))
+		if ($this->expression->try_evaluate ($value))
 		{
 			if ($value !== null && !is_scalar ($value) && (!is_object ($value) || !method_exists ($value, '__toString')))
 				throw new CompileException ($value, 'cannot be converted to string');

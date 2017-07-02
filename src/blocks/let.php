@@ -70,7 +70,7 @@ class LetBlock implements Block
 			$expression = $expression->inject ($invariants);
 
 			// Inline expression if constant or used at most once
-			if ($expression->get_value ($unused) || $this->body->count_symbol ($name) < 2)
+			if ($expression->try_evaluate ($unused) || $this->body->count_symbol ($name) < 2)
 				$invariants[$name] = $expression;
 
 			// Keep as an assignment otherwise

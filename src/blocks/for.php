@@ -84,7 +84,7 @@ class ForBlock implements Block
 		$source = $this->source->inject ($invariants);
 
 		// Unroll loop if elements can be enumerated
-		if ($source->get_elements ($elements))
+		if ($source->try_enumerate ($elements))
 		{
 			$loops = array ();
 

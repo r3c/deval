@@ -37,16 +37,6 @@ class UnaryExpression implements Expression
 		return $this->operand->count_symbol ($name);
 	}
 
-	public function get_elements (&$elements)
-	{
-		return false;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		return $this->operator . $this->operand->generate ($generator, $variables);
@@ -56,12 +46,22 @@ class UnaryExpression implements Expression
 	{
 		$operand = $this->operand->inject ($invariants);
 
-		if (!$operand->get_value ($value))
+		if (!$operand->try_evaluate ($value))
 			return new self ($this->operator, $operand);
 
 		$callback = $this->callback;
 
 		return new ConstantExpression ($callback ($value));
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return false;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

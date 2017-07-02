@@ -116,16 +116,6 @@ class BinaryExpression implements Expression
 		return $this->lhs->count_symbol ($name) + $this->rhs->count_symbol ($name);
 	}
 
-	public function get_elements (&$elements)
-	{
-		return false;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$emit = $this->emit;
@@ -138,7 +128,7 @@ class BinaryExpression implements Expression
 		$early = $this->early;
 		$lhs = $this->lhs->inject ($invariants);
 
-		if (!$lhs->get_value ($lhs_result))
+		if (!$lhs->try_evaluate ($lhs_result))
 			return new self ($this->operator, $lhs, $this->rhs->inject ($invariants));
 		else if ($early !== null && $early ($lhs_result))
 			return new ConstantExpression ($lhs_result);
@@ -147,11 +137,21 @@ class BinaryExpression implements Expression
 			$lazy = $this->lazy;
 			$rhs = $this->rhs->inject ($invariants);
 
-			if (!$rhs->get_value ($rhs_result))
+			if (!$rhs->try_evaluate ($rhs_result))
 				return new self ($this->operator, $lhs, $rhs);
 			else
 				return new ConstantExpression ($lazy ($lhs_result, $rhs_result));
 		}
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return false;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

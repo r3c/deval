@@ -20,16 +20,6 @@ class MemberExpression implements Expression
 		return $this->offset->count_symbol ($name) + $this->source->count_symbol ($name);
 	}
 
-	public function get_elements (&$elements)
-	{
-		return false;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$offset = $this->offset->generate ($generator, $variables);
@@ -44,19 +34,29 @@ class MemberExpression implements Expression
 		$source = $this->source->inject ($invariants);
 
 		// Member can be fetched from source only if offset can be evaluated
-		if ($offset->get_value ($key))
+		if ($offset->try_evaluate ($key))
 		{
 			// Fetch member from parent if source can be evaluated
-			if ($source->get_value ($parent))
+			if ($source->try_evaluate ($parent))
 				return new ConstantExpression (m ($parent, $key));
 
 			// Otherwise find member in source elements if possible
-			else if ($source->get_elements ($elements) && array_key_exists ($key, $elements))
+			else if ($source->try_enumerate ($elements) && array_key_exists ($key, $elements))
 				return new GroupExpression ($elements[$key]);
 		}
 
 		// Otherwise return injected source and offset
 		return new self ($source, $offset);
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return false;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

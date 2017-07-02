@@ -20,16 +20,6 @@ class LambdaExpression implements Expression
 		return $this->body->count_symbol ($name);
 	}
 
-	public function get_elements (&$elements)
-	{
-		return false;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		// Generate body, split variables into parameters and external uses
@@ -54,6 +44,16 @@ class LambdaExpression implements Expression
 	public function inject ($invariants)
 	{
 		return new self ($this->names, $this->body->inject ($invariants));
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return false;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

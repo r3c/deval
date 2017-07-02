@@ -19,7 +19,17 @@ class ConstantExpression implements Expression
 		return 0;
 	}
 
-	public function get_elements (&$elements)
+	public function generate ($generator, &$variables)
+	{
+		return Generator::emit_value ($this->value);
+	}
+
+	public function inject ($invariants)
+	{
+		return $this;
+	}
+
+	public function try_enumerate (&$elements)
 	{
 		$elements = array ();
 
@@ -32,21 +42,11 @@ class ConstantExpression implements Expression
 		return true;
 	}
 
-	public function get_value (&$value)
+	public function try_evaluate (&$value)
 	{
 		$value = $this->value;
 
 		return true;
-	}
-
-	public function generate ($generator, &$variables)
-	{
-		return Generator::emit_value ($this->value);
-	}
-
-	public function inject ($invariants)
-	{
-		return $this;
 	}
 }
 

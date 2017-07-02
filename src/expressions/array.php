@@ -29,35 +29,6 @@ class ArrayExpression implements Expression
 		return $count;
 	}
 
-	public function get_elements (&$elements)
-	{
-		$elements = array ();
-
-		foreach ($this->elements as $element)
-		{
-			list ($key, $value) = $element;
-
-			// Let PHP define an automatic index if no key was specified
-			if ($key === null)
-				$elements[] = $value;
-
-			// Assign element to index if key can be evaluated
-			else if ($key->get_value ($index))
-				$elements[$index] = $value;
-
-			// Otherwise keys set can't be evaluated
-			else
-				return false;
-		}
-
-		return true;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$source = '';
@@ -92,11 +63,11 @@ class ArrayExpression implements Expression
 
 			$value = $value->inject ($invariants);
 
-			if (!$value->get_value ($value_result))
+			if (!$value->try_evaluate ($value_result))
 				$ready = false;
 			else if ($key === null)
 				$values[] = $value_result;
-			else if (!$key->get_value ($key_result))
+			else if (!$key->try_evaluate ($key_result))
 				$ready = false;
 			else
 				$values[$key_result] = $value_result;
@@ -110,6 +81,35 @@ class ArrayExpression implements Expression
 
 		// Otherwise return array construct with injected elements
 		return new self ($elements);
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		$elements = array ();
+
+		foreach ($this->elements as $element)
+		{
+			list ($key, $value) = $element;
+
+			// Let PHP define an automatic index if no key was specified
+			if ($key === null)
+				$elements[] = $value;
+
+			// Assign element to index if key can be evaluated
+			else if ($key->try_evaluate ($index))
+				$elements[$index] = $value;
+
+			// Otherwise keys set can't be evaluated
+			else
+				return false;
+		}
+
+		return true;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

@@ -25,16 +25,6 @@ class InvokeExpression implements Expression
 		return $count;
 	}
 
-	public function get_elements (&$elements)
-	{
-		return false;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$arguments = array ();
@@ -43,7 +33,7 @@ class InvokeExpression implements Expression
 			$arguments[] = $argument->generate ($generator, $variables);
 
 		// If caller can't be evaluated to a value, generate as an expression
-		if (!$this->caller->get_value ($result))
+		if (!$this->caller->try_evaluate ($result))
 		{
 			$caller = $this->caller->generate ($generator, $variables);
 			$direct = $this->caller instanceof SymbolExpression || $generator->support ('7.0.1');
@@ -94,7 +84,7 @@ class InvokeExpression implements Expression
 		{
 			$argument = $argument->inject ($invariants);
 
-			if ($argument->get_value ($value))
+			if ($argument->try_evaluate ($value))
 				$values[] = $value;
 			else
 				$ready = false;
@@ -103,7 +93,7 @@ class InvokeExpression implements Expression
 		}
 
 		// Invoke and pass return value if caller and arguments were evaluated
-		if ($ready && $caller->get_value ($value))
+		if ($ready && $caller->try_evaluate ($value))
 		{
 			if (!is_callable ($value))
 				throw new CompileException ($caller, 'is not callable');
@@ -113,6 +103,16 @@ class InvokeExpression implements Expression
 
 		// Otherwise return injected caller and arguments
 		return new self ($caller, $arguments);
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return false;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

@@ -19,16 +19,6 @@ class SymbolExpression implements Expression
 		return $this->name === $name ? 1 : 0;
 	}
 
-	public function get_elements (&$elements)
-	{
-		return false;
-	}
-
-	public function get_value (&$value)
-	{
-		return false;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$variables[$this->name] = true;
@@ -42,6 +32,16 @@ class SymbolExpression implements Expression
 			return new GroupExpression ($invariants[$this->name]);
 
 		return $this;
+	}
+
+	public function try_enumerate (&$elements)
+	{
+		return false;
+	}
+
+	public function try_evaluate (&$value)
+	{
+		return false;
 	}
 }
 

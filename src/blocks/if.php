@@ -61,7 +61,7 @@ class IfBlock implements Block
 			// Conditions can be statically evaluated if previous ones were too
 			$condition = $condition->inject ($invariants);
 
-			if ($static && $condition->get_value ($value))
+			if ($static && $condition->try_evaluate ($value))
 			{
 				if ($value)
 					return $body->inject ($invariants);
