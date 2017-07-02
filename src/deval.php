@@ -92,6 +92,11 @@ class Builtin
 		return array_flip ($items);
 	}
 
+	public static function _float ($value)
+	{
+		return (float)$value;
+	}
+
 	public static function _group ($items, $get_key = null, $get_value = null, $merge = null)
 	{
 		if ($get_key === null)
@@ -263,6 +268,7 @@ class Builtin
 			'filter',
 			'find',
 			'flip',
+			'float',
 			'group',
 			'int',
 			'join',

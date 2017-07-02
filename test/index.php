@@ -78,6 +78,9 @@ render_code ('{{ null }}', make_empty (), '');
 render_code ('{{ false }}', make_empty (), '');
 render_code ('{{ true }}', make_empty (), '1');
 render_code ('{{ 0 }}', make_empty (), '0');
+render_code ('{{ 5 }}', make_empty (), '5');
+render_code ('{{ .5 }}', make_empty (), '0.5');
+render_code ('{{ 9.2 }}', make_empty (), '9.2');
 render_code ('{{ "hello" }}', make_empty (), 'hello');
 render_code ('{{ [1][0] }}', make_empty (), '1');
 render_code ('{{ [1: 2][1] }}', make_empty (), '2');
@@ -89,6 +92,7 @@ render_code ('{{ [[42, a]][0][0] }}', make_empty (), '42');
 
 // Render variables
 render_code ('{{ bool }}', make_combinations (array ('bool' => true)), '1');
+render_code ('{{ float }}', make_combinations (array ('float' => 5.3)), '5.3');
 render_code ('{{ int }}', make_combinations (array ('int' => 3)), '3');
 render_code ('{{ str }}', make_combinations (array ('str' => 'value')), 'value');
 
@@ -231,6 +235,7 @@ foreach ($tests as $style => $expect)
 // Invoke builtins
 render_code ('{{ join(",", array(true, false, true)) }}', make_builtins ('array', 'join'), '1,,1');
 render_code ('{{ join(",", array(0, 1, 5)) }}', make_builtins ('array', 'join'), '0,1,5');
+render_code ('{{ join(",", array(0.5, 1.2, 5.7)) }}', make_builtins ('array', 'join'), '0.5,1.2,5.7');
 render_code ('{{ join(",", array("a", "b", "c")) }}', make_builtins ('array', 'join'), 'a,b,c');
 render_code ('{{ join(",", array([1, 2])) }}', make_builtins ('array', 'join'), '1,2');
 render_code ('{{ join(",", array([1, 2], [3, 4])) }}', make_builtins ('array', 'join'), '1,2,3,4');
@@ -238,6 +243,8 @@ render_code ('{{ join(",", array([1, 2], [3, 4])) }}', make_builtins ('array', '
 render_code ('{{ bool(false) }}', make_builtins ('bool'), '');
 render_code ('{{ bool(true) }}', make_builtins ('bool'), '1');
 render_code ('{{ bool(5) }}', make_builtins ('bool'), '1');
+render_code ('{{ bool(0.0) }}', make_builtins ('bool'), '');
+render_code ('{{ bool(7.8) }}', make_builtins ('bool'), '1');
 render_code ('{{ bool("") }}', make_builtins ('bool'), '');
 render_code ('{{ bool("test") }}', make_builtins ('bool'), '1');
 render_code ('{{ bool([]) }}', make_builtins ('bool'), '');
@@ -262,6 +269,12 @@ render_code ('{% let pair = find(["a": 1, "b": 2, "c": 3], (v, k) => k == "b") %
 
 render_code ('{{ join(",", flip(["a": 0, "b": 1, "c": 2])) }}', make_builtins ('flip', 'join'),  'a,b,c');
 
+render_code ('{{ float(false) }}', make_builtins ('float'), '0');
+render_code ('{{ float(true) }}', make_builtins ('float'), '1');
+render_code ('{{ float(8) }}', make_builtins ('float'), '8');
+render_code ('{{ float("") }}', make_builtins ('float'), '0');
+render_code ('{{ float("test") }}', make_builtins ('float'), '0');
+
 render_code ('{{ join(",", group([1, 1, 3, 3])) }}', make_builtins ('group', 'join'), '1,3');
 render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2)) }}', make_builtins ('group', 'join'), '2,4');
 render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2, (v1, v2) => v1 + v2)) }}', make_builtins ('group', 'join'), '8,12');
@@ -269,6 +282,7 @@ render_code ('{{ join(",", group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2, (v1, 
 render_code ('{{ int(false) }}', make_builtins ('int'), '0');
 render_code ('{{ int(true) }}', make_builtins ('int'), '1');
 render_code ('{{ int(5) }}', make_builtins ('int'), '5');
+render_code ('{{ int(12.8) }}', make_builtins ('int'), '12');
 render_code ('{{ int("") }}', make_builtins ('int'), '0');
 render_code ('{{ int("test") }}', make_builtins ('int'), '0');
 
@@ -322,6 +336,7 @@ render_code ('{{ join(",", split("1:2:3:4", ":")) }}', make_builtins ('join', 's
 render_code ('{{ str(false) }}', make_builtins ('str'), '');
 render_code ('{{ str(true) }}', make_builtins ('str'), '1');
 render_code ('{{ str(5) }}', make_builtins ('str'), '5');
+render_code ('{{ str(95.1) }}', make_builtins ('str'), '95.1');
 render_code ('{{ str("") }}', make_builtins ('str'), '');
 render_code ('{{ str("test") }}', make_builtins ('str'), 'test');
 

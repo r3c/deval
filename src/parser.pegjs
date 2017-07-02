@@ -172,7 +172,7 @@ PathChar
 	}
 
 Symbol "symbol"
-	= $ ([_A-Za-z] [_0-9A-Za-z]*)
+	= $([_A-Za-z] [_0-9A-Za-z]*)
 
 // Expression tree
 
@@ -354,6 +354,7 @@ LambdaNames
 
 Scalar
 	= Boolean
+	/ Float
 	/ Integer
 	/ Null
 	/ String
@@ -368,10 +369,16 @@ Boolean "boolean"
 		return true;
 	}
 
+Float "floating point number"
+	= digits:$([0-9]* "." [0-9]+)
+	{
+		return (float)$digits;
+	}
+
 Integer "integer"
 	= digits:$[0-9]+
 	{
-		return intval ($digits);
+		return (int)$digits;
 	}
 
 Null "null"
