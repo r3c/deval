@@ -53,6 +53,7 @@ raise_render ('{{ _deval_input }}', array (), array ('_deval_input' => 0), 'inva
 render_code ('lol', make_empty (), 'lol');
 
 render_code ('l{o}l', make_empty (), 'l{o}l');
+render_code ('{', make_empty (), '{');
 render_code ('\\{', make_empty (), '{');
 render_code ('{\\{', make_empty (), '{{');
 render_code ('{\\%', make_empty (), '{%');

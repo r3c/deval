@@ -51,6 +51,10 @@ PlainCharacter
 	{
 		return $brace . $char;
 	}
+	/ brace:"{" !.
+	{
+		return $brace;
+	}
 	/ [^\\{]
 	/ PlainEscape
 
