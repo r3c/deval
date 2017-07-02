@@ -47,12 +47,11 @@ raise_compile ('{{ ["TestClass", "missing"](x) }}', array ('x' => 1), 'is not ca
 // Render exceptions
 raise_render ('{{ a }}', array (), array (), 'undefined symbol(s) a');
 raise_render ('{{ a }}{% let a = 1 %}{% end %}', array (), array (), 'undefined symbol(s) a');
-raise_render ('{{ _d_input }}', array (), array ('_d_input' => 0), 'invalid symbol name');
-raise_render ('{{ _d_local }}', array (), array ('_d_local' => 0), 'invalid symbol name');
-raise_render ('{{ _d_state }}', array (), array ('_d_state' => 0), 'invalid symbol name');
+raise_render ('{{ _deval_input }}', array (), array ('_deval_input' => 0), 'invalid or reserved symbol name');
 
 // Render plain texts
 render_code ('lol', make_empty (), 'lol');
+
 render_code ('l{o}l', make_empty (), 'l{o}l');
 render_code ('\\{', make_empty (), '{');
 render_code ('{\\{', make_empty (), '{{');
@@ -95,6 +94,7 @@ render_code ('{{ bool }}', make_combinations (array ('bool' => true)), '1');
 render_code ('{{ float }}', make_combinations (array ('float' => 5.3)), '5.3');
 render_code ('{{ int }}', make_combinations (array ('int' => 3)), '3');
 render_code ('{{ str }}', make_combinations (array ('str' => 'value')), 'value');
+render_code ('{{ _0 }}', make_combinations (array ('_0' => 12)), '12');
 
 // Render binary expressions
 render_code ('{{ a + b }}', make_combinations (array ('a' => 1, 'b' => 1)), '2');
@@ -352,6 +352,7 @@ render_code ('{% let c = false %}{% if c %}{{ crash }}{% end %}{{ c }}{% end %}'
 // Source code generation
 source_code ('{% let v = f() %}{{ v /* non-constant but used once, should be inlined */ }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0));
 source_code ('{% let v = f() %}{{ v }}{{ v /* non-constant used twice, should not be inlined */ }}{% end %}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 6));
-source_code ('{% let v = 42 %}{{ v }}{{ v /* constant used twiec, should be inlined */ }}{% end %}', array (), array ('/42/' => 2, '/\\$v/' => 0));
+source_code ('{% let v = 42 %}{{ v }}{{ v /* constant used twice, should be inlined */ }}{% end %}', array (), array ('/42/' => 2, '/\\$v/' => 0));
+source_code ('{{ _0 && _1 /* _2 is used as temporary variable, _3 as runtime state */ }}', array (), array ('/\\$_2=/' => 1, '/\\$_3=new/' => 1));
 
 ?>

@@ -9,7 +9,7 @@ class LabelBlock implements Block
 		$this->name = $name;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator)
 	{
 		throw new \Exception ('cannot compile label block');
 	}

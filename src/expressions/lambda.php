@@ -15,30 +15,28 @@ class LambdaExpression implements Expression
 		return '(' . implode (', ', $this->names) . ') => ' . $this->body;
 	}
 
-	public function generate ($generator, &$variables)
+	public function generate ($generator)
 	{
-		// Generate body, split variables into parameters and external uses
-		$requires = array ();
-		$body = $this->body->generate ($generator, $requires);
+		// Helper lambda to emit symbol from name
+		$emit_symbol = function ($name) use ($generator)
+		{
+			return $generator->emit_symbol ($name);
+		};
 
-		$captures = array_diff_key ($requires, array_flip ($this->names));
-		$variables += $captures;
-
-		// Generate lambda code
-		$emit_symbol = function ($name) use ($generator) { return $generator->emit_symbol ($name); };
-
+		// Generate lambda code from captures, parameters and body expression
+		$captures = array_diff_key ($this->body->get_symbols (), array_flip ($this->names));
 		$parameters = array_map ($emit_symbol, $this->names);
 		$uses = array_map ($emit_symbol, array_keys ($captures));
 
 		return
 			'function(' . implode (',', $parameters) . ')' .
 			(count ($uses) > 0 ? 'use(' . implode (',', $uses) . ')' : '') .
-			'{return ' . $body . ';}';
+			'{return ' . $this->body->generate ($generator) . ';}';
 	}
 
 	public function get_symbols ()
 	{
-		return $this->body->get_symbols ();
+		return array_diff_key ($this->body->get_symbols (), array_flip ($this->names));
 	}
 
 	public function inject ($invariants)

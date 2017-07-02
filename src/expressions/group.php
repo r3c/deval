@@ -14,9 +14,9 @@ class GroupExpression implements Expression
 		return '(' . $this->expression . ')';
 	}
 
-	public function generate ($generator, &$variables)
+	public function generate ($generator)
 	{
-		return '(' . $this->expression->generate ($generator, $variables) . ')';
+		return '(' . $this->expression->generate ($generator) . ')';
 	}
 
 	public function get_symbols ()

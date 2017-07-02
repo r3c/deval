@@ -14,10 +14,8 @@ class SymbolExpression implements Expression
 		return $this->name;
 	}
 
-	public function generate ($generator, &$variables)
+	public function generate ($generator)
 	{
-		$variables[$this->name] = true;
-
 		return Generator::emit_symbol ($this->name);
 	}
 

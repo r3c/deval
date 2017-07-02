@@ -5,7 +5,6 @@ TODO
 ----
 
 - Support builtin syntax for defering an expression
-- Implement static variable allocation to replace _d_(input|local|state)
 
 DONE
 ----
@@ -25,3 +24,4 @@ DONE
 - Implement variable aliasing
 - Support ternary operator
 - Do not inline variables when used more than once
+- Implement static variable allocation to replace _d_(input|local|state)

@@ -13,12 +13,12 @@ class ForBlock implements Block
 		$this->value_name = $value_name;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator)
 	{
 		$output = new Output ();
 
 		// Generate loop counter if empty block contains instructions
-		$empty = $this->empty->compile ($generator, $variables);
+		$empty = $this->empty->compile ($generator);
 
 		if ($empty->has_data ())
 		{
@@ -33,10 +33,10 @@ class ForBlock implements Block
 		if ($this->key_name !== null)
 			$provides[$this->key_name] = null;
 
-		$output->append_code (Generator::emit_scope_push (array_keys ($provides)));
+		$output->append_code ($generator->emit_scope_push (array_keys ($provides)));
 
 		// Generate for control loop
-		$output->append_code ('foreach(' . $this->source->generate ($generator, $variables) . ' as ');
+		$output->append_code ('foreach(' . $this->source->generate ($generator) . ' as ');
 
 		if ($this->key_name !== null)
 			$output->append_code (Generator::emit_symbol ($this->key_name) . '=>' . Generator::emit_symbol ($this->value_name));
@@ -57,7 +57,7 @@ class ForBlock implements Block
 		$output->append_code ('}');
 
 		// Restore key and value variables
-		$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
+		$output->append_code ($generator->emit_scope_pop (array_keys ($provides)));
 
 		// Write empty block if it contains instructions
 		if ($empty->has_data ())
@@ -68,18 +68,21 @@ class ForBlock implements Block
 			$output->append_code ('}');
 		}
 
-		// Append required variables excepted key and value
-		$variables += array_diff_key ($requires, $provides);
-
 		return $output;
 	}
 
 	public function get_symbols ()
 	{
+		$requires = $this->loop->get_symbols ();
 		$symbols = array ();
 
+		if ($this->key_name !== null)
+			unset ($requires[$this->key_name]);
+
+		unset ($requires[$this->value_name]);
+
+		Generator::merge_symbols ($symbols, $requires);
 		Generator::merge_symbols ($symbols, $this->empty->get_symbols ());
-		Generator::merge_symbols ($symbols, $this->loop->get_symbols ());
 		Generator::merge_symbols ($symbols, $this->source->get_symbols ());
 
 		return $symbols;

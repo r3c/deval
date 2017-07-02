@@ -10,7 +10,7 @@ class LetBlock implements Block
 		$this->body = $body;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator)
 	{
 		// Evalulate or generate code for assignment variables
 		$assignments = new Output ();
@@ -21,11 +21,7 @@ class LetBlock implements Block
 			list ($name, $expression) = $assignment;
 
 			// Generate evaluation code for current variable
-			$requires = array ();
-			$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator, $requires) . ';');
-
-			// Append required variables but the ones provided by previous assignments
-			$variables += array_diff_key ($requires, $provides);
+			$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator) . ';');
 
 			// Mark variable as available for next assignments
 			$provides[$name] = true;
@@ -33,27 +29,35 @@ class LetBlock implements Block
 
 		// Backup provided variables and assign them new values
 		$output = new Output ();
-		$output->append_code (Generator::emit_scope_push (array_keys ($provides)));
+		$output->append_code ($generator->emit_scope_push (array_keys ($provides)));
 		$output->append ($assignments);
 
 		// Generate body evaluation and restore variables
-		$requires = array ();
-
-		$output->append ($this->body->compile ($generator, $requires));
-		$output->append_code (Generator::emit_scope_pop (array_keys ($provides)));
-
-		// Append required variables but the ones provided by all assignments
-		$variables += array_diff_key ($requires, $provides);
+		$output->append ($this->body->compile ($generator));
+		$output->append_code ($generator->emit_scope_pop (array_keys ($provides)));
 
 		return $output;
 	}
 
 	public function get_symbols ()
 	{
-		$symbols = $this->body->get_symbols ();
+		$provides = array ();
+		$symbols = array ();
 
 		foreach ($this->assignments as $assignment)
-			Generator::merge_symbols ($symbols, $assignment[1]->get_symbols ());
+		{
+			list ($name, $expression) = $assignment;
+
+			// Append symbols required for current assignment without the ones
+			// provided by previous assignments
+			Generator::merge_symbols ($symbols, array_diff_key ($expression->get_symbols (), $provides));
+
+			$provides[$name] = true;
+		}
+
+		// Append symbols required for current assignment without the ones
+		// provided by all assignments
+		Generator::merge_symbols ($symbols, array_diff_key ($this->body->get_symbols (), $provides));
 
 		return $symbols;
 	}

@@ -15,17 +15,17 @@ class InvokeExpression implements Expression
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
 	}
 
-	public function generate ($generator, &$variables)
+	public function generate ($generator)
 	{
 		$arguments = array ();
 
 		foreach ($this->arguments as $argument)
-			$arguments[] = $argument->generate ($generator, $variables);
+			$arguments[] = $argument->generate ($generator);
 
 		// If caller can't be evaluated to a value, generate as an expression
 		if (!$this->caller->try_evaluate ($result))
 		{
-			$caller = $this->caller->generate ($generator, $variables);
+			$caller = $this->caller->generate ($generator);
 			$direct = $this->caller instanceof SymbolExpression || $generator->support ('7.0.1');
 		}
 

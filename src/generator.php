@@ -4,55 +4,17 @@ namespace Deval;
 
 class Generator
 {
-	private static $input_name = '_d_input';
-	private static $local_name = '_d_local';
-	private static $state_name = '_d_state';
-
-	public static function emit_local ()
-	{
-		return '$' . self::$local_name;
-	}
+	private static $input_name = '_deval_input';
 
 	public static function emit_member ($source, $index)
 	{
 		return '\\' . __NAMESPACE__ . '\\m(' . $source . ',' . $index . ')';
 	}
 
-	public static function emit_scope_pop ($names)
-	{
-		if (count ($names) < 1)
-			return '';
-
-		return 'list(' . implode (',', array_map (function ($name)
-		{
-			return Generator::emit_symbol ($name);
-		}, $names)) . ')=$' . self::$state_name . '->scope_pop();';
-	}
-
-	public static function emit_scope_push ($names)
-	{
-		if (count ($names) < 1)
-			return '';
-
-		return '$' . self::$state_name . '->scope_push(' . implode (',', array_map (function ($name)
-		{
-			$symbol = Generator::emit_symbol ($name);
-
-			return 'isset(' . $symbol . ')?' . $symbol . ':null';
-		}, $names)) . ');';
-	}
-
-	public static function emit_state ($names)
-	{
-		return
-			'$' . self::$state_name . '=new\\' . __NAMESPACE__ . '\\Runtime(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
-			'\\extract($' . self::$input_name . ');';
-	}
-
 	public static function emit_symbol ($name)
 	{
-		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name) || $name === self::$input_name || $name === self::$local_name || $name === self::$state_name)
-			throw new RenderException ('invalid symbol name ' . $name);
+		if (!preg_match ('/^[_A-Za-z][_0-9A-Za-z]*$/', $name) || $name === self::$input_name)
+			throw new RenderException ('invalid or reserved symbol name ' . $name);
 
 		return '$' . $name;
 	}
@@ -88,11 +50,14 @@ class Generator
 		return $symbols;
 	}
 
+	private $reserves;
+	private $state;
+	private $temporary;
 	private $trimmer;
 	private $unique;
 	private $version;
 
-	public function __construct ($setup)
+	public function __construct ($setup, $names)
 	{
 		static $trims;
 
@@ -136,13 +101,67 @@ class Generator
 		else
 			throw new ParseException ('<setup>', 'invalid style, must be either builtin style or callable');
 
+		$this->reserves = array_flip ($names);
 		$this->unique = 0;
 		$this->version = $setup->version;
 	}
 
+	public function emit_runtime ($names)
+	{
+		return
+			$this->emit_state () . '=new\\' . __NAMESPACE__ . '\\Runtime(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
+			'\\extract($' . self::$input_name . ');';
+	}
+
+	public function emit_scope_pop ($names)
+	{
+		if (count ($names) < 1)
+			return '';
+
+		return 'list(' . implode (',', array_map (function ($name)
+		{
+			return Generator::emit_symbol ($name);
+		}, $names)) . ')=' . $this->emit_state () . '->scope_pop();';
+	}
+
+	public function emit_scope_push ($names)
+	{
+		if (count ($names) < 1)
+			return '';
+
+		return $this->emit_state () . '->scope_push(' . implode (',', array_map (function ($name)
+		{
+			$symbol = Generator::emit_symbol ($name);
+
+			return 'isset(' . $symbol . ')?' . $symbol . ':null';
+		}, $names)) . ');';
+	}
+
+	public function emit_state ()
+	{
+		if (!isset ($this->state))
+			$this->state = $this->emit_unique ();
+
+		return $this->state;
+	}
+
+	public function emit_temporary ()
+	{
+		if (!isset ($this->temporary))
+			$this->temporary = $this->emit_unique ();
+
+		return $this->temporary;
+	}
+
 	public function emit_unique ()
 	{
-		return '$' . self::$state_name . '->_' . $this->unique++;
+		do
+		{
+			$name = '_' . $this->unique++;
+		}
+		while (isset ($this->reserves[$name]));
+
+		return '$' . $name;
 	}
 
 	public function make_plain ($text)

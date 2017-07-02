@@ -14,7 +14,7 @@ class ConstantExpression implements Expression
 		return var_export ($this->value, true);
 	}
 
-	public function generate ($generator, &$variables)
+	public function generate ($generator)
 	{
 		return Generator::emit_value ($this->value);
 	}

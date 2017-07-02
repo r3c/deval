@@ -304,13 +304,13 @@ class Builtin
 
 class Evaluator
 {
-	public static function code ($_d_code, $_d_input)
+	public static function code ($_deval_code, $_deval_input)
 	{
 		ob_start ();
 
 		try
 		{
-			eval ('?>' . $_d_code);
+			eval ('?>' . $_deval_code);
 		}
 		catch (\Exception $exception) // Replace by "finally" once PHP < 5.5 compatibility can be dropped
 		{
@@ -322,13 +322,13 @@ class Evaluator
 		return ob_get_clean ();
 	}
 
-	public static function path ($_d_path, $_d_input)
+	public static function path ($_deval_path, $_deval_input)
 	{
 		ob_start ();
 
 		try
 		{
-			require $_d_path;
+			require $_deval_path;
 		}
 		catch (\Exception $exception) // Replace by "finally" once PHP < 5.5 compatibility can be dropped
 		{

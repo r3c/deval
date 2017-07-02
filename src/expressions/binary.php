@@ -14,79 +14,79 @@ class BinaryExpression implements Expression
 			(
 				'%'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '%' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '%' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs % $rhs; }
 				),
 				'&&'	=> array
 				(
-					function ($lhs, $rhs) { return '(' . Generator::emit_local () . '=' . $lhs . ')?' . $rhs . ':' . Generator::emit_local (); },
+					function ($generator, $lhs, $rhs) { return '(' . $generator->emit_temporary () . '=' . $lhs . ')?' . $rhs . ':' . $generator->emit_temporary (); },
 					function ($lhs) { return !$lhs; },
 					function ($lhs, $rhs) { return $lhs ? $rhs : $lhs; }
 				),
 				'=='	=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '===' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '===' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs === $rhs; }
 				),
 				'!='	=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '!==' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '!==' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs !== $rhs; }
 				),
 				'>'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '>' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '>' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs > $rhs; }
 				),
 				'>='	=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '>=' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '>=' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs >= $rhs; }
 				),
 				'<'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '<' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '<' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs < $rhs; }
 				),
 				'<='	=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '<=' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '<=' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs <= $rhs; }
 				),
 				'*'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '*' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '*' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs * $rhs; }
 				),
 				'+'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '+' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '+' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs + $rhs; }
 				),
 				'-'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '-' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '-' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs - $rhs; }
 				),
 				'/'		=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '/' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '/' . $rhs; },
 					null,
 					function ($lhs, $rhs) { return $lhs / $rhs; }
 				),
 				'||'	=> array
 				(
-					function ($lhs, $rhs) { return $lhs . '?:' . $rhs; },
+					function ($generator, $lhs, $rhs) { return $lhs . '?:' . $rhs; },
 					function ($lhs) { return !!$lhs; },
 					function ($lhs, $rhs) { return $lhs ?: $rhs; }
 				)
@@ -111,11 +111,11 @@ class BinaryExpression implements Expression
 		return $this->lhs . ' ' . $this->operator . ' ' . $this->rhs;
 	}
 
-	public function generate ($generator, &$variables)
+	public function generate ($generator)
 	{
 		$emit = $this->emit;
 
-		return '(' . $emit ($this->lhs->generate ($generator, $variables), $this->rhs->generate ($generator, $variables)) . ')';
+		return '(' . $emit ($generator, $this->lhs->generate ($generator), $this->rhs->generate ($generator)) . ')';
 	}
 
 	public function get_symbols ()

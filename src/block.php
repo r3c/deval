@@ -4,7 +4,7 @@ namespace Deval;
 
 interface Block
 {
-	public function compile ($generator, &$variables);
+	public function compile ($generator);
 	public function get_symbols ();
 	public function inject ($invariants);
 	public function resolve ($blocks);

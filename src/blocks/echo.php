@@ -9,7 +9,7 @@ class EchoBlock implements Block
 		$this->expression = $expression;
 	}
 
-	public function compile ($generator, &$variables)
+	public function compile ($generator)
 	{
 		$output = new Output ();
 
@@ -21,7 +21,7 @@ class EchoBlock implements Block
 			$output->append_text ($generator->make_plain ((string)$value));
 		}
 		else
-			$output->append_code ('echo ' . $this->expression->generate ($generator, $variables) . ';');
+			$output->append_code ('echo ' . $this->expression->generate ($generator) . ';');
 
 		return $output;
 	}
