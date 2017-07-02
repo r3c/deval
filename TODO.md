@@ -5,6 +5,7 @@ TODO
 ----
 
 - Support builtin syntax for defering an expression
+- Implement static variable allocation to replace _d_(input|local|state)
 
 DONE
 ----

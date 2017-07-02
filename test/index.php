@@ -163,6 +163,10 @@ render_code ('{{ 5 + +3 }}', make_empty (), '8');
 render_code ('{{ f[0](s) }}', make_combinations (array ('f' => array ('strlen'), 's' => 'test')), '4');
 render_code ('{{ f(s)[0] }}', make_combinations (array ('f' => 'str_split', 's' => 'test')), 't');
 
+// Render extend command
+render_code ('{% extend template/extend_inner.deval %}{% block first %}1{% block second %}2{% end %}', make_combinations (array ('a' => 'A', 'b' => 'B', 'c' => 'C')), 'A1B2C');
+render_code ('{% extend template/extend_outer.deval %}{% end %}', make_combinations (array ('first' => 'x', 'second' => 'y')), '1x2y3');
+
 // Render for command
 render_code ('{% for v in [1, 2, 3] %}{{ v }}{% end %}', make_empty (), '123');
 render_code ('{% for k, v in [1, 2, 3] %}{{ k }}:{{ v }}{% end %}', make_empty (), '0:11:22:3');
@@ -180,10 +184,6 @@ render_code ('{% if 0 %}x{% else if 0 %}y{% else %}z{% end %}', make_empty (), '
 render_code ('{% if 0 %}{% for x in null %}{% end %}{% end %}', make_empty (), '');
 render_code ('{% if 1 %}{% else %}{% for x in null %}{% end %}{% end %}', make_empty (), '');
 render_code ('{% if false %}{{ php("missing")() }}{% end %}', make_builtins ('php'), '');
-
-// Render import command
-render_code ('{% import template/import_inner.deval %}{% block first %}1{% block second %}2{% end %}', make_combinations (array ('a' => 'A', 'b' => 'B', 'c' => 'C')), 'A1B2C');
-render_code ('{% import template/import_outer.deval %}{% end %}', make_combinations (array ('first' => 'x', 'second' => 'y')), '1x2y3');
 
 // Render include command
 render_code ('{% include template/include_inner.deval %}', make_combinations (array ('inner_x' => 'x', 'inner_y' => 'y')), 'xy');

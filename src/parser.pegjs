@@ -63,16 +63,16 @@ PlainEscape
 // Command tree
 
 Command "command block"
-	= CommandFor
+	= CommandExtend
+	/ CommandFor
 	/ CommandIf
-	/ CommandImport
 	/ CommandInclude
 	/ CommandLabel
 	/ CommandLet
 	/ CommandWrap
 
-CommandImport "import command"
-	= "import" _ path:Path _ BlockCommandEnd _ blocks:CommandImportBlock* BlockCommandBegin _ "end"
+CommandExtend "extend command"
+	= "extend" _ path:Path _ BlockCommandEnd _ blocks:CommandExtendBlock* BlockCommandBegin _ "end"
 	{
 		$bodies = array_map (function ($b) { return $b[1]; }, $blocks);
 		$names = array_map (function ($b) { return $b[0]; }, $blocks);
@@ -80,7 +80,7 @@ CommandImport "import command"
 		return \Deval\Compiler::parse_file ($path, array_combine ($names, $bodies));
 	}
 
-CommandImportBlock
+CommandExtendBlock
 	= BlockCommandBegin _ "block" _ name:Symbol _ BlockCommandEnd body:Content
 	{
 		return array ($name, $body);
