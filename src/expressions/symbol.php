@@ -14,16 +14,16 @@ class SymbolExpression implements Expression
 		return $this->name;
 	}
 
-	public function count_symbol ($name)
-	{
-		return $this->name === $name ? 1 : 0;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$variables[$this->name] = true;
 
 		return Generator::emit_symbol ($this->name);
+	}
+
+	public function get_symbols ()
+	{
+		return array ($this->name => 1);
 	}
 
 	public function inject ($invariants)

@@ -15,11 +15,6 @@ class LambdaExpression implements Expression
 		return '(' . implode (', ', $this->names) . ') => ' . $this->body;
 	}
 
-	public function count_symbol ($name)
-	{
-		return $this->body->count_symbol ($name);
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		// Generate body, split variables into parameters and external uses
@@ -39,6 +34,11 @@ class LambdaExpression implements Expression
 			'function(' . implode (',', $parameters) . ')' .
 			(count ($uses) > 0 ? 'use(' . implode (',', $uses) . ')' : '') .
 			'{return ' . $body . ';}';
+	}
+
+	public function get_symbols ()
+	{
+		return $this->body->get_symbols ();
 	}
 
 	public function inject ($invariants)

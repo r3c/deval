@@ -14,14 +14,14 @@ class ConstantExpression implements Expression
 		return var_export ($this->value, true);
 	}
 
-	public function count_symbol ($name)
-	{
-		return 0;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		return Generator::emit_value ($this->value);
+	}
+
+	public function get_symbols ()
+	{
+		return array ();
 	}
 
 	public function inject ($invariants)

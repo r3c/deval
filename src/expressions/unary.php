@@ -32,14 +32,14 @@ class UnaryExpression implements Expression
 		return $this->operator . $this->operand;
 	}
 
-	public function count_symbol ($name)
-	{
-		return $this->operand->count_symbol ($name);
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		return $this->operator . $this->operand->generate ($generator, $variables);
+	}
+
+	public function get_symbols ()
+	{
+		return $this->operand->get_symbols ();
 	}
 
 	public function inject ($invariants)

@@ -14,14 +14,14 @@ class GroupExpression implements Expression
 		return '(' . $this->expression . ')';
 	}
 
-	public function count_symbol ($name)
-	{
-		return $this->expression->count_symbol ($name);
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		return '(' . $this->expression->generate ($generator, $variables) . ')';
+	}
+
+	public function get_symbols ()
+	{
+		return $this->expression->get_symbols ();
 	}
 
 	public function inject ($invariants)

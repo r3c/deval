@@ -14,9 +14,9 @@ class LabelBlock implements Block
 		throw new \Exception ('cannot compile label block');
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		return 0;
+		return array ();
 	}
 
 	public function inject ($invariants)

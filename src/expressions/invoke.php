@@ -15,16 +15,6 @@ class InvokeExpression implements Expression
 		return $this->caller . '(' . implode (', ', array_map (function ($a) { return (string)$a; }, $this->arguments)) . ')';
 	}
 
-	public function count_symbol ($name)
-	{
-		$count = $this->caller->count_symbol ($name);
-
-		foreach ($this->arguments as $argument)
-			$count += $argument->count_symbol ($name);
-
-		return $count;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$arguments = array ();
@@ -71,6 +61,16 @@ class InvokeExpression implements Expression
 			return $caller . '(' . implode (',', $arguments) . ')';
 		else
 			return '\\call_user_func(' . implode (',', array_merge (array ($caller), $arguments)) . ')';
+	}
+
+	public function get_symbols ()
+	{
+		$symbols = $this->caller->get_symbols ();
+
+		foreach ($this->arguments as $argument)
+			Generator::merge_symbols ($symbols, $argument->get_symbols ());
+
+		return $symbols;
 	}
 
 	public function inject ($invariants)

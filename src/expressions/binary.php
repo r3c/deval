@@ -111,16 +111,21 @@ class BinaryExpression implements Expression
 		return $this->lhs . ' ' . $this->operator . ' ' . $this->rhs;
 	}
 
-	public function count_symbol ($name)
-	{
-		return $this->lhs->count_symbol ($name) + $this->rhs->count_symbol ($name);
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$emit = $this->emit;
 
 		return '(' . $emit ($this->lhs->generate ($generator, $variables), $this->rhs->generate ($generator, $variables)) . ')';
+	}
+
+	public function get_symbols ()
+	{
+		$symbols = array ();
+
+		Generator::merge_symbols ($symbols, $this->lhs->get_symbols ());
+		Generator::merge_symbols ($symbols, $this->rhs->get_symbols ());
+
+		return $symbols;
 	}
 
 	public function inject ($invariants)

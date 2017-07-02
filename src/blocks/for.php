@@ -74,9 +74,15 @@ class ForBlock implements Block
 		return $output;
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		return $this->empty->count_symbol ($name) + $this->loop->count_symbol ($name) + $this->source->count_symbol ($name);
+		$symbols = array ();
+
+		Generator::merge_symbols ($symbols, $this->empty->get_symbols ());
+		Generator::merge_symbols ($symbols, $this->loop->get_symbols ());
+		Generator::merge_symbols ($symbols, $this->source->get_symbols ());
+
+		return $symbols;
 	}
 
 	public function inject ($invariants)

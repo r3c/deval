@@ -22,14 +22,14 @@ class ConcatBlock implements Block
 		return $output;
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		$count = 0;
+		$symbols = array ();
 
 		foreach ($this->blocks as $block)
-			$count += $block->count_symbol ($name);
+			Generator::merge_symbols ($symbols, $block->get_symbols ());
 
-		return $count;
+		return $symbols;
 	}
 
 	public function inject ($invariants)

@@ -80,6 +80,14 @@ class Generator
 		return var_export ($input, true);
 	}
 
+	public static function merge_symbols (&$symbols, $others)
+	{
+		foreach ($others as $name => $count)
+			$symbols[$name] = (isset ($symbols[$name]) ? $symbols[$name] : 0) + $count;
+
+		return $symbols;
+	}
+
 	private $trimmer;
 	private $unique;
 	private $version;

@@ -26,9 +26,9 @@ class EchoBlock implements Block
 		return $output;
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		return $this->expression->count_symbol ($name);
+		return $this->expression->get_symbols ();
 	}
 
 	public function inject ($invariants)

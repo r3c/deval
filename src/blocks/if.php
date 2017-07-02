@@ -40,14 +40,17 @@ class IfBlock implements Block
 		return $output;
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		$count = $this->fallback->count_symbol ($name);
+		$symbols = $this->fallback->get_symbols ();
 
 		foreach ($this->branches as $branch)
-			$count += $branch[0]->count_symbol ($name) + $branch[1]->count_symbol ($name);
+		{
+			Generator::merge_symbols ($symbols, $branch[0]->get_symbols ());
+			Generator::merge_symbols ($symbols, $branch[1]->get_symbols ());
+		}
 
-		return $count;
+		return $symbols;
 	}
 
 	public function inject ($invariants)

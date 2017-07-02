@@ -9,9 +9,9 @@ class VoidBlock implements Block
 		return new Output ();
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		return 0;
+		return array ();
 	}
 
 	public function inject ($invariants)

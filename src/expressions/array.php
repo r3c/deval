@@ -14,21 +14,6 @@ class ArrayExpression implements Expression
 		return '[' . implode (', ', array_map (function ($e) { return ($e[0] !== null ? $e[0] . ': ' : '') . $e[1]; }, $this->elements)) . ']';
 	}
 
-	public function count_symbol ($name)
-	{
-		$count = 0;
-
-		foreach ($this->elements as $element)
-		{
-			if ($element[0] !== null)
-				$count += $element[0]->count_symbol ($name);
-
-			$count += $element[1]->count_symbol ($name);
-		}
-
-		return $count;
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$source = '';
@@ -46,6 +31,21 @@ class ArrayExpression implements Expression
 		}
 
 		return 'array(' . (string)substr ($source, 1) . ')';
+	}
+
+	public function get_symbols ()
+	{
+		$symbols = array ();
+
+		foreach ($this->elements as $element)
+		{
+			if ($element[0] !== null)
+				Generator::merge_symbols ($symbols, $element[0]->get_symbols ());
+
+			Generator::merge_symbols ($symbols, $element[1]->get_symbols ());
+		}
+
+		return $symbols;
 	}
 
 	public function inject ($invariants)

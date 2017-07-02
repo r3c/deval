@@ -48,19 +48,20 @@ class LetBlock implements Block
 		return $output;
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		$count = $this->body->count_symbol ($name);
+		$symbols = $this->body->get_symbols ();
 
 		foreach ($this->assignments as $assignment)
-			$count += $assignment[1]->count_symbol ($name);
+			Generator::merge_symbols ($symbols, $assignment[1]->get_symbols ());
 
-		return $count;
+		return $symbols;
 	}
 
 	public function inject ($invariants)
 	{
 		$assignments = array ();
+		$symbols = $this->body->get_symbols ();
 
 		foreach ($this->assignments as $assignment)
 		{
@@ -70,7 +71,7 @@ class LetBlock implements Block
 			$expression = $expression->inject ($invariants);
 
 			// Inline expression if constant or used at most once
-			if ($expression->try_evaluate ($unused) || $this->body->count_symbol ($name) < 2)
+			if ($expression->try_evaluate ($unused) || !isset ($symbols[$name]) || $symbols[$name] < 2)
 				$invariants[$name] = $expression;
 
 			// Keep as an assignment otherwise

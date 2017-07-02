@@ -14,9 +14,9 @@ class PlainBlock implements Block
 		return (new Output ())->append_text ($generator->make_plain ($this->text));
 	}
 
-	public function count_symbol ($name)
+	public function get_symbols ()
 	{
-		return 0;
+		return array ();
 	}
 
 	public function inject ($invariants)

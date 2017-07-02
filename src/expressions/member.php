@@ -15,17 +15,22 @@ class MemberExpression implements Expression
 		return $this->source . '[' . $this->offset . ']';
 	}
 
-	public function count_symbol ($name)
-	{
-		return $this->offset->count_symbol ($name) + $this->source->count_symbol ($name);
-	}
-
 	public function generate ($generator, &$variables)
 	{
 		$offset = $this->offset->generate ($generator, $variables);
 		$source = $this->source->generate ($generator, $variables);
 
 		return Generator::emit_member ($source, $offset);
+	}
+
+	public function get_symbols ()
+	{
+		$symbols = array ();
+
+		Generator::merge_symbols ($symbols, $this->offset->get_symbols ());
+		Generator::merge_symbols ($symbols, $this->source->get_symbols ());
+
+		return $symbols;
 	}
 
 	public function inject ($invariants)
