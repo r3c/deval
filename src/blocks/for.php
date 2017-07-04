@@ -46,10 +46,8 @@ class ForBlock implements Block
 		$output->append_code (')');
 
 		// Compile inner loop
-		$requires = array ();
-
 		$output->append_code ('{');
-		$output->append ($this->loop->compile ($generator, $requires));
+		$output->append ($this->loop->compile ($generator));
 
 		if ($empty->has_data ())
 			$output->append_code ('++' . $counter . ';');

@@ -17,20 +17,15 @@ class LambdaExpression implements Expression
 
 	public function generate ($generator)
 	{
-		// Helper lambda to emit symbol from name
-		$emit_symbol = function ($name) use ($generator)
-		{
-			return $generator->emit_symbol ($name);
-		};
+		// Deduce captures from requires symbols minus provided arguments
+		$captures = array_diff (array_keys ($this->body->get_symbols ()), $this->names);
 
 		// Generate lambda code from captures, parameters and body expression
-		$captures = array_diff_key ($this->body->get_symbols (), array_flip ($this->names));
-		$parameters = array_map ($emit_symbol, $this->names);
-		$uses = array_map ($emit_symbol, array_keys ($captures));
+		$callback = function ($name) { return Generator::emit_symbol ($name); };
 
 		return
-			'function(' . implode (',', $parameters) . ')' .
-			(count ($uses) > 0 ? 'use(' . implode (',', $uses) . ')' : '') .
+			'function(' . implode (',', array_map ($callback, $this->names)) . ')' .
+			(count ($captures) > 0 ? 'use(' . implode (',', array_map ($callback, $captures)) . ')' : '') .
 			'{return ' . $this->body->generate ($generator) . ';}';
 	}
 
