@@ -5,6 +5,7 @@ TODO
 ----
 
 - Support builtin syntax for defering an expression
+- Backup in-use symbols only
 
 DONE
 ----

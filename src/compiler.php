@@ -65,13 +65,14 @@ class Compiler
 	public function compile ($setup, &$names)
 	{
 		$block = $this->block->inject ($this->expressions);
+		$symbols = $block->get_symbols ();
 		$names = array_keys ($block->get_symbols ());
 
-		$generator = new Generator ($setup, $names);
-		$source = $block->compile ($generator);
+		$generator = new Generator ($setup);
+		$source = $block->compile ($generator, $symbols);
 
 		$output = new Output ();
-		$output->append_code ($generator->emit_runtime ($names));
+		$output->append_code (Generator::emit_run ($names));
 		$output->append ($source);
 
 		return $output->source ();

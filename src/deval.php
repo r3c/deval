@@ -477,29 +477,6 @@ class StringRenderer extends DirectRenderer
 	}
 }
 
-class Runtime
-{
-	private $scopes = array ();
-
-	public function __construct ($required, &$provided)
-	{
-		$undefined = array_diff ($required, array_keys ($provided));
-
-		if (count ($undefined) > 0)
-			throw new RenderException ('undefined symbol(s) ' . implode (', ', $undefined));
-	}
-
-	public function scope_pop ()
-	{
-		return array_pop ($this->scopes);
-	}
-
-	public function scope_push ()
-	{
-		$this->scopes[] = func_get_args ();
-	}
-}
-
 class Setup
 {
 	public $style = 'deindent';
@@ -527,6 +504,20 @@ function m ($parent, $key)
 		return $parent[$key];
 
 	return null;
+}
+
+/*
+** Decvate run method, assert provided symbols match required ones and throw
+** exception otherwise.
+** $required:	required symbols list
+** $provided:	provided symbols map
+*/
+function r ($required, &$provided)
+{
+	$undefined = array_diff ($required, array_keys ($provided));
+
+	if (count ($undefined) > 0)
+		throw new RenderException ('undefined symbol(s) ' . implode (', ', $undefined));
 }
 
 ?>

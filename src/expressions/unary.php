@@ -32,9 +32,9 @@ class UnaryExpression implements Expression
 		return $this->operator . $this->operand;
 	}
 
-	public function generate ($generator)
+	public function generate ($generator, $preserves)
 	{
-		return $this->operator . $this->operand->generate ($generator);
+		return $this->operator . $this->operand->generate ($generator, $preserves);
 	}
 
 	public function get_symbols ()

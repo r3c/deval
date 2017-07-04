@@ -10,7 +10,7 @@ class LetBlock implements Block
 		$this->body = $body;
 	}
 
-	public function compile ($generator)
+	public function compile ($generator, $preserves)
 	{
 		// Evalulate or generate code for assignment variables
 		$assignments = new Output ();
@@ -21,20 +21,24 @@ class LetBlock implements Block
 			list ($name, $expression) = $assignment;
 
 			// Generate evaluation code for current variable
-			$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator) . ';');
+			$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator, $preserves) . ';');
 
 			// Mark variable as available for next assignments
+			$preserves[$name] = true;
 			$provides[$name] = true;
 		}
 
+		$backup = $generator->make_local ($preserves);
+		$names = array_keys ($provides); // FIXME: backup symbols previously existing in preserve only
+
 		// Backup provided variables and assign them new values
 		$output = new Output ();
-		$output->append_code ($generator->emit_scope_push (array_keys ($provides)));
+		$output->append_code (Generator::emit_backup ($backup, $names));
 		$output->append ($assignments);
 
 		// Generate body evaluation and restore variables
-		$output->append ($this->body->compile ($generator));
-		$output->append_code ($generator->emit_scope_pop (array_keys ($provides)));
+		$output->append ($this->body->compile ($generator, $preserves));
+		$output->append_code (Generator::emit_restore ($backup, $names));
 
 		return $output;
 	}

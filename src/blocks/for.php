@@ -13,30 +13,35 @@ class ForBlock implements Block
 		$this->value_name = $value_name;
 	}
 
-	public function compile ($generator)
+	public function compile ($generator, $preserves)
 	{
 		$output = new Output ();
 
-		// Generate loop counter if empty block contains instructions
-		$empty = $this->empty->compile ($generator);
+		// Generate empty block before adding variables to preserves list
+		$empty = $this->empty->compile ($generator, $preserves);
 
+		if ($this->key_name !== null)
+			$preserves[$this->key_name] = true;
+
+		$preserves[$this->value_name] = true;
+
+		// Generate loop counter if empty block contains instructions
 		if ($empty->has_data ())
 		{
-			$counter = $generator->emit_unique ();
+			$counter = $generator->make_local ($preserves);
+			$preserves[$counter] = true;
 
-			$output->append_code ($counter . '=0;');
+			$output->append_code (Generator::emit_symbol ($counter) . '=0;');
 		}
 
 		// Backup key and value variables
-		$provides = array ($this->value_name => null);
+		$backup = $generator->make_local ($preserves);
+		$names = $this->key_name !== null ? array ($this->key_name, $this->value_name) : array ($this->value_name); // FIXME: backup symbols previously existing in preserve only
 
-		if ($this->key_name !== null)
-			$provides[$this->key_name] = null;
-
-		$output->append_code ($generator->emit_scope_push (array_keys ($provides)));
+		$output->append_code (Generator::emit_backup ($backup, $names));
 
 		// Generate for control loop
-		$output->append_code ('foreach(' . $this->source->generate ($generator) . ' as ');
+		$output->append_code ('foreach(' . $this->source->generate ($generator, $preserves) . ' as ');
 
 		if ($this->key_name !== null)
 			$output->append_code (Generator::emit_symbol ($this->key_name) . '=>' . Generator::emit_symbol ($this->value_name));
@@ -47,20 +52,20 @@ class ForBlock implements Block
 
 		// Compile inner loop
 		$output->append_code ('{');
-		$output->append ($this->loop->compile ($generator));
+		$output->append ($this->loop->compile ($generator, $preserves));
 
 		if ($empty->has_data ())
-			$output->append_code ('++' . $counter . ';');
+			$output->append_code ('++' . Generator::emit_symbol ($counter) . ';');
 
 		$output->append_code ('}');
 
 		// Restore key and value variables
-		$output->append_code ($generator->emit_scope_pop (array_keys ($provides)));
+		$output->append_code (Generator::emit_restore ($backup, $names));
 
 		// Write empty block if it contains instructions
 		if ($empty->has_data ())
 		{
-			$output->append_code ('if(' . $counter . '==0)');
+			$output->append_code ('if(' . Generator::emit_symbol ($counter) . '===0)');
 			$output->append_code ('{');
 			$output->append ($empty);
 			$output->append_code ('}');

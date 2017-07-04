@@ -14,7 +14,7 @@ class ArrayExpression implements Expression
 		return '[' . implode (', ', array_map (function ($e) { return ($e[0] !== null ? $e[0] . ': ' : '') . $e[1]; }, $this->elements)) . ']';
 	}
 
-	public function generate ($generator)
+	public function generate ($generator, $preserves)
 	{
 		$source = '';
 
@@ -22,10 +22,10 @@ class ArrayExpression implements Expression
 		{
 			list ($e_key, $e_value) = $element;
 
-			$value = $e_value->generate ($generator);
+			$value = $e_value->generate ($generator, $preserves);
 
 			if ($e_key !== null)
-				$source .= ',' . $e_key->generate ($generator) . '=>' . $value;
+				$source .= ',' . $e_key->generate ($generator, $preserves) . '=>' . $value;
 			else
 				$source .= ',' . $value;
 		}

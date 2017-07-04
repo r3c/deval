@@ -9,12 +9,12 @@ class ConcatBlock implements Block
 		$this->blocks = $blocks;
 	}
 
-	public function compile ($generator)
+	public function compile ($generator, $preserves)
 	{
 		$output = new Output ();
 
 		foreach ($this->blocks as $block)
-			$output->append ($block->compile ($generator));
+			$output->append ($block->compile ($generator, $preserves));
 
 		return $output;
 	}

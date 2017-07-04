@@ -10,7 +10,7 @@ class IfBlock implements Block
 		$this->fallback = $fallback;
 	}
 
-	public function compile ($generator)
+	public function compile ($generator, $preserves)
 	{
 		$keyword = 'if';
 		$output = new Output ();
@@ -19,15 +19,15 @@ class IfBlock implements Block
 		{
 			list ($condition, $body) = $branch;
 
-			$output->append_code ($keyword . '(' . $condition->generate ($generator) . ')');
+			$output->append_code ($keyword . '(' . $condition->generate ($generator, $preserves) . ')');
 			$output->append_code ('{');
-			$output->append ($body->compile ($generator));
+			$output->append ($body->compile ($generator, $preserves));
 			$output->append_code ('}');
 
 			$keyword = 'else if';
 		}
 
-		$fallback = $this->fallback->compile ($generator);
+		$fallback = $this->fallback->compile ($generator, $preserves);
 
 		if ($fallback->has_data ())
 		{

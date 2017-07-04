@@ -6,9 +6,40 @@ class Generator
 {
 	private static $input_name = '_deval_input';
 
+	public static function emit_backup ($backup, $names)
+	{
+		if (count ($names) < 1)
+			return '';
+
+		return self::emit_symbol ($backup) . '=array(' . implode (',', array_map (function ($name)
+		{
+			$symbol = Generator::emit_symbol ($name);
+
+			return 'isset(' . $symbol . ')?' . $symbol . ':null';
+		}, $names)) . ');';
+	}	
+
 	public static function emit_member ($source, $index)
 	{
 		return '\\' . __NAMESPACE__ . '\\m(' . $source . ',' . $index . ')';
+	}
+
+	public static function emit_restore ($backup, $names)
+	{
+		if (count ($names) < 1)
+			return '';
+
+		return 'list(' . implode (',', array_map (function ($name)
+		{
+			return Generator::emit_symbol ($name);
+		}, $names)) . ')=' . self::emit_symbol ($backup) . ';';
+	}	
+
+	public static function emit_run ($names)
+	{
+		return
+			'\\' . __NAMESPACE__ . '\\r(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
+			'\\extract($' . self::$input_name . ');';
 	}
 
 	public static function emit_symbol ($name)
@@ -50,14 +81,11 @@ class Generator
 		return $symbols;
 	}
 
-	private $reserves;
-	private $state;
-	private $temporary;
 	private $trimmer;
 	private $unique;
 	private $version;
 
-	public function __construct ($setup, $names)
+	public function __construct ($setup)
 	{
 		static $trims;
 
@@ -101,67 +129,19 @@ class Generator
 		else
 			throw new ParseException ('<setup>', 'invalid style, must be either builtin style or callable');
 
-		$this->reserves = array_flip ($names);
 		$this->unique = 0;
 		$this->version = $setup->version;
 	}
 
-	public function emit_runtime ($names)
-	{
-		return
-			$this->emit_state () . '=new\\' . __NAMESPACE__ . '\\Runtime(' . self::emit_value ($names) . ',$' . self::$input_name . ');' .
-			'\\extract($' . self::$input_name . ');';
-	}
-
-	public function emit_scope_pop ($names)
-	{
-		if (count ($names) < 1)
-			return '';
-
-		return 'list(' . implode (',', array_map (function ($name)
-		{
-			return Generator::emit_symbol ($name);
-		}, $names)) . ')=' . $this->emit_state () . '->scope_pop();';
-	}
-
-	public function emit_scope_push ($names)
-	{
-		if (count ($names) < 1)
-			return '';
-
-		return $this->emit_state () . '->scope_push(' . implode (',', array_map (function ($name)
-		{
-			$symbol = Generator::emit_symbol ($name);
-
-			return 'isset(' . $symbol . ')?' . $symbol . ':null';
-		}, $names)) . ');';
-	}
-
-	public function emit_state ()
-	{
-		if (!isset ($this->state))
-			$this->state = $this->emit_unique ();
-
-		return $this->state;
-	}
-
-	public function emit_temporary ()
-	{
-		if (!isset ($this->temporary))
-			$this->temporary = $this->emit_unique ();
-
-		return $this->temporary;
-	}
-
-	public function emit_unique ()
+	public function make_local ($preserves)
 	{
 		do
 		{
 			$name = '_' . $this->unique++;
 		}
-		while (isset ($this->reserves[$name]));
+		while (isset ($preserves[$name]));
 
-		return '$' . $name;
+		return $name;
 	}
 
 	public function make_plain ($text)

@@ -4,7 +4,7 @@ namespace Deval;
 
 class VoidBlock implements Block
 {
-	public function compile ($generator)
+	public function compile ($generator, $preserves)
 	{
 		return new Output ();
 	}

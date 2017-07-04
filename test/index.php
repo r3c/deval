@@ -345,11 +345,12 @@ render_code ('{{ let x = zip(["a", "b", "c"], [0, 1, 2]) }}{{ $ join(",", keys(x
 
 // Rendering optimizations
 render_code ('{{ let c = false }}{{ if c }}{{ $ crash }}{{ end }}{{ $ c }}{{ end }}', make_empty (), ''); // Dead code elimination
+render_code ('{{ for _0 in x }}{{ $ _0 }}{{ empty }}empty{{ end }}', make_combinations (array ('x' => array (1))), '1'); // Generated variables must not overlap local ones
 
 // Source code generation
 source_code ('{{ let v = f() }}{{ $ v /* non-constant but used once, should be inlined */ }}{{ end }}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0));
 source_code ('{{ let v = f() }}{{ $ v }}{{ $ v /* non-constant used twice, should not be inlined */ }}{{ end }}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 6));
 source_code ('{{ let v = 42 }}{{ $ v }}{{ $ v /* constant used twice, should be inlined */ }}{{ end }}', array (), array ('/42/' => 2, '/\\$v/' => 0));
-source_code ('{{ $ _0 && _1 /* _2 is used as temporary variable, _3 as runtime state */ }}', array (), array ('/\\$_2=/' => 1, '/\\$_3=new/' => 1));
+source_code ('{{ $ _0 && _1 /* _2 is used as temporary variable */ }}', array (), array ('/\\$_2=/' => 1));
 
 ?>

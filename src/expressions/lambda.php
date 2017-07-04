@@ -15,10 +15,11 @@ class LambdaExpression implements Expression
 		return '(' . implode (', ', $this->names) . ') => ' . $this->body;
 	}
 
-	public function generate ($generator)
+	public function generate ($generator, $preserves)
 	{
 		// Deduce captures from requires symbols minus provided arguments
 		$captures = array_diff (array_keys ($this->body->get_symbols ()), $this->names);
+		$provides = array_merge ($this->names, $captures);
 
 		// Generate lambda code from captures, parameters and body expression
 		$callback = function ($name) { return Generator::emit_symbol ($name); };
@@ -26,7 +27,7 @@ class LambdaExpression implements Expression
 		return
 			'function(' . implode (',', array_map ($callback, $this->names)) . ')' .
 			(count ($captures) > 0 ? 'use(' . implode (',', array_map ($callback, $captures)) . ')' : '') .
-			'{return ' . $this->body->generate ($generator) . ';}';
+			'{return ' . $this->body->generate ($generator, array_combine ($provides, array_fill (0, count ($provides), 1))) . ';}';
 	}
 
 	public function get_symbols ()

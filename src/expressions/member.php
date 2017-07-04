@@ -15,10 +15,10 @@ class MemberExpression implements Expression
 		return $this->source . '[' . $this->offset . ']';
 	}
 
-	public function generate ($generator)
+	public function generate ($generator, $preserves)
 	{
-		$offset = $this->offset->generate ($generator);
-		$source = $this->source->generate ($generator);
+		$offset = $this->offset->generate ($generator, $preserves);
+		$source = $this->source->generate ($generator, $preserves);
 
 		return Generator::emit_member ($source, $offset);
 	}
