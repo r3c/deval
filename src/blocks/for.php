@@ -15,13 +15,24 @@ class ForBlock implements Block
 
 	public function compile ($generator, $preserves)
 	{
+		$backups = array ();
 		$output = new Output ();
 
-		// Generate empty block before adding variables to preserves list
+		// Generate empty block
 		$empty = $this->empty->compile ($generator, $preserves);
 
+		// Backup key variable if any and add to preserve list
 		if ($this->key_name !== null)
+		{
+			if (isset ($preserves[$this->key_name]))
+				$backups[] = $this->key_name;
+
 			$preserves[$this->key_name] = true;
+		}
+
+		// Backup value variable and add to preserve list
+		if (isset ($preserves[$this->value_name]))
+			$backups[] = $this->value_name;
 
 		$preserves[$this->value_name] = true;
 
@@ -29,16 +40,24 @@ class ForBlock implements Block
 		if ($empty->has_data ())
 		{
 			$counter = $generator->make_local ($preserves);
-			$preserves[$counter] = true;
 
-			$output->append_code (Generator::emit_symbol ($counter) . '=0;');
+			// Counter must be saved and restored if present in the preserve list
+			if (isset ($preserves[$counter]))
+				$backups[] = $counter;
+
+			$preserves[$counter] = true;
 		}
 
-		// Backup key and value variables
-		$backup = $generator->make_local ($preserves);
-		$names = $this->key_name !== null ? array ($this->key_name, $this->value_name) : array ($this->value_name); // FIXME: backup symbols previously existing in preserve only
+		// Backup conflicting counter, key and value variables if any
+		if (count ($backups) > 0)
+		{
+			$store = $generator->make_local ($preserves);
+			$output->append_code (Generator::emit_backup ($store, $backups));
+		}
 
-		$output->append_code (Generator::emit_backup ($backup, $names));
+		// Initialize counter if any
+		if ($empty->has_data ())
+			$output->append_code (Generator::emit_symbol ($counter) . '=0;');
 
 		// Generate for control loop
 		$output->append_code ('foreach(' . $this->source->generate ($generator, $preserves) . ' as ');
@@ -59,8 +78,9 @@ class ForBlock implements Block
 
 		$output->append_code ('}');
 
-		// Restore key and value variables
-		$output->append_code (Generator::emit_restore ($backup, $names));
+		// Restore backup variables
+		if (count ($backups) > 0)
+			$output->append_code (Generator::emit_restore ($store, $backups));
 
 		// Write empty block if it contains instructions
 		if ($empty->has_data ())

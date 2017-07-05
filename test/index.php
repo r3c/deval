@@ -347,10 +347,17 @@ render_code ('{{ let x = zip(["a", "b", "c"], [0, 1, 2]) }}{{ $ join(",", keys(x
 render_code ('{{ let c = false }}{{ if c }}{{ $ crash }}{{ end }}{{ $ c }}{{ end }}', make_empty (), ''); // Dead code elimination
 render_code ('{{ for _0 in x }}{{ $ _0 }}{{ empty }}empty{{ end }}', make_combinations (array ('x' => array (1))), '1'); // Generated variables must not overlap local ones
 
-// Source code generation
-source_code ('{{ let v = f() }}{{ $ v /* non-constant but used once, should be inlined */ }}{{ end }}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0));
-source_code ('{{ let v = f() }}{{ $ v }}{{ $ v /* non-constant used twice, should not be inlined */ }}{{ end }}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 6));
-source_code ('{{ let v = 42 }}{{ $ v }}{{ $ v /* constant used twice, should be inlined */ }}{{ end }}', array (), array ('/42/' => 2, '/\\$v/' => 0));
-source_code ('{{ $ _0 && _1 /* _2 is used as temporary variable */ }}', array (), array ('/\\$_2=/' => 1));
+// Source local symbols
+source_code ('{{ $ _1 && _2 }}', array (), array ('/\\$_0=/' => 1)); // Variable _0 is used as temporary when available
+source_code ('{{ $ _0 && _1 }}', array (), array ('/\\$_2=/' => 1)); // Variable _2 is used as temporary to avoid conflict with _0 and _1
+
+// Source inlining
+source_code ('{{ let v = f() }}{{ $ v }}{{ end }}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 0)); // Non-constant but used once, should be inlined
+source_code ('{{ let v = f() }}{{ $ v }}{{ $ v }}{{ end }}', array (), array ('/\\$f()/' => 1, '/\\$v/' => 3)); // Non-constant used twice, should not be inlined
+source_code ('{{ let v = 42 }}{{ $ v }}{{ $ v }}{{ end }}', array (), array ('/42/' => 2, '/\\$v/' => 0)); // Constant used twice, should be inlined
+
+// Source backup & restore
+source_code ('{{ let v = f() }}{{ let w = g() }}{{ $ w + w }}{{ end }}{{ $ v + v }}{{ end }}', array (), array ('/\\$.*=array\\(/' => 0, '/list\\(.*\\)=/' => 0)); // No conflict on variables, no need for backup/restore
+source_code ('{{ let v = f() }}{{ let v = g() }}{{ $ v + v }}{{ end }}{{ $ v + v }}{{ end }}', array (), array ('/\\$_0=array\\(/' => 1, '/list\\(\\$v\\)=/' => 1, '/\\$f()/' => 1, '/\\$g/' => 1)); // Conflict on "v" variable should trigger backup/restore
 
 ?>

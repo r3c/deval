@@ -5,7 +5,6 @@ TODO
 ----
 
 - Support builtin syntax for defering an expression
-- Backup in-use symbols only
 
 DONE
 ----
@@ -26,3 +25,4 @@ DONE
 - Support ternary operator
 - Do not inline variables when used more than once
 - Implement static variable allocation to replace _d_(input|local|state)
+- Backup in-use symbols only

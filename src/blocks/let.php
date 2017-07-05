@@ -14,7 +14,8 @@ class LetBlock implements Block
 	{
 		// Evalulate or generate code for assignment variables
 		$assignments = new Output ();
-		$provides = array ();
+		$backups = array ();
+		$output = new Output ();
 
 		foreach ($this->assignments as $assignment)
 		{
@@ -23,22 +24,28 @@ class LetBlock implements Block
 			// Generate evaluation code for current variable
 			$assignments->append_code (Generator::emit_symbol ($name) . '=' . $expression->generate ($generator, $preserves) . ';');
 
+			// Variable must be saved and restored if present in the preserve list
+			if (isset ($preserves[$name]))
+				$backups[] = $name;
+
 			// Mark variable as available for next assignments
 			$preserves[$name] = true;
-			$provides[$name] = true;
 		}
 
-		$backup = $generator->make_local ($preserves);
-		$names = array_keys ($provides); // FIXME: backup symbols previously existing in preserve only
+		// Backup conflicting variables if any
+		if (count ($backups) > 0)
+		{
+			$store = $generator->make_local ($preserves);
+			$output->append_code (Generator::emit_backup ($store, $backups));
+		}
 
-		// Backup provided variables and assign them new values
-		$output = new Output ();
-		$output->append_code (Generator::emit_backup ($backup, $names));
+		// Output assignments and body evaluation
 		$output->append ($assignments);
-
-		// Generate body evaluation and restore variables
 		$output->append ($this->body->compile ($generator, $preserves));
-		$output->append_code (Generator::emit_restore ($backup, $names));
+
+		// Restore backup variables if any
+		if (count ($backups) > 0)
+			$output->append_code (Generator::emit_restore ($store, $backups));
 
 		return $output;
 	}
@@ -84,7 +91,11 @@ class LetBlock implements Block
 
 			// Keep as an assignment otherwise
 			else
+			{
 				$assignments[] = array ($name, $expression);
+
+				unset ($invariants[$name]);
+			}
 		}
 
 		// Inject all invariants and assignments into body
