@@ -295,11 +295,13 @@ render_code ('{{ $ max(1, 3) }}', make_builtins ('max'), '3');
 render_code ('{{ $ max([1, 3]) }}', make_builtins ('max'), '3');
 render_code ('{{ $ max(7, 3) }}', make_builtins ('max'), '7');
 render_code ('{{ $ max([7, 3]) }}', make_builtins ('max'), '7');
+render_code ('{{ $ max([]) }}', make_builtins ('max'), '');
 
 render_code ('{{ $ min(1, 3) }}', make_builtins ('min'), '1');
 render_code ('{{ $ min([1, 3]) }}', make_builtins ('min'), '1');
 render_code ('{{ $ min(7, 3) }}', make_builtins ('min'), '3');
 render_code ('{{ $ min([7, 3]) }}', make_builtins ('min'), '3');
+render_code ('{{ $ min([]) }}', make_builtins ('min'), '');
 
 render_code ('{{ $ php("implode")(",", [1, 2]) }}', make_builtins ('php'), '1,2');
 render_code ('{{ $ php("#PHP_VERSION") }}', make_builtins ('php'), PHP_VERSION);

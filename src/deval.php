@@ -154,13 +154,19 @@ class Builtin
 		return array_map ($apply, $items);
 	}
 
-	public static function _max ()
+	public static function _max ($first)
 	{
+		if (is_array ($first) && count ($first) === 0)
+			return null;
+
 		return call_user_func_array ('max', func_get_args ());
 	}
 
-	public static function _min ()
+	public static function _min ($first)
 	{
+		if (is_array ($first) && count ($first) === 0)
+			return null;
+
 		return call_user_func_array ('min', func_get_args ());
 	}
 
