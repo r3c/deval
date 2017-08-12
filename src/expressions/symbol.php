@@ -27,7 +27,7 @@ class SymbolExpression implements Expression
 	public function inject ($invariants)
 	{
 		if (array_key_exists ($this->name, $invariants))
-			return new GroupExpression ($invariants[$this->name]);
+			return $invariants[$this->name];
 
 		return $this;
 	}

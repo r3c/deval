@@ -103,10 +103,10 @@ render_code ('{{ $ a / b * c }}', make_combinations (array ('a' => 4, 'b' => 1, 
 render_code ('{{ $ a % b }}', make_combinations (array ('a' => 4, 'b' => 3)), '1');
 render_code ('{{ $ a && b }}', make_combinations (array ('a' => 1, 'b' => 0)), '0');
 render_code ('{{ $ a && b }}', make_combinations (array ('a' => 1, 'b' => 2)), '2');
-render_code ('{{ $ x && crash () }}', make_slices (array ('crash' => 'crash', 'x' => 0)), '0');
+render_code ('{{ $ x && crash() }}', make_slices (array ('crash' => 'crash', 'x' => 0)), '0');
 render_code ('{{ $ a || b }}', make_combinations (array ('a' => 0, 'b' => 0)), '0');
 render_code ('{{ $ a || b }}', make_combinations (array ('a' => 1, 'b' => 0)), '1');
-render_code ('{{ $ x || crash () }}', make_slices (array ('crash' => 'crash', 'x' => 1)), '1');
+render_code ('{{ $ x || crash() }}', make_slices (array ('crash' => 'crash', 'x' => 1)), '1');
 render_code ('{{ $ a == b }}', make_combinations (array ('a' => 0, 'b' => 1)), '');
 render_code ('{{ $ a == b }}', make_combinations (array ('a' => 0, 'b' => 0)), '1');
 render_code ('{{ $ a == b }}', make_combinations (array ('a' => 0, 'b' => '0')), '');
@@ -149,6 +149,15 @@ render_code ('{{ $ a[0] }}', make_combinations (array ('a' => array (7))), '7');
 render_code ('{{ $ [2, 9, 3][x] }}', make_combinations (array ('x' => 1)), '9');
 render_code ('{{ $ a[x][y] }}', make_combinations (array ('a' => array (0, 0, array (0, 5)), 'x' => 2, 'y' => 1)), '5');
 render_code ('{{ $ obj.instance_field }}', make_combinations (array ('obj' => new TestClass ())), '1');
+
+// Render temporal expressions
+raise_compile ('{{ $ (+)x }}', array (), 'must evaluate to a constant');
+raise_compile ('{{ $ (+)(x * 2) }}', array (), 'must evaluate to a constant');
+render_code ('{{ $ (+)1 }}', make_empty (), '1');
+render_code ('{{ $ (+)(x + 3) }}', array (array (array ('x' => 2), array ())), '5');
+source_code ('{{ $ ((-)crash)() }}', array ('crash' => 'crash'), array ('/echo \\(\'crash\'\\)\\(\\);/' => 1));
+source_code ('{{ $ ((-)crash)(x + 1) }}', array ('crash' => 'crash', 'x' => '2'), array ('/echo \\(\'crash\'\\)\\(3\\);/' => 1));
+source_code ('{{ $ (-)strlen("test") }}', array ('strlen' => 'strlen'), array ('/echo 4;/' => 1, '/strlen/' => 0));
 
 // Render unary expressions
 render_code ('{{ $ -3 }}', make_empty (), '-3');
@@ -346,7 +355,7 @@ render_code ('{{ $ void() }}', make_builtins ('void'), '');
 render_code ('{{ let x = zip(["a", "b", "c"], [0, 1, 2]) }}{{ $ join(",", keys(x)) }}:{{ $ join(",", values(x)) }}{{ end }}', make_builtins ('join', 'keys', 'values', 'zip'), 'a,b,c:0,1,2');
 
 // Rendering optimizations
-render_code ('{{ let c = false }}{{ if c }}{{ $ crash }}{{ end }}{{ $ c }}{{ end }}', make_empty (), ''); // Dead code elimination
+render_code ('{{ let c = false }}{{ if c }}{{ $ crash() }}{{ end }}{{ $ c }}{{ end }}', make_empty (), ''); // Dead code elimination
 render_code ('{{ for _0 in x }}{{ $ _0 }}{{ empty }}empty{{ end }}', make_combinations (array ('x' => array (1))), '1'); // Generated variables must not overlap local ones
 
 // Source local symbols

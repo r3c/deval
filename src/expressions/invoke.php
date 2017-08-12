@@ -76,24 +76,24 @@ class InvokeExpression implements Expression
 	public function inject ($invariants)
 	{
 		$arguments = array ();
-		$caller = $this->caller->inject ($invariants);
-		$ready = true;
+		$caller = $this->caller->inject ($invariants, true);
+		$evaluate = true;
 		$values = array ();
 
 		foreach ($this->arguments as $argument)
 		{
-			$argument = $argument->inject ($invariants);
+			$argument = $argument->inject ($invariants, true);
 
 			if ($argument->try_evaluate ($value))
 				$values[] = $value;
 			else
-				$ready = false;
+				$evaluate = false;
 
 			$arguments[] = $argument;
 		}
 
 		// Invoke and pass return value if caller and arguments were evaluated
-		if ($ready && $caller->try_evaluate ($value))
+		if ($evaluate && $caller->try_evaluate ($value))
 		{
 			if (!is_callable ($value))
 				throw new CompileException ($caller, 'is not callable');

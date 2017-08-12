@@ -250,11 +250,25 @@ ExpressionMathMulOperator
 	/ "%"
 
 ExpressionPrefix
-	= operator:ExpressionPrefixOperator _ operand:ExpressionPrefix
+	= moment:ExpressionPrefixMoment _ operand:ExpressionPrefix
+	{
+		return new \Deval\DeferExpression ($moment, $operand);
+	}
+	/ operator:ExpressionPrefixOperator _ operand:ExpressionPrefix
 	{
 		return new \Deval\UnaryExpression ($operator, $operand);
 	}
 	/ ExpressionPostfix
+
+ExpressionPrefixMoment
+	= "(-)"
+	{
+		return false;
+	}
+	/ "(+)"
+	{
+		return true;
+	}
 
 ExpressionPrefixOperator
 	= "~"

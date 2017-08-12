@@ -4,8 +4,6 @@ Deval TODO list
 TODO
 ----
 
-- Support builtin syntax for defering an expression
-
 DONE
 ----
 
@@ -26,3 +24,4 @@ DONE
 - Do not inline variables when used more than once
 - Implement static variable allocation to replace _d_(input|local|state)
 - Backup in-use symbols only
+- Support builtin syntax for defering an expression
