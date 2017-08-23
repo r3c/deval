@@ -1,3 +1,5 @@
+"use strict";
+
 let fs = require ('fs');
 let pegjs = require ('pegjs');
 let phppegjs = require ('php-pegjs');
