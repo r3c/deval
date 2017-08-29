@@ -204,6 +204,11 @@ class Builtin
 		return range ((int)$start, (int)$stop, (int)$step);
 	}
 
+	public static function _reduce ($items, $callback, $initial = null)
+	{
+		return array_reduce ($items, $callback, $initial);
+	}
+
 	public static function _slice ($input, $offset, $count = null)
 	{
 		if ($input === null)
@@ -285,6 +290,7 @@ class Builtin
 			'min',
 			'php',
 			'range',
+			'reduce',
 			'slice',
 			'sort',
 			'split',

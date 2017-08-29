@@ -328,6 +328,9 @@ render_code ('{{ $ join(",", range(1, 5, 2)) }}', make_builtins ('join', 'range'
 render_code ('{{ $ join(",", range(4, 3)) }}', make_builtins ('join', 'range'), '');
 render_code ('{{ $ join(",", range(4, 0, -2)) }}', make_builtins ('join', 'range'), '4,2,0');
 
+render_code ('{{ $ reduce([1, 2, 3, 4], (v1, v2) => v1 + v2) }}', make_builtins ('reduce'), '10');
+render_code ('{{ $ reduce([1, 2, 3, 4], (v1, v2) => v1 * v2, 1) }}', make_builtins ('reduce'), '24');
+
 render_code ('{{ $ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ $ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ $ slice("1234", -3) }}', make_builtins ('slice'), '234');
