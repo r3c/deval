@@ -2,7 +2,7 @@
 
 let fs = require ('fs');
 let pegjs = require ('pegjs');
-let phppegjs = require ('php-pegjs');
+let phppegjs = require ('phpegjs');
 
 let input = 'src/parser.pegjs';
 let output = 'src/parser.php';
@@ -11,7 +11,7 @@ fs.readFile (input, 'utf8', function (err, data) {
 	if (err)
 		return console.log (err);
 
-	var parser = pegjs.buildParser (data, {
+	var parser = pegjs.generate (data, {
 		cache: true,
 		plugins: [phppegjs]
 	});
