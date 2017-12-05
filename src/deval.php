@@ -139,14 +139,14 @@ class Builtin
 		return array_keys ($items);
 	}
 
-	public static function _length ($input)
+	public static function _length ($value)
 	{
-		if ($input === null)
+		if ($value === null)
 			return null;
-		else if (is_array ($input))
-			return count ($input);
+		else if (is_array ($value))
+			return count ($value);
 		else
-			return mb_strlen ((string)$input);
+			return mb_strlen ((string)$value);
 	}
 
 	public static function _map ($items, $apply)
@@ -209,23 +209,23 @@ class Builtin
 		return array_reduce ($items, $callback, $initial);
 	}
 
-	public static function _slice ($input, $offset, $count = null)
+	public static function _slice ($value, $offset, $count = null)
 	{
-		if ($input === null)
+		if ($value === null)
 			return null;
-		else if (is_array ($input))
+		else if (is_array ($value))
 		{
 			if ($count !== null)
-				return array_slice ($input, $offset, $count);
+				return array_slice ($value, $offset, $count);
 
-			return array_slice ($input, $offset);
+			return array_slice ($value, $offset);
 		}
 		else
 		{
 			if ($count !== null)
-				return mb_substr ((string)$input, $offset, $count);
+				return mb_substr ((string)$value, $offset, $count);
 
-			return mb_substr ((string)$input, $offset);
+			return mb_substr ((string)$value, $offset);
 		}
 	}
 
@@ -239,12 +239,9 @@ class Builtin
 		return $items;
 	}
 
-	public static function _split ($string, $separator, $limit = null)
+	public static function _split ($string, $separator, $limit = PHP_INT_MAX)
 	{
-		if ($limit !== null)
-			return explode ($separator, $string, $limit);
-
-		return explode ($separator, $string);
+		return explode ($separator, $string, $limit);
 	}
 
 	public static function _str ($value)
@@ -426,7 +423,7 @@ class CacheRenderer implements Renderer
 	{
 		$cache = $this->directory . DIRECTORY_SEPARATOR . pathinfo (basename ($this->path), PATHINFO_FILENAME) . '_' . md5 ($this->path . ':' . serialize ($this->constants)) . '.php';
 
-		if (!file_exists ($cache) || $this->invalidate)
+		if (!file_exists ($cache) || filemtime ($cache) < filemtime ($this->path) || $this->invalidate)
 			file_put_contents ($cache, $this->source ($names), LOCK_EX);
 
 		return Evaluator::path ($cache, $variables);

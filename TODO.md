@@ -4,6 +4,8 @@ Deval TODO list
 TODO
 ----
 
+- Add `reverse` builtin to reverse items order in array or string
+
 DONE
 ----
 
