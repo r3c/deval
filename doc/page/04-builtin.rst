@@ -7,11 +7,11 @@ Builtin functions
 Functional constraint
 =====================
 
-Deval's ability to evaluate code at compilation or delay it to runtime relies on template code not having any side-effect. Side-effects would make evaluation not predictable by depending on inputs that Deval have no control on, and therefore could break your templates by producing different results depending on when or in which order functions are evaluated. This is why the template language and all :ref:`flavor_deval` must be :ref:`pure`.
+Deval's ability to evaluate code at compilation or delay it to runtime relies on template code not having any side-effect. Side-effects would make evaluation not predictable by depending on inputs that Deval have no control on, and therefore could break your templates by producing different results depending on when or in which order functions are evaluated. This is why the template language and all :ref:`flavor_deval` are :ref:`pure`.
 
 .. _pure: https://en.wikipedia.org/wiki/Pure_function
 
-Deval has no way to make sure functions you inject are pure, so this responsibility is left to the developer. Remember it's technically possible to inject unpure functions into a Deval template but you'll most probably break something if you do so, unless you really know what you're doing.
+Deval has no way to make sure functions you inject are pure, so this responsibility is left to the developer. Remember it's technically possible to inject non-pure functions into a Deval template but you'll most probably break something if you do so, unless you really know what you're doing.
 
 
 List of builtin functions
@@ -20,7 +20,7 @@ List of builtin functions
 Deval offers two predefined "flavors" of builtin functions you can inject:
 
 - Preferred "deval" flavor: a minimal set of pure functions you can safely use in your templates without any risk of unexpected behavior ;
-- Alternative "php" flavor: all standard PHP functions made directly available in your templates. Make sure you only use the pure ones, otherwise you may experience unreliable results.
+- Alternative "php" flavor: all standard PHP functions made directly available in your templates. Make sure you only use the pure ones, otherwise you may experience unreliable results as explained above.
 
 To inject builtin functions into your template, use the same :php:meth:`Deval\\Renderer::inject` method we saw in previous sections:
 
@@ -159,21 +159,17 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 
 .. py:function:: max(value1[, value2[, ...]])
 
-	Returns highest value in given array when given a single argument, or highest argument when given more than one (similar to PHP function max_).
+	Returns highest value in given array when given a single argument, or highest argument when given more than one (similar to PHP function `max <http://php.net/manual/function.max.php>`_).
 
 	:param mixed valueN: array (if one argument) or scalar value (if more)
 	:return: greatest value or argument
 
-.. _max: http://php.net/manual/function.max.php
-
 .. py:function:: min(value1[, value2[, ...]])
 
-	Returns lowest value in given array when given a single argument, or lowest argument when given more than one (similar to PHP function min_).
+	Returns lowest value in given array when given a single argument, or lowest argument when given more than one (similar to PHP function `min <http://php.net/manual/function.min.php>`_).
 
 	:param mixed valueN: array (if one argument) or scalar value (if more)
 	:return: lowest value or argument
-
-.. _min: http://php.net/manual/function.min.php
 
 .. py:function:: php(symbol)
 
@@ -188,6 +184,7 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 	{{ $ php("#PHP_VERSION") /* access PHP constant */ }}
 	{{ $ php("$_SERVER")["PHP_SELF"] /* access PHP variable */ }}
 	{{ $ php("My\\SomeClass::$field") /* access class variable */ }}
+	{{ $ php("OtherClass::#VALUE") /* access class constant */ }}
 
 .. py:function:: range(start, stop[, step])
 
@@ -209,7 +206,7 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 	:param mixed initial: value used as initial aggregate, ``null`` if not specified
 	:return: final aggregated value
 
-.. array_reduce: http://php.net/manual/function.array-reduce.php
+.. _`array_reduce`: http://php.net/manual/function.array-reduce.php
 
 .. py:function:: slice(value, offset[, count])
 
@@ -265,7 +262,7 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 
 .. py:function:: zip(keys, values)
 
-	Create a key-value array from given list of keys and values (similar to PHP functions `array_combine`_). Input arrays ``keys`` and ``values`` must have the same length for this function to work properly.
+	Create a key-value array from given list of keys and values (similar to PHP function `array_combine`_). Input arrays ``keys`` and ``values`` must have the same length for this function to work properly.
 
 	:param any_array keys: items to be used as array keys
 	:param any_array values: items to be used as array values
@@ -278,7 +275,7 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 PHP flavor functions
 --------------------
 
-If you chose to use :php:meth:`Deval\\Builtin::php` flavor, all standard PHP functions are available in your templates. Proceed with caution! Using any non-pure function e.g. rand_ could make your template unreliable as you don't control when exactly it's going to be called.
+If you chose to use :php:meth:`Deval\\Builtin::php` flavor, all standard PHP functions are available in your templates. Proceed with caution! Using any non-pure function e.g. rand_ could make your template unreliable as you don't control when exactly it's going to be called nor how many times.
 
 .. _rand: http://php.net/manual/function.rand.php
 
