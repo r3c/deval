@@ -349,6 +349,6 @@ Default value of style option is 'deindent'.
 PHP compatibility
 -----------------
 
-Use the :php:attr:`Deval\\Setup::$version` property to change target PHP compatibility version. All PHP versions above 7 unlocked some constructs that were not possible with previous versions, meaning some less effective workarounds need to be use when targeting one of these.
+Use the :php:attr:`Deval\\Setup::$version` property to change target PHP compatibility version. PHP versions 7 and above unlocked language constructs that were not possible on previous versions (e.g. ``$f()()``), saving Deval from resorting to less effective workarounds.
 
 Default value of this option is current executing PHP version (obtained through ``PHP_VERSION`` constant), meaning you should not have to touch this option except in rare situations if you use Deval to generate and execute code that don't run using the same PHP version.
