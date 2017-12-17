@@ -209,6 +209,11 @@ class Builtin
 		return array_reduce ($items, $callback, $initial);
 	}
 
+	public static function _replace ($value, $replacements)
+	{
+		return str_replace (array_keys ($replacements), array_values ($replacements), $value);
+	}
+
 	public static function _slice ($value, $offset, $count = null)
 	{
 		if ($value === null)
@@ -288,6 +293,7 @@ class Builtin
 			'php',
 			'range',
 			'reduce',
+			'replace',
 			'slice',
 			'sort',
 			'split',

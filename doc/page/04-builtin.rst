@@ -208,6 +208,16 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 
 .. _`array_reduce`: http://php.net/manual/function.array-reduce.php
 
+.. py:function:: replace(value, replacements)
+
+	Replace all occurrences of ``replacements`` keys by corresponding values (similar to PHP function `str_replace`_ but takes a single key-value array for replacements instead of two separate arrays).
+
+	:param string value: original string
+	:param any_array replacements: replacements key-value pairs
+	:return: string with all keys from ``replacements`` replaced
+
+.. _`str_replace`: http://php.net/manual/function.str-replace.php
+
 .. py:function:: slice(value, offset[, count])
 
 	Extract delimited slice from given array or string starting at given offset.

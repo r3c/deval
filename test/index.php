@@ -331,6 +331,10 @@ render_code ('{{ $ join(",", range(4, 0, -2)) }}', make_builtins ('join', 'range
 render_code ('{{ $ reduce([1, 2, 3, 4], (v1, v2) => v1 + v2) }}', make_builtins ('reduce'), '10');
 render_code ('{{ $ reduce([1, 2, 3, 4], (v1, v2) => v1 * v2, 1) }}', make_builtins ('reduce'), '24');
 
+render_code ('{{ $ replace("foo", []) }}', make_builtins ('replace'), 'foo');
+render_code ('{{ $ replace("foo bar baz", ["foo": "1", "baz": "2"]) }}', make_builtins ('replace'), '1 bar 2');
+render_code ('{{ $ replace("foo bar baz", ["a": "111", "b": "222"]) }}', make_builtins ('replace'), 'foo 222111r 222111z');
+
 render_code ('{{ $ slice("1234", 1) }}', make_builtins ('slice'), '234');
 render_code ('{{ $ slice("1234", 1, 2) }}', make_builtins ('slice'), '23');
 render_code ('{{ $ slice("1234", -3) }}', make_builtins ('slice'), '234');
