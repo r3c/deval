@@ -55,7 +55,8 @@ class IfBlock implements Block
 
 	public function inject ($invariants)
 	{
-		$static = true;
+		$branches = array ();
+		$fallback = null;
 
 		foreach ($this->branches as $branch)
 		{
@@ -64,26 +65,33 @@ class IfBlock implements Block
 			// Conditions can be statically evaluated if previous ones were too
 			$condition = $condition->inject ($invariants);
 
-			if ($static && $condition->try_evaluate ($value))
+			if ($condition->try_evaluate ($value))
 			{
+				// If evaluation result is true, use body as fallback don't process following branches
 				if ($value)
-					return $body->inject ($invariants);
+				{
+					$fallback = $body->inject ($invariants);
 
+					break;
+				}
+
+				// Otherwise skip current branch from injected ones
 				continue;
 			}
 
 			// First non-static condition requires branches reconstruction
 			$branches[] = array ($condition, $body->inject ($invariants));
-			$static = false;
 		}
 
-		$fallback = $this->fallback->inject ($invariants);
+		// Inject fallback unless a branch has been used as replacement fallback already
+		if ($fallback === null)
+			$fallback = $this->fallback->inject ($invariants);
 
-		// Use fallback if conditions were all static and evaluated to false
-		if ($static)
+		// Emit fallback directly if no conditional branch remains
+		if (count ($branches) === 0)
 			return $fallback;
 
-		// Otherwise rebuild command with injected branches and fallback
+		// Otherwise rebuild command with surviving branches and fallback
 		return new self ($branches, $fallback);
 	}
 

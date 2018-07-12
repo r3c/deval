@@ -365,6 +365,10 @@ render_code ('{{ let x = zip(["a", "b", "c"], [0, 1, 2]) }}{{ $ join(",", keys(x
 render_code ('{{ let c = false }}{{ if c }}{{ $ crash() }}{{ end }}{{ $ c }}{{ end }}', make_empty (), ''); // Dead code elimination
 render_code ('{{ for _0 in x }}{{ $ _0 }}{{ empty }}empty{{ end }}', make_combinations (array ('x' => array (1))), '1'); // Generated variables must not overlap local ones
 
+// Conditional branches simplification
+source_code ('{{ if a }}first{{ else if true }}second{{ else }}third{{ end }}', array (), array ('/first/' => 1, '/second/' => 1, '/third/' => 0)); // Always-true branch should drop following ones
+source_code ('{{ if a }}first{{ else if false }}second{{ else }}third{{ end }}', array (), array ('/first/' => 1, '/second/' => 0, '/third/' => 1)); // Always-false branch should be eliminated
+
 // Source local symbols
 source_code ('{{ $ _1 && _2 }}', array (), array ('/\\$_0=/' => 1)); // Variable _0 is used as temporary when available
 source_code ('{{ $ _0 && _1 }}', array (), array ('/\\$_2=/' => 1)); // Variable _2 is used as temporary to avoid conflict with _0 and _1
