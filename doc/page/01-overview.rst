@@ -61,8 +61,7 @@ We'll see about template syntax later and for now you only need to know about th
   it ;
 - ``{{ for i in c }}...{{ empty }}...{{ end }}`` is a foreach-like loop.
 
-Ater injecting a ``locale`` function and a ``language`` string as constants,
-Deval will compile and cache a PHP snippet similar to this one:
+After injecting a ``locale`` function and a ``language`` string as constants, Deval will compile and cache a PHP snippet similar to this one:
 
 .. code-block:: php
 
