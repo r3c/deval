@@ -16,7 +16,7 @@ class EchoBlock implements Block
 		if ($this->expression->try_evaluate ($value))
 		{
 			if ($value !== null && !is_scalar ($value) && (!is_object ($value) || !method_exists ($value, '__toString')))
-				throw new CompileException ($value, 'cannot be converted to string');
+				throw new CompileException ('"' . var_export ($value, true) . '" cannot be converted to string');
 
 			$output->append_text ($generator->make_plain ((string)$value));
 		}

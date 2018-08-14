@@ -224,10 +224,11 @@ render_code ('{{ let x = [[1, a], [2, b]] }}{{ for i in x }}{{ $ i[0] }}{{ end }
 render_code ('{{ let x = a != 0 }}{{ $ !x }}{{ end }}', make_combinations (array ('a' => 1)), '');
 
 // Render unwrap command
-raise_parse ('{{ unwrap }}{{ $ "a" }}{{ end }}', 1, 4, 'no "wrap" parent');
+raise_compile ('{{ unwrap }}{{ $ "a" }}{{ end }}', array (), '"unwrap" block has no "wrap" parent');
 
 render_code ('{{ wrap php ("strtoupper") }}{{ unwrap }}{{ $ "a" }}{{ end }}{{ end }}', make_builtins ('php'), 'a');
 render_code ('{{ wrap php ("strrev") }}{{ wrap php ("strtoupper") }}{{ $ "ab" }}{{ unwrap }}{{ $ "cd" }}{{ end }}{{ $ "ef" }}{{ end }}{{ end }}', make_builtins ('php'), 'BAdcFE');
+render_code ('{{ wrap php ("strtoupper") }}{{ include template/unwrap.deval }}{{ end }}', make_builtins ('php'), 'raw');
 
 // Render wrap command
 render_code ('{{ wrap length }}{{ $ "Hello!" }}{{ end }}', make_builtins ('length'), '6');

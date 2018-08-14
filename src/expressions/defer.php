@@ -33,7 +33,7 @@ class DeferExpression implements Expression
 	public function try_enumerate (&$elements)
 	{
 		if ($this->moment && !$this->operand->try_enumerate ($elements))
-			throw new CompileException ((string)$this->operand, 'must evaluate to a constant');
+			throw new CompileException ('"' . var_export ((string)$this->operand, true) . '" must evaluate to a constant');
 
 		return $this->moment;
 	}
@@ -41,7 +41,7 @@ class DeferExpression implements Expression
 	public function try_evaluate (&$value)
 	{
 		if ($this->moment && !$this->operand->try_evaluate ($value))
-			throw new CompileException ((string)$this->operand, 'must evaluate to a constant');
+			throw new CompileException ('"' . var_export ((string)$this->operand, true) . '" must evaluate to a constant');
 
 		return $this->moment;
 	}

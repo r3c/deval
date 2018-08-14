@@ -4,9 +4,9 @@ namespace Deval;
 
 class CompileException extends \Exception
 {
-	public function __construct ($value, $message)
+	public function __construct ($message)
 	{
-		parent::__construct ('compile error: "' . var_export ($value, true) . '" ' . $message);
+		parent::__construct ('compile error: ' . $message);
 	}
 }
 

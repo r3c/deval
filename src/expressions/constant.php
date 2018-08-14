@@ -34,7 +34,7 @@ class ConstantExpression implements Expression
 		$elements = array ();
 
 		if (!is_array ($this->value) && !($this->value instanceof \Traversable))
-			throw new CompileException ($this->value, 'is not iterable');
+			throw new CompileException ('"' . var_export ($this->value, true) . '" is not iterable');
 
 		foreach ($this->value as $key => $value)
 			$elements[$key] = new self ($value);

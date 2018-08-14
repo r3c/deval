@@ -4,15 +4,14 @@ namespace Deval;
 
 class UnwrapBlock implements Block
 {
-	public function __construct ($location, $body)
+	public function __construct ($body)
 	{
 		$this->body = $body;
-		$this->location = $location;
 	}
 
 	public function compile ($generator, $preserves)
 	{
-		throw new \Exception ('cannot compile unwrap block');
+		throw new CompileException ('"unwrap" block has no "wrap" parent');
 	}
 
 	public function get_symbols ()
@@ -22,12 +21,12 @@ class UnwrapBlock implements Block
 
 	public function inject ($invariants)
 	{
-		throw new \Exception ('cannot inject unwrap block');
+		return new self ($this->body->inject ($invariants));
 	}
 
 	public function resolve ($blocks)
 	{
-		throw new ParseException ($this->location, 'block "unwrap" has no "wrap" parent block');
+		return new self ($this->body->resolve ($blocks));
 	}
 
 	public function wrap ($caller)

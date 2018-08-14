@@ -1,9 +1,3 @@
-{
-	$this->locate = function ()
-	{
-		return new \Deval\Location ($this->context, $this->line (), $this->column ());
-	};
-}
 
 // Document tree
 
@@ -165,9 +159,7 @@ CommandLetAssignmentsPair "assignment"
 CommandUnwrap "unwrap command"
 	= "unwrap" _ BlockEnd body:Content BlockBegin _ "end"
 	{
-		$locate = $this->locate;
-
-		return new \Deval\UnwrapBlock ($locate (), $body);
+		return new \Deval\UnwrapBlock ($body);
 	}
 
 CommandWrap "wrap command"
