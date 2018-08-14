@@ -4,9 +4,10 @@ namespace Deval;
 
 class UnwrapBlock implements Block
 {
-	public function __construct ($body)
+	public function __construct ($location, $body)
 	{
 		$this->body = $body;
+		$this->location = $location;
 	}
 
 	public function compile ($generator, $preserves)
@@ -26,7 +27,7 @@ class UnwrapBlock implements Block
 
 	public function resolve ($blocks)
 	{
-		throw new ResolveException ('block "unwrap" has no "wrap" parent block');
+		throw new ParseException ($this->location, 'block "unwrap" has no "wrap" parent block');
 	}
 
 	public function wrap ($caller)

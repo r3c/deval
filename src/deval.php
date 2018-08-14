@@ -12,9 +12,11 @@ class CompileException extends \Exception
 
 class ParseException extends \Exception
 {
-	public function __construct ($context, $message)
+	public function __construct ($location, $message)
 	{
-		parent::__construct ('parse error: ' . $message . ' in "' . $context . '"');
+		parent::__construct ('parse error in ' . $location->context . ' at line ' . $location->line . ' column ' . $location->column . ': ' . $message);
+
+		$this->location = $location;
 	}
 }
 
@@ -26,11 +28,11 @@ class RenderException extends \Exception
 	}
 }
 
-class ResolveException extends \Exception
+class SetupException extends \Exception
 {
 	public function __construct ($message)
 	{
-		parent::__construct ('resolve error: ' . $message);
+		parent::__construct ('setup error: ' . $message);
 	}
 }
 
@@ -398,6 +400,7 @@ class Loader
 		require $path . '/expressions/symbol.php';
 		require $path . '/expressions/unary.php';
 		require $path . '/generator.php';
+		require $path . '/location.php';
 		require $path . '/output.php';
 		require $path . '/parser.php';
 
@@ -532,7 +535,7 @@ function m ($parent, $key)
 }
 
 /*
-** Decvate run method, assert provided symbols match required ones and throw
+** Deval run method, assert provided symbols match required ones and throw
 ** exception otherwise.
 ** $required:	required symbols list
 ** $provided:	provided symbols map

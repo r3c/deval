@@ -121,9 +121,11 @@ function raise_compile ($source, $constants, $message)
 /*
 ** Ensure source code throw parse exception when scanned.
 ** $source:		template source code
+** $line:		expected error line
+** $column:		excepted error column
 ** $message:	expected exception message
 */
-function raise_parse ($source, $message)
+function raise_parse ($source, $line, $column, $message)
 {
 	try
 	{
@@ -134,6 +136,9 @@ function raise_parse ($source, $message)
 	catch (Deval\ParseException $exception)
 	{
 		raise ($exception, $message);
+
+		assert ($exception->location->line === $line, 'parse error should have been located at line ' . $line . ' but was ' . $exception->location->line);
+		assert ($exception->location->column === $column, 'parse error should have been located at column ' . $column . ' but was ' . $exception->location->column);
 	}
 }
 
@@ -176,6 +181,27 @@ function raise_render ($source, $constants, $variables, $message)
 		assert (false, 'should have raised exception when rendering');
 	}
 	catch (Deval\RenderException $exception)
+	{
+		raise ($exception, $message);
+	}
+}
+
+/*
+** Ensure source code throw setup exception when initialized.
+** $setup:		compiler setup
+** $message:	expected exception message
+*/
+function raise_setup ($setup, $message)
+{
+	$renderer = new Deval\StringRenderer ('', $setup);
+
+	try
+	{
+		$renderer->render (array ());
+
+		assert (false, 'should have raised exception when setting up');
+	}
+	catch (Deval\SetupException $exception)
 	{
 		raise ($exception, $message);
 	}

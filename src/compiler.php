@@ -21,7 +21,7 @@ class Compiler
 			$path = $base . DIRECTORY_SEPARATOR . $path;
 
 		if (!file_exists ($path))
-			throw new ParseException ($path, 'source file doesn\'t exist');
+			throw new ParseException (new Location ($path, 0, 0), 'source file doesn\'t exist');
 
 		array_push (self::$bases, dirname ($path));
 
@@ -44,6 +44,7 @@ class Compiler
 	private static function parse ($context, $source, $blocks)
 	{
 		$parser = new \PhpPegJs\Parser ();
+		$parser->context = $context;
 
 		try
 		{
@@ -51,7 +52,9 @@ class Compiler
 		}
 		catch (\PhpPegJs\SyntaxError $exception)
 		{
-			throw new ParseException ($context, $exception->getMessage () . ' at line ' . $exception->grammarLine . ', character ' . $exception->grammarColumn);
+			$location = new Location ($context, $exception->grammarLine, $exception->grammarColumn);
+
+			throw new ParseException ($location, $exception->getMessage ());
 		}
 	}
 

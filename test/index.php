@@ -29,12 +29,9 @@ function crash ()
 	assert (false, 'function should not have been called');
 }
 
-$preserve = new Deval\Setup ();
-$preserve->style = 'preserve';
-
 // Parse exceptions
-raise_parse ('{{ $ x y }}', 'but "y" found');
-raise_parse ('{{ $ x ** y }}', 'but "*" found');
+raise_parse ('{{ $ x y }}', 1, 8, 'but "y" found');
+raise_parse ('{{ $ x ** y }}', 1, 8, 'but "*" found');
 
 // Compile exceptions
 raise_compile ('{{ $ x }}', array ('x' => array ()), 'cannot be converted to string');
@@ -48,6 +45,16 @@ raise_compile ('{{ $ ["TestClass", "missing"](x) }}', array ('x' => 1), 'is not 
 raise_render ('{{ $ a }}', array (), array (), 'undefined symbol(s) a');
 raise_render ('{{ $ a }}{{ let a = 1, b = 2 }}{{ end }}{{ $ b }}', array (), array (), 'undefined symbol(s) a, b');
 raise_render ('{{ $ _deval_input }}', array (), array ('_deval_input' => 0), 'invalid or reserved symbol name');
+
+// Setup exceptions
+$style_invalid = new Deval\Setup ();
+$style_invalid->style = 'invalid';
+
+raise_setup ($style_invalid, 'unknown style "invalid"');
+
+$style_invalid->style = 42;
+
+raise_setup ($style_invalid, 'builtin style or callable');
 
 // Render plain texts
 render_code ('lol', make_empty (), 'lol');
@@ -66,8 +73,11 @@ render_code ('{{ $ /* one */ 1 }}', make_empty (), '1');
 render_code ('{{ $ 2 /* two */ }}', make_empty (), '2');
 
 // Render interleaved blocks
-render_code ("A {{ $ \"B\" }} C", make_empty (), "A B C", $preserve);
-render_code ("A\n{{ $ \"B\" }}\nC", make_empty (), "A\nB\nC", $preserve);
+$style_preserve = new Deval\Setup ();
+$style_preserve->style = 'preserve';
+
+render_code ("A {{ $ \"B\" }} C", make_empty (), "A B C", $style_preserve);
+render_code ("A\n{{ $ \"B\" }}\nC", make_empty (), "A\nB\nC", $style_preserve);
 
 // Render constants
 render_code ('{{ $ null }}', make_empty (), '');
@@ -153,6 +163,7 @@ render_code ('{{ $ obj.instance_field }}', make_combinations (array ('obj' => ne
 // Render temporal expressions
 raise_compile ('{{ $ (+)x }}', array (), 'must evaluate to a constant');
 raise_compile ('{{ $ (+)(x * 2) }}', array (), 'must evaluate to a constant');
+
 render_code ('{{ $ (+)1 }}', make_empty (), '1');
 render_code ('{{ $ (+)(x + 3) }}', array (array (array ('x' => 2), array ())), '5');
 source_code ('{{ $ ((-)crash)() }}', array ('crash' => 'crash'), array ('/echo \\(\'crash\'\\)\\(\\);/' => 1));
@@ -213,7 +224,8 @@ render_code ('{{ let x = [[1, a], [2, b]] }}{{ for i in x }}{{ $ i[0] }}{{ end }
 render_code ('{{ let x = a != 0 }}{{ $ !x }}{{ end }}', make_combinations (array ('a' => 1)), '');
 
 // Render unwrap command
-raise_resolve ('{{ unwrap }}{{ $ "a" }}{{ end }}', 'no "wrap" parent');
+raise_parse ('{{ unwrap }}{{ $ "a" }}{{ end }}', 1, 4, 'no "wrap" parent');
+
 render_code ('{{ wrap php ("strtoupper") }}{{ unwrap }}{{ $ "a" }}{{ end }}{{ end }}', make_builtins ('php'), 'a');
 render_code ('{{ wrap php ("strrev") }}{{ wrap php ("strtoupper") }}{{ $ "ab" }}{{ unwrap }}{{ $ "cd" }}{{ end }}{{ $ "ef" }}{{ end }}{{ end }}', make_builtins ('php'), 'BAdcFE');
 
