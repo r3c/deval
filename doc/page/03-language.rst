@@ -150,7 +150,7 @@ You'll most probably want to escape unsafe values (e.g. user input) before print
 
 .. code-block:: deval
 
-	{{ wrap html }}
+	{{ wrap escape }}
 	    Every {{ $ expression }} printed within this wrap {{ $ block }} will
 	    be passed {{ $ through }} an escaping function.
 	{{ end }}
@@ -159,12 +159,25 @@ Is equivalent to:
 
 .. code-block:: deval
 
-	Every {{ $ html(expression) }} printed within this wrap {{ $ html(block) }}
-	will be passed {{ $ html(through) }} an escaping function.
+	Every {{ $ escape(expression) }} printed within this wrap {{ $ escape(block) }}
+	will be passed {{ $ escape(through) }} an escaping function.
 
-As long as you inject a function such as :ref:`htmlentities` as variable ``html`` you can be sure nothing inside your "wrap" block is left unescaped.
+The "wrap" statement takes any function as its unique parameter and calls it on every value printed by inner "$" statements. Multiple "wrap" statements can be nested, resulting in functions being called from the innermost to outermost "wrap" statement. A common use case for HTML generation is using a "wrap" statement at the very beginning of the template with an injected function such as :ref:`htmlentities` as variable ``html`` you can be sure nothing is left unescaped before printing.
 
 .. _htmlentities: http://php.net/manual/function.htmlentities.php
+
+When doing so, you may occasionally want to cancel wrapping for printing a safe HTML snippet from some variable without wrapping it. This can be achieved with the "unwrap" statement that cancels the innermost parent "wrap" one:
+
+.. code-block:: deval
+
+	{{ wrap html }}
+		<p>This {{ $ variable }} will be HTML-escaped.</p>
+		{{ unwrap }}
+			<p>This {{ $ raw }} one won't so make sure it doesn't contain unvalidated user input!</p>
+		{{ end }}
+		<p>We're back in {{ $ safe }} context here with auto-escaping enabled.</p>
+	{{ end }}
+
 
 Expressions
 ===========
