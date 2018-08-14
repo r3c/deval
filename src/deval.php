@@ -26,6 +26,14 @@ class RenderException extends \Exception
 	}
 }
 
+class ResolveException extends \Exception
+{
+	public function __construct ($message)
+	{
+		parent::__construct ('resolve error: ' . $message);
+	}
+}
+
 class Builtin
 {
 	public static function _array ()
@@ -375,6 +383,7 @@ class Loader
 		require $path . '/blocks/label.php';
 		require $path . '/blocks/let.php';
 		require $path . '/blocks/plain.php';
+		require $path . '/blocks/unwrap.php';
 		require $path . '/blocks/void.php';
 		require $path . '/compiler.php';
 		require $path . '/expression.php';

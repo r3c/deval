@@ -138,6 +138,25 @@ function raise_parse ($source, $message)
 }
 
 /*
+** Ensure source code throw resolve exception after parsing.
+** $source:		template source code
+** $message:	expected exception message
+*/
+function raise_resolve ($source, $message)
+{
+	try
+	{
+		$renderer = new Deval\StringRenderer ($source);
+
+		assert (false, 'should have raised exception when resolving');
+	}
+	catch (Deval\ResolveException $exception)
+	{
+		raise ($exception, $message);
+	}
+}
+
+/*
 ** Ensure source code throw render exception when injected given constants and
 ** variables.
 ** $source:		template source code

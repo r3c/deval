@@ -66,6 +66,7 @@ Command "command block"
 	/ CommandInclude
 	/ CommandLabel
 	/ CommandLet
+	/ CommandUnwrap
 	/ CommandWrap
 
 CommandEcho "echo command"
@@ -153,6 +154,12 @@ CommandLetAssignmentsPair "assignment"
 	= name:Symbol _ "=" _ value:Expression
 	{
 		return array ($name, $value);
+	}
+
+CommandUnwrap "unwrap command"
+	= "unwrap" _ BlockEnd body:Content BlockBegin _ "end"
+	{
+		return new \Deval\UnwrapBlock ($body);
 	}
 
 CommandWrap "wrap command"
