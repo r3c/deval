@@ -13,7 +13,7 @@ Option 1: download latest release
 
 Download `latest Deval release`_, unzip it somewhere inside your project directory and skip to next section to see how to import Deval into your project.
 
-.. _`latest Deval release`: https://github.com/r3c/deval/releases/download/1.0.0/deval-1.0.0.zip
+.. _`latest Deval release`: https://github.com/r3c/deval/releases/latest
 
 Option 2: build from source
 ---------------------------
