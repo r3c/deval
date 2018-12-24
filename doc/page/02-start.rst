@@ -76,8 +76,7 @@ In this example we created an instance of :php:class:`Deval\\CacheRenderer` whic
 
 .. _builtin:
 
-By default you don't have access to PHP functions from within a template (we'll explain why exactly in :ref:`functional` section), which is why we added a first call to method :php:meth:`Deval\\Renderer::inject` in previous example. It's here to inject a few common functions in our template and make them available before compilation to enable many early optimizations. A full list of functions injected from :php:meth:`Deval\\Builtin::deval` can be found in the
-:ref:`functions` section.
+By default you don't have access to PHP functions from within a template (we'll explain why exactly in :ref:`functional` section), which is why we added a first call to method :php:meth:`Deval\\Renderer::inject` in previous example. It's here to inject a few common functions in our template and make them available before compilation to enable many early optimizations. A full list of functions injected from :php:meth:`Deval\\Builtin::deval` can be found in the :ref:`flavor_deval` section.
 
 
 Write a template
