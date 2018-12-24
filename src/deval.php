@@ -245,6 +245,15 @@ class Builtin
         return str_replace(array_keys($replacements), array_values($replacements), $value);
     }
 
+    public static function _reverse($value)
+    {
+        if (is_array($value)) {
+            return array_reverse($value, true);
+        }
+
+        return strrev((string)$value);
+    }
+
     public static function _slice($value, $offset, $count = null)
     {
         if ($value === null) {
@@ -324,6 +333,7 @@ class Builtin
             'range',
             'reduce',
             'replace',
+            'reverse',
             'slice',
             'sort',
             'split',

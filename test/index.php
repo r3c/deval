@@ -359,6 +359,13 @@ render_code('{{ $ replace("foo", []) }}', make_builtins('replace'), 'foo');
 render_code('{{ $ replace("foo bar baz", ["foo": "1", "baz": "2"]) }}', make_builtins('replace'), '1 bar 2');
 render_code('{{ $ replace("foo bar baz", ["a": "111", "b": "222"]) }}', make_builtins('replace'), 'foo 222111r 222111z');
 
+render_code('{{ $ reverse("") }}', make_builtins('reverse'), '');
+render_code('{{ $ reverse("a") }}', make_builtins('reverse'), 'a');
+render_code('{{ $ reverse("abc") }}', make_builtins('reverse'), 'cba');
+render_code('{{ $ join(",", reverse([])) }}', make_builtins('join', 'reverse'), '');
+render_code('{{ $ join(",", reverse([1])) }}', make_builtins('join', 'reverse'), '1');
+render_code('{{ $ join(",", reverse([1, 2, 3])) }}', make_builtins('join', 'reverse'), '3,2,1');
+
 render_code('{{ $ slice("1234", 1) }}', make_builtins('slice'), '234');
 render_code('{{ $ slice("1234", 1, 2) }}', make_builtins('slice'), '23');
 render_code('{{ $ slice("1234", -3) }}', make_builtins('slice'), '234');

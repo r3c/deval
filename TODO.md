@@ -4,8 +4,6 @@ Deval TODO list
 TODO
 ----
 
-- Add `reverse` builtin to reverse items order in array or string
-
 DONE
 ----
 
@@ -27,3 +25,4 @@ DONE
 - Implement static variable allocation to replace _d_(input|local|state)
 - Backup in-use symbols only
 - Support builtin syntax for defering an expression
+- Add `reverse` builtin to reverse items order in array or string
