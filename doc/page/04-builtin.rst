@@ -218,6 +218,16 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 
 .. _`str_replace`: http://php.net/manual/function.str-replace.php
 
+.. py:function:: reverse(value)
+
+	Reverse elements in an array (similar to PHP function `array_reverse`_) or characters in a string (similar to PHP function strrev_).
+
+	:param mixed value: input array or string
+	:return: reversed array or string
+
+.. _`array_reverse`: http://php.net/manual/function.array-reverse.php
+.. _`strrev`: http://php.net/manual/function.strrev.php
+
 .. py:function:: slice(value, offset[, count])
 
 	Extract delimited slice from given array or string starting at given offset.
