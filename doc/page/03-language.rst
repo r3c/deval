@@ -234,7 +234,7 @@ When accessing property with name as a constant string you can replace square br
 
 Accessing a non-existent member in Deval won't trigger in an error but evaluates to ``null`` instead.
 
-Due to the fact Deval handles names in a different way than PHP it can't make the difference between properties and functions having the same name within some class, nor it can make the difference between static and instance properties. This means if your obect ``o`` has both a property ``$o->member`` and a method ``$o->member()`` then writing ``o.member`` in a template will lead to undefined result.
+Due to the fact Deval handles names in a different way than PHP it can't make the difference between properties and functions having the same name within some class, nor it can make the difference between static and instance properties. This means if your object ``o`` has both a property ``$o->member`` and a method ``$o->member()`` then writing ``o.member`` in a template will lead to undefined result.
 
 Mathematical & logical
 ----------------------
