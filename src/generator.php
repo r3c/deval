@@ -38,7 +38,7 @@ class Generator
     public static function emit_run($names)
     {
         return
-            '\\' . __NAMESPACE__ . '\\r(' . self::emit_value($names) . ',$' . self::$input_name . ');' .
+            (count($names) > 0 ? '\\' . __NAMESPACE__ . '\\r(' . self::emit_value($names) . ',$' . self::$input_name . ');' : '') .
             '\\extract($' . self::$input_name . ');';
     }
 

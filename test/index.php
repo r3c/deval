@@ -56,6 +56,10 @@ $style_invalid->style = 42;
 
 raise_setup($style_invalid, 'builtin style or callable');
 
+// Code generation assertions
+source_code('{{ $ a }}', array(), array('/\\\\Deval\\\\r\\(array\\(\'a\'\\),\\$_deval_input\\);/' => 1));
+source_code('{{ $ a }}', array('a' => 0), array('/\\\\Deval\\\\r\\(.*\\);/' => 0));
+
 // Render plain texts
 render_code('lol', make_empty(), 'lol');
 render_code('l{o}l', make_empty(), 'l{o}l');
