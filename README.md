@@ -49,16 +49,18 @@ value when rendering the template (and will raise an error if you don’t).
 Instructions
 ------------
 
-Download latest release [from GitHub](https://github.com/r3c/deval/releases/latest).
+Download latest release
+[from GitHub](https://github.com/r3c/deval/releases/latest).
 
-Full documentation is available [on Read the Docs](http://deval.readthedocs.io/).
+Full documentation is available
+[on Read the Docs](http://deval.readthedocs.io/).
 
 
 Licence
 -------
 
-This project is open-source, released under MIT licence. See file `LICENSE.md`
-for details.
+This project is open-source, released under MIT licence. See file
+[LICENSE.md](LICENSE.md) for details.
 
 
 Author
