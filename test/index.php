@@ -174,8 +174,8 @@ raise_compile('{{ $ (+)(x * 2) }}', array(), 'must evaluate to a constant');
 
 render_code('{{ $ (+)1 }}', make_empty(), '1');
 render_code('{{ $ (+)(x + 3) }}', array(array(array('x' => 2), array())), '5');
-source_code('{{ $ ((-)crash)() }}', array('crash' => 'crash'), array('/echo \\(\'crash\'\\)\\(\\);/' => 1));
-source_code('{{ $ ((-)crash)(x + 1) }}', array('crash' => 'crash', 'x' => '2'), array('/echo \\(\'crash\'\\)\\(3\\);/' => 1));
+source_code('{{ $ ((-)crash)() }}', array('crash' => 'crash'), array('/echo (?:\\(\'crash\'\\)\\(\\)|\\\\call_user_func\\(\\(\'crash\'\\)\\));/' => 1));
+source_code('{{ $ ((-)crash)(x + 1) }}', array('crash' => 'crash', 'x' => '2'), array('/echo (?:\\(\'crash\'\\)\\(3\\)|\\\\call_user_func\\(\\(\'crash\'\\),3\\));/' => 1));
 source_code('{{ $ (-)strlen("test") }}', array('strlen' => 'strlen'), array('/echo 4;/' => 1, '/strlen/' => 0));
 
 // Render unary expressions
