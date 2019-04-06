@@ -49,7 +49,7 @@ value when rendering the template (and will raise an error if you don’t).
 Instructions
 ------------
 
-Download latest release [from GitHub](https://github.com/r3c/deval/releases/download/1.1.0/deval-1.1.0.zip).
+Download latest release [from GitHub](https://github.com/r3c/deval/releases/latest).
 
 Full documentation is available [on Read the Docs](http://deval.readthedocs.io/).
 
