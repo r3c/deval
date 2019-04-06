@@ -91,12 +91,8 @@ class Builtin
 
     public static function _find($items, $predicate = null)
     {
-        if ($predicate === null) {
-            return each($items);
-        }
-
         foreach ($items as $key => $value) {
-            if ($predicate($value, $key)) {
+            if ($predicate === null || $predicate($value, $key)) {
                 return array($key, $value);
             }
         }
