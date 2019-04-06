@@ -1,6 +1,9 @@
 Deval: Deferred Evaluation Templates
 ====================================
 
+[![Build Status](https://travis-ci.org/r3c/deval.svg?branch=master)](https://travis-ci.org/r3c/deval)
+[![license](https://img.shields.io/github/license/r3c/deval.svg)](https://opensource.org/licenses/MIT)
+
 Overview
 --------
 
