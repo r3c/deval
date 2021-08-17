@@ -56,7 +56,7 @@ class Generator
         if (is_array($input)) {
             $source = '';
 
-            if (array_reduce(array_keys($input), function (&$result, $item) {
+            if (array_reduce(array_keys($input), function ($result, $item) {
                 return $result === $item ? $item + 1 : null;
             }, 0) !== count($input)) {
                 foreach ($input as $key => $value) {
