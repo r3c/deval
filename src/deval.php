@@ -73,6 +73,31 @@ class Builtin
         return $buffer;
     }
 
+    public static function _compare($a, $b)
+    {
+        $type_a = gettype($a);
+        $type_b = gettype($b);
+
+        if ($type_a !== $type_b) {
+            return strcmp($type_a, $type_b);
+        }
+
+        switch ($type_a) {
+            case "boolean":
+                return (int)$a - (int)$b;
+
+            case "double":
+            case "integer":
+                return $a - $b;
+
+            case "string":
+                return strcmp($a, $b);
+
+            default:
+                return 0;
+        }
+    }
+
     public static function _default($value, $fallback)
     {
         return $value !== null ? $value : $fallback;
@@ -312,6 +337,7 @@ class Builtin
             'array',
             'bool',
             'cat',
+            'compare',
             'default',
             'filter',
             'find',

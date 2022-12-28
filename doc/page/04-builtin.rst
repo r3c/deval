@@ -62,6 +62,13 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 	:param mixed valueN: string or array
 	:return: concatenated values
 
+.. py:function:: compare(value1, value2)
+
+	Compare two values and return -1 if first one is lower than second one, 1 if first one is greater than second one, or 0 otherwise. When used on numeric values comparison uses numerical order. When used on strings comparison uses alphabetical order. Two values of different types are always different but the order between them is undefined.
+
+	:param mixed valueN: any value
+	:return: comparison order
+
 .. py:function:: default(value, fallback)
 
 	Shorthand function to test whether a value is defined and not null.

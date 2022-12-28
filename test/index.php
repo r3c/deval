@@ -253,10 +253,10 @@ render_file('template/symbol.deval', 'template', make_combinations(array('x' => 
 
 // Setup style
 $tests = array(
-    'collapse'			=> '1 X2 3Y 4 5',
-    'deindent'			=> '1X2  3Y45',
-    'preserve'			=> "1\n  X2  3Y\n  4\n5",
-    'deindent,collapse'	=> '1X2 3Y45'
+    'collapse'            => '1 X2 3Y 4 5',
+    'deindent'            => '1X2  3Y45',
+    'preserve'            => "1\n  X2  3Y\n  4\n5",
+    'deindent,collapse'    => '1X2 3Y45'
 );
 
 foreach ($tests as $style => $expect) {
@@ -288,6 +288,21 @@ render_code('{{ $ cat(1, 2) }}', make_builtins('cat'), '12');
 render_code('{{ $ cat(1, 2, 3) }}', make_builtins('cat'), '123');
 render_code('{{ $ cat("AB", "CD") }}', make_builtins('cat'), 'ABCD');
 render_code('{{ $ join(cat([1, 2], [3, 4]), ",") }}', make_builtins('cat', 'join'), '1,2,3,4');
+
+render_code('{{ $ compare(false, false) }}', make_builtins('compare'), '0');
+render_code('{{ $ compare(false, true) }}', make_builtins('compare'), '-1');
+render_code('{{ $ compare(true, false) }}', make_builtins('compare'), '1');
+render_code('{{ $ compare(true, true) }}', make_builtins('compare'), '0');
+render_code('{{ $ compare(0, 0) }}', make_builtins('compare'), '0');
+render_code('{{ $ compare(0, 1) }}', make_builtins('compare'), '-1');
+render_code('{{ $ compare(1, 0) }}', make_builtins('compare'), '1');
+render_code('{{ $ compare(1, 1) }}', make_builtins('compare'), '0');
+render_code('{{ $ compare("a", "ab") }}', make_builtins('compare'), '-1');
+render_code('{{ $ compare("abd", "abc") }}', make_builtins('compare'), '1');
+render_code('{{ $ compare("hello", "hello") }}', make_builtins('compare'), '0');
+render_code('{{ $ compare(0, "a") }}', make_builtins('compare'), '-1');
+render_code('{{ $ compare(false, 0) }}', make_builtins('compare'), '-1');
+render_code('{{ $ compare("b", true) }}', make_builtins('compare'), '1');
 
 render_code('{{ $ default(null, 5) }}', make_builtins('default'), '5');
 render_code('{{ $ default(0, 5) }}', make_builtins('default'), '0');
@@ -380,6 +395,7 @@ render_code('{{ $ join(slice([1, 2, 3, 4], -3), ",") }}', make_builtins('join', 
 render_code('{{ $ join(slice([1, 2, 3, 4], -3, 2), ",") }}', make_builtins('join', 'slice'), '2,3');
 
 render_code('{{ $ join(sort([4, 2, 3, 1]), ",") }}', make_builtins('join', 'sort'), '1,2,3,4');
+render_code('{{ $ join(sort(["b", "c", "a", "d"], compare), ",") }}', make_builtins('compare', 'join', 'sort'), 'a,b,c,d');
 
 render_code('{{ $ join(split("1:2:3:4", ":"), ",") }}', make_builtins('join', 'split'), '1,2,3,4');
 
