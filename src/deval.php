@@ -421,34 +421,32 @@ class Loader
             return;
         }
 
-        $path = dirname(__FILE__);
-
-        require $path . '/block.php';
-        require $path . '/blocks/concat.php';
-        require $path . '/blocks/echo.php';
-        require $path . '/blocks/for.php';
-        require $path . '/blocks/if.php';
-        require $path . '/blocks/label.php';
-        require $path . '/blocks/let.php';
-        require $path . '/blocks/plain.php';
-        require $path . '/blocks/unwrap.php';
-        require $path . '/blocks/void.php';
-        require $path . '/compiler.php';
-        require $path . '/expression.php';
-        require $path . '/expressions/array.php';
-        require $path . '/expressions/binary.php';
-        require $path . '/expressions/constant.php';
-        require $path . '/expressions/defer.php';
-        require $path . '/expressions/group.php';
-        require $path . '/expressions/invoke.php';
-        require $path . '/expressions/lambda.php';
-        require $path . '/expressions/member.php';
-        require $path . '/expressions/symbol.php';
-        require $path . '/expressions/unary.php';
-        require $path . '/generator.php';
-        require $path . '/location.php';
-        require $path . '/output.php';
-        require $path . '/parser.php';
+        require __DIR__ . '/block.php';
+        require __DIR__ . '/blocks/concat.php';
+        require __DIR__ . '/blocks/echo.php';
+        require __DIR__ . '/blocks/for.php';
+        require __DIR__ . '/blocks/if.php';
+        require __DIR__ . '/blocks/label.php';
+        require __DIR__ . '/blocks/let.php';
+        require __DIR__ . '/blocks/plain.php';
+        require __DIR__ . '/blocks/unwrap.php';
+        require __DIR__ . '/blocks/void.php';
+        require __DIR__ . '/compiler.php';
+        require __DIR__ . '/expression.php';
+        require __DIR__ . '/expressions/array.php';
+        require __DIR__ . '/expressions/binary.php';
+        require __DIR__ . '/expressions/constant.php';
+        require __DIR__ . '/expressions/defer.php';
+        require __DIR__ . '/expressions/group.php';
+        require __DIR__ . '/expressions/invoke.php';
+        require __DIR__ . '/expressions/lambda.php';
+        require __DIR__ . '/expressions/member.php';
+        require __DIR__ . '/expressions/symbol.php';
+        require __DIR__ . '/expressions/unary.php';
+        require __DIR__ . '/generator.php';
+        require __DIR__ . '/location.php';
+        require __DIR__ . '/output.php';
+        require __DIR__ . '/parser.php';
 
         $setup = true;
     }

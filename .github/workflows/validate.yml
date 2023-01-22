@@ -1,0 +1,35 @@
+name: Build & test
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "35 4 * * *"
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php:
+          - version: "5.6"
+          - version: "7.4"
+          - version: "8.1"
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: Setup PHP v${{ matrix.php.version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php.version }}
+      - name: Install dependencies & build
+        run: npm install
+      - name: Run test suite
+        run: php test/index.php
