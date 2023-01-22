@@ -1,7 +1,7 @@
 <?php
 
-require '../src/deval.php';
-require 'test.php';
+require __DIR__ . '/../src/deval.php';
+require __DIR__ . '/test.php';
 
 header('Content-Type: text/plain');
 
@@ -197,8 +197,8 @@ render_code('{{ $ f[0](s) }}', make_combinations(array('f' => array('strlen'), '
 render_code('{{ $ f(s)[0] }}', make_combinations(array('f' => 'str_split', 's' => 'test')), 't');
 
 // Render extend command
-render_code('{{ extend template/extend_inner.deval }}{{ block first }}1{{ block second }}2{{ end }}', make_combinations(array('a' => 'A', 'b' => 'B', 'c' => 'C')), 'A1B2C');
-render_code('{{ extend template/extend_outer.deval }}{{ end }}', make_combinations(array('first' => 'x', 'second' => 'y')), '1x2y3');
+render_code('{{ extend ' . __DIR__ . '/template/extend_inner.deval }}{{ block first }}1{{ block second }}2{{ end }}', make_combinations(array('a' => 'A', 'b' => 'B', 'c' => 'C')), 'A1B2C');
+render_code('{{ extend ' . __DIR__ . '/template/extend_outer.deval }}{{ end }}', make_combinations(array('first' => 'x', 'second' => 'y')), '1x2y3');
 
 // Render for command
 render_code('{{ for v in [1, 2, 3] }}{{ $ v }}{{ end }}', make_empty(), '123');
@@ -219,9 +219,8 @@ render_code('{{ if 1 }}{{ else }}{{ for x in null }}{{ end }}{{ end }}', make_em
 render_code('{{ if false }}{{ $ php("missing")() }}{{ end }}', make_builtins('php'), '');
 
 // Render include command
-render_code('{{ include template/include_inner.deval }}', make_combinations(array('inner_x' => 'x', 'inner_y' => 'y')), 'xy');
-render_code('{{ include template/include_outer.deval }}', make_combinations(array('outer_x' => 'x', 'outer_y' => 'y')), 'xy');
-render_code('{{ include ' . dirname(__FILE__) . '/template/include_inner.deval }}', make_combinations(array('inner_x' => '1', 'inner_y' => '2')), '12');
+render_code('{{ include ' . __DIR__ . '/template/include_outer.deval }}', make_combinations(array('outer_x' => 'x', 'outer_y' => 'y')), 'xy');
+render_code('{{ include ' . __DIR__ . '/template/include_inner.deval }}', make_combinations(array('inner_x' => '1', 'inner_y' => '2')), '12');
 
 // Render let command
 render_code('{{ let a = 5 }}{{ $ a }}{{ end }}', make_empty(), '5');
@@ -240,7 +239,7 @@ raise_compile('{{ unwrap }}{{ $ "a" }}{{ end }}', array(), '"unwrap" block has n
 
 render_code('{{ wrap php ("strtoupper") }}{{ unwrap }}{{ $ "a" }}{{ end }}{{ end }}', make_builtins('php'), 'a');
 render_code('{{ wrap php ("strrev") }}{{ wrap php ("strtoupper") }}{{ $ "ab" }}{{ unwrap }}{{ $ "cd" }}{{ end }}{{ $ "ef" }}{{ end }}{{ end }}', make_builtins('php'), 'BAdcFE');
-render_code('{{ wrap php ("strtoupper") }}{{ include template/unwrap.deval }}{{ end }}', make_builtins('php'), 'raw');
+render_code('{{ wrap php ("strtoupper") }}{{ include ' . __DIR__ . '/template/unwrap.deval }}{{ end }}', make_builtins('php'), 'raw');
 
 // Render wrap command
 render_code('{{ wrap length }}{{ $ "Hello!" }}{{ end }}', make_builtins('length'), '6');
@@ -248,8 +247,8 @@ render_code('{{ wrap length }}{{ wrap group }}{{ $ [1, 1, 2, 3, 3] }}{{ end }}{{
 render_code('{{ wrap php ("strtoupper") }}{{ $ "World" }}{{ end }}', make_builtins('php'), 'WORLD');
 
 // Render files
-render_file('template/member.deval', 'template', make_combinations(array('x' => 0)), '1337');
-render_file('template/symbol.deval', 'template', make_combinations(array('x' => 1, 'y' => 2, 'z' => 3)), "123");
+render_file(__DIR__ . '/template/member.deval', __DIR__ . '/template', make_combinations(array('x' => 0)), '1337');
+render_file(__DIR__ . '/template/symbol.deval', __DIR__ . '/template', make_combinations(array('x' => 1, 'y' => 2, 'z' => 3)), "123");
 
 // Setup style
 $tests = array(
