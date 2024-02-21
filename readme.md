@@ -1,11 +1,9 @@
-Deval: Deferred Evaluation Templates
-====================================
+# Deval: Deferred Evaluation Templates
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/r3c/deval/validate.yml?branch=master)](https://github.com/r3c/deval/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/r3c/deval/verify.yml?branch=master)](https://github.com/r3c/deval/actions/workflows/verify.yml)
 [![license](https://img.shields.io/github/license/r3c/deval.svg)](https://opensource.org/licenses/MIT)
 
-Overview
---------
+## Overview
 
 Deval is a PHP template engine with support for partial evaluation at
 compilation to enable early error detection, optimize generated code and
@@ -45,9 +43,7 @@ been evaluated in generated code, as their value was known at compile time.
 Other variables have been left untouched and Deval expects you to specify their
 value when rendering the template (and will raise an error if you don’t).
 
-
-Instructions
-------------
+## Instructions
 
 Download latest release
 [from GitHub](https://github.com/r3c/deval/releases/latest).
@@ -55,15 +51,7 @@ Download latest release
 Full documentation is available
 [on Read the Docs](http://deval.readthedocs.io/).
 
+## Resource
 
-Licence
--------
-
-This project is open-source, released under MIT licence. See file
-[LICENSE.md](LICENSE.md) for details.
-
-
-Author
-------
-
-[Rémi Caput](http://remi.caput.fr/) (github.com+deval [at] mirari [dot] fr)
+- Contact: v.github.com+deval [at] mirari [dot] fr
+- License: [license.md](license.md)
