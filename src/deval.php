@@ -135,7 +135,7 @@ class Builtin
         return (float)$value;
     }
 
-    public static function _group($items, $get_key = null, $get_value = null, $merge = null)
+    public static function _group($items, $get_key = null, $get_value = null, $initial = null)
     {
         if ($get_key === null) {
             $get_key = function ($v) {
@@ -144,13 +144,7 @@ class Builtin
         }
 
         if ($get_value === null) {
-            $get_value = function ($v) {
-                return $v;
-            };
-        }
-
-        if ($merge === null) {
-            $merge = function ($v) {
+            $get_value = function ($_, $v) {
                 return $v;
             };
         }
@@ -158,14 +152,10 @@ class Builtin
         $groups = array();
 
         foreach ($items as $key => $value) {
-            $k = $get_key($value, $key);
-            $v = $get_value($value, $key);
+            $group_key = $get_key($value, $key);
+            $group_value = $get_value(isset($groups[$group_key]) ? $groups[$group_key] : $initial, $value);
 
-            if (isset($groups[$k])) {
-                $groups[$k] = $merge($groups[$k], $v);
-            } else {
-                $groups[$k] = $v;
-            }
+            $groups[$group_key] = $group_value;
         }
 
         return $groups;

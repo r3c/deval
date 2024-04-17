@@ -110,17 +110,23 @@ Following functions are available in :php:meth:`Deval\\Builtin::deval` flavor:
 	:param mixed value: any value
 	:return: input value converted to floating point number
 
-.. py:function:: group(items[, get_key[, get_value[, merge]]])
+.. py:function:: group(items[, get_key[, get_value[, initial]]])
 
-	Group array items together, optionally transforming keys and values and handling key collisions using callback functions. This function will process every key and value from input array and apply specified ``get_key`` and ``get_value`` callbacks on them, passing them ``value`` and ``key`` as arguments. Resulting key and value are inserted into output array, using ``merge`` callback to resolve conflict when two values share the same key and passing it both previous and current value as arguments.
+	Group array items by key and merge together values sharing the same key. This function will process every key and value from input array items and apply ``get_key(item.value, item.key)`` to compute grouping key, then ``get_value(aggregate, item.value)`` to compute aggregated value. In case two or more items share the same key, ``get_value`` will be called with ``initial`` as first argument then each subsequent call receives aggregated value resulting from previous call.
 
-	This very versatile function can be used in multiple situations depending on the callback you specify. For example when used with default callbacks it will act as a "unique" function and remove duplicates, by using values as keys and solving conflicts by keeping first encountered value.
+	This very versatile function can be used in multiple situations depending on the callbacks you specify. Here are a few examples:
 
 	:param any_array items: input items
-	:param function get_key: key transform callback, returns ``value`` if not specified
-	:param function get_value: value transform callback, returns ``value`` if not specified
-	:param function merge: merge conflict handling callback, returns previous value if not specified
+	:param function get_key: key transform callback receiving item's ``value`` and ``key`` as arguments ; returns ``value`` if not specified
+	:param function get_value: value transform callback receiving current aggregate for this item's computed key and ``value`` as arguments ; returns ``value`` if not specified
+	:param any initial: initial aggregate passed as first argument of ``get_value`` for the first item of each group ; ``null`` if not specified
 	:return: grouped array
+
+.. code-block:: deval
+
+	{{ $ group(values) /* keep distinct values */ }}
+	{{ $ group(users, (user) => user.id) /* index users by ID */ }}
+	{{ $ group(books, (book) => book.author, (books, book) => cat(books, [book]), []) /* group books by author */ }}
 
 .. py:function:: int(value)
 
