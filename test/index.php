@@ -324,8 +324,8 @@ render_code('{{ $ float("") }}', make_builtins('float'), '0');
 render_code('{{ $ float("test") }}', make_builtins('float'), '0');
 
 render_code('{{ $ join(group([1, 1, 3, 3]), ",") }}', make_builtins('group', 'join'), '1,3');
-render_code('{{ $ join(group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2), ",") }}', make_builtins('group', 'join'), '2,4');
-render_code('{{ $ join(group([1, 2, 3, 4], (v) => v % 2, (v) => v * 2, (v1, v2) => v1 + v2), ",") }}', make_builtins('group', 'join'), '8,12');
+render_code('{{ $ join(group([1, 2, 3, 4], (v) => v % 2, (_, v) => v * 2), ",") }}', make_builtins('group', 'join'), '6,8');
+render_code('{{ $ join(group([1, 2, 3, 4], (v) => v % 2, (a, v) => a + v * 2, 0), ",") }}', make_builtins('group', 'join'), '8,12');
 
 render_code('{{ $ int(false) }}', make_builtins('int'), '0');
 render_code('{{ $ int(true) }}', make_builtins('int'), '1');
