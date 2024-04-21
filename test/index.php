@@ -1,6 +1,5 @@
 <?php
 
-require __DIR__ . '/../src/deval.php';
 require __DIR__ . '/test.php';
 
 header('Content-Type: text/plain');
@@ -47,18 +46,12 @@ raise_render('{{ $ a }}{{ let a = 1, b = 2 }}{{ end }}{{ $ b }}', array(), array
 raise_render('{{ $ _deval_input }}', array(), array('_deval_input' => 0), 'invalid or reserved symbol name');
 
 // Setup exceptions
-$style_invalid = new Deval\Setup();
-$style_invalid->style = 'invalid';
-
-raise_setup($style_invalid, 'unknown style "invalid"');
-
-$style_invalid->style = 42;
-
-raise_setup($style_invalid, 'builtin style or callable');
+raise_setup(setup('style', 'invalid'), 'unknown style "invalid"');
+raise_setup(setup('style', 42), 'builtin style or callable');
 
 // Code generation assertions
-source_code('{{ $ a }}', array(), array('/\\\\Deval\\\\r\\(array\\(\'a\'\\),\\$_deval_input\\);/' => 1));
-source_code('{{ $ a }}', array('a' => 0), array('/\\\\Deval\\\\r\\(.*\\);/' => 0));
+source_code('{{ $ a }}', array(), array('/\\\\Deval\\\\r\\(\\$_deval_input,array\\(\'a\'\\),\'fallback\'\\)/' => 1), setup('undefined_variable_fallback', 'fallback'));
+source_code('{{ $ a }}', array('a' => 0), array('/\\\\Deval\\\\r\\(.*\\)/' => 0));
 
 // Render plain texts
 render_code('lol', make_empty(), 'lol');
@@ -77,11 +70,8 @@ render_code('{{ $ /* one */ 1 }}', make_empty(), '1');
 render_code('{{ $ 2 /* two */ }}', make_empty(), '2');
 
 // Render interleaved blocks
-$style_preserve = new Deval\Setup();
-$style_preserve->style = 'preserve';
-
-render_code("A {{ $ \"B\" }} C", make_empty(), "A B C", $style_preserve);
-render_code("A\n{{ $ \"B\" }}\nC", make_empty(), "A\nB\nC", $style_preserve);
+render_code("A {{ $ \"B\" }} C", make_empty(), "A B C", setup('style', 'preserve'));
+render_code("A\n{{ $ \"B\" }}\nC", make_empty(), "A\nB\nC", setup('style', 'preserve'));
 
 // Render constants
 render_code('{{ $ null }}', make_empty(), '');
@@ -105,6 +95,7 @@ render_code('{{ $ bool }}', make_combinations(array('bool' => true)), '1');
 render_code('{{ $ float }}', make_combinations(array('float' => 5.3)), '5.3');
 render_code('{{ $ int }}', make_combinations(array('int' => 3)), '3');
 render_code('{{ $ str }}', make_combinations(array('str' => 'value')), 'value');
+render_code('{{ $ undefined }}', array(array(array(), array(), true)), '17', setup('undefined_variable_fallback', array('TestClass', 'static_method')));
 render_code('{{ $ _0 }}', make_combinations(array('_0' => 12)), '12');
 
 // Render binary expressions
@@ -252,17 +243,14 @@ render_file(__DIR__ . '/template/symbol.deval', __DIR__ . '/template', make_comb
 
 // Setup style
 $tests = array(
-    'collapse'            => '1 X2 3Y 4 5',
-    'deindent'            => '1X2  3Y45',
-    'preserve'            => "1\n  X2  3Y\n  4\n5",
-    'deindent,collapse'    => '1X2 3Y45'
+    'collapse' => '1 X2 3Y 4 5',
+    'deindent' => '1X2  3Y45',
+    'preserve' => "1\n  X2  3Y\n  4\n5",
+    'deindent,collapse' => '1X2 3Y45'
 );
 
 foreach ($tests as $style => $expect) {
-    $setup = new Deval\Setup();
-    $setup->style = $style;
-
-    render_code("{{ $ 1 }}\n  X{{ $ 2 }}  {{ $ 3 }}Y\n  {{ $ 4 }}\n{{ $ 5 }}", make_empty(), $expect, $setup);
+    render_code("{{ $ 1 }}\n  X{{ $ 2 }}  {{ $ 3 }}Y\n  {{ $ 4 }}\n{{ $ 5 }}", make_empty(), $expect, setup('style', $style));
 }
 
 // Invoke builtins

@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/../src/deval.php';
+
 /*
 ** Generate all possible combinations of $n elements where $k elements are
 ** equal to "true" and $n - $k are equal to "false".
@@ -124,7 +126,7 @@ function raise_compile($source, $constants, $message)
 function raise_parse($source, $line, $column, $message)
 {
     try {
-        $renderer = new Deval\StringRenderer($source);
+        new Deval\StringRenderer($source);
 
         assert(false, 'should have raised exception when parsing');
     } catch (Deval\ParseException $exception) {
@@ -132,22 +134,6 @@ function raise_parse($source, $line, $column, $message)
 
         assert($exception->location->line === $line, 'parse error should have been located at line ' . $line . ' but was ' . $exception->location->line);
         assert($exception->location->column === $column, 'parse error should have been located at column ' . $column . ' but was ' . $exception->location->column);
-    }
-}
-
-/*
-** Ensure source code throw resolve exception after parsing.
-** $source:		template source code
-** $message:	expected exception message
-*/
-function raise_resolve($source, $message)
-{
-    try {
-        $renderer = new Deval\StringRenderer($source);
-
-        assert(false, 'should have raised exception when resolving');
-    } catch (Deval\ResolveException $exception) {
-        raise($exception, $message);
     }
 }
 
@@ -194,9 +180,9 @@ function raise_setup($setup, $message)
 /*
 ** Run tests using given renderers constructor and set of
 ** (constants, variables) pairs array.
-** $constructor:	renderers constructor
-** $pairs:			(constants, variables) pairs array
-** $expect:			expected rendered string
+** $constructor: renderers constructor
+** $pairs: (constants, variables) pairs array
+** $expect: expected rendered string
 */
 function render($constructor, $pairs, $expect)
 {
@@ -211,7 +197,10 @@ function render($constructor, $pairs, $expect)
 
             $renderer->source($names_result);
 
-            assert(count(array_diff($names_result, $names_expect)) === 0, 'invalid detected variables: ' . var_export($names_result, true) . ' !== ' . var_export($names_expect, true));
+            // Assert detected variables unless disabled (for testing undefined variables fallback behavior)
+            if (!isset($pair[2]) || !$pair[2]) {
+                assert(count(array_diff($names_result, $names_expect)) === 0, 'invalid detected variables: ' . var_export($names_result, true) . ' !== ' . var_export($names_expect, true));
+            }
 
             $result = $renderer->render($variables);
 
@@ -256,11 +245,19 @@ function render_file($path, $directory, $pairs, $expect, $setup = null)
     }, $pairs, $expect, $setup);
 }
 
+function setup($property, $value)
+{
+    $setup = new Deval\Setup();
+    $setup->$property = $value;
+
+    return $setup;
+}
+
 function source($constructor, $constants, $expects)
 {
     foreach ($constructor() as $renderer) {
         $renderer->inject($constants);
-        $source = $renderer->source($requires);
+        $source = $renderer->source();
 
         foreach ($expects as $pattern => $expect) {
             $count = preg_match_all($pattern, $source, $matches);

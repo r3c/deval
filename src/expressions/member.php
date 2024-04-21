@@ -23,7 +23,7 @@ class MemberExpression implements Expression
         $offset = $this->offset->generate($generator, $preserves);
         $source = $this->source->generate($generator, $preserves);
 
-        return Generator::emit_member($source, $offset);
+        return $generator->emit_member($source, $offset);
     }
 
     public function get_symbols()

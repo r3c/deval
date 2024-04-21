@@ -18,7 +18,7 @@ class ConstantExpression implements Expression
 
     public function generate($generator, $preserves)
     {
-        return Generator::emit_value($this->value);
+        return $generator->emit_value($this->value);
     }
 
     public function get_symbols()

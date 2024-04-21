@@ -335,7 +335,7 @@ Following sections list available options.
 Whitespace control
 ------------------
 
-The way Deval handles whitespaces in the literal text parts of your templates can be modified through the :php:attr:`Deval\\Setup::$style` property. You can use some of Deval predefined styles or pass a PHP function to define your own. Use ',' as a separator between names if you want to apply more than one Deval predefined style:
+The way Deval handles whitespaces in the literal text parts of your templates can be modified through property :php:attr:`Deval\\Setup::$style`. You can use some of Deval predefined styles or pass a PHP function to define your own. Use ',' as a separator between names if you want to apply more than one Deval predefined style:
 
 .. code-block:: php
 
@@ -357,11 +357,45 @@ Predefined styles are:
 
 Default value of style option is 'deindent'.
 
+Undefined variable behavior
+---------------------------
+
+By default Deval will raise an exception for any variable referenced in a template but not injected as a compile-time constant nor a render-time variable. While this behavior provides a strict verification of template instantiation you may want to relax this rule, especially when switching to Deval from another template engine with loose validation.
+
+Assign a callable function to property :php:attr:`Deval\\Setup::$undefined_variable_fallback` to have it called for any missing variable at render-time. This function will receive the variable name as an argument and its return value will be used as the value for this variable, as a replacement for default exception-throwing behavior.
+
+Setup:
+
+.. code-block:: php
+
+	<?php
+
+	function my_undefined_variable_handler($name)
+	{
+		return '<undefined "' . $name . '">';
+	}
+
+	[ ... ]
+
+	$setup->undefined_variable_fallback = 'my_undefined_variable_handler';
+
+Template:
+
+.. code-block:: deval
+
+	{{ $ missing }}
+
+Output:
+
+.. code-block:: plain
+
+	<undefined "missing">
+
 .. _version:
 
 PHP compatibility
 -----------------
 
-Use the :php:attr:`Deval\\Setup::$version` property to change target PHP compatibility version. PHP versions 7 and above unlocked language constructs that were not possible on previous versions (e.g. ``$f()()``), saving Deval from resorting to less effective workarounds.
+Use property :php:attr:`Deval\\Setup::$version` to change target PHP compatibility version. PHP versions 7 and above unlocked language constructs that were not possible on previous versions (e.g. ``$f()()``), saving Deval from resorting to less effective workarounds.
 
 Default value of this option is current executing PHP version (obtained through ``PHP_VERSION`` constant), meaning you should not have to touch this option except in rare situations if you use Deval to generate and execute code that don't run using the same PHP version.

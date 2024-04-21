@@ -71,7 +71,7 @@ class Compiler
         $source = $block->compile($generator, $symbols);
 
         $output = new Output();
-        $output->append_code(Generator::emit_run($names));
+        $output->append_code($generator->emit_run($names));
         $output->append($source);
 
         return $output->source();
