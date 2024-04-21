@@ -58,21 +58,21 @@ class ForBlock implements Block
         // Backup conflicting counter, key and value variables if any
         if (count($backups) > 0) {
             $store = $generator->make_local($preserves);
-            $output->append_code(Generator::emit_backup($store, $backups));
+            $output->append_code($generator->emit_backup($store, $backups));
         }
 
         // Initialize counter if any
         if ($empty->has_data()) {
-            $output->append_code(Generator::emit_symbol($counter) . '=0;');
+            $output->append_code($generator->emit_symbol($counter) . '=0;');
         }
 
         // Generate for control loop
         $output->append_code('foreach(' . $this->source->generate($generator, $preserves) . ' as ');
 
         if ($this->key_name !== null) {
-            $output->append_code(Generator::emit_symbol($this->key_name) . '=>' . Generator::emit_symbol($this->value_name));
+            $output->append_code($generator->emit_symbol($this->key_name) . '=>' . $generator->emit_symbol($this->value_name));
         } else {
-            $output->append_code(Generator::emit_symbol($this->value_name));
+            $output->append_code($generator->emit_symbol($this->value_name));
         }
 
         $output->append_code(')');
@@ -82,19 +82,19 @@ class ForBlock implements Block
         $output->append($this->loop->compile($generator, $preserves));
 
         if ($empty->has_data()) {
-            $output->append_code('++' . Generator::emit_symbol($counter) . ';');
+            $output->append_code('++' . $generator->emit_symbol($counter) . ';');
         }
 
         $output->append_code('}');
 
         // Restore backup variables
         if (count($backups) > 0) {
-            $output->append_code(Generator::emit_restore($store, $backups));
+            $output->append_code($generator->emit_restore($store, $backups));
         }
 
         // Write empty block if it contains instructions
         if ($empty->has_data()) {
-            $output->append_code('if(' . Generator::emit_symbol($counter) . '===0)');
+            $output->append_code('if(' . $generator->emit_symbol($counter) . '===0)');
             $output->append_code('{');
             $output->append($empty);
             $output->append_code('}');

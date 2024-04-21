@@ -18,7 +18,7 @@ class SymbolExpression implements Expression
 
     public function generate($generator, $preserves)
     {
-        return Generator::emit_symbol($this->name);
+        return $generator->emit_symbol($this->name);
     }
 
     public function get_symbols()

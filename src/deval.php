@@ -545,6 +545,7 @@ class StringRenderer extends DirectRenderer
 class Setup
 {
     public $style = 'deindent';
+    public $undefined_variable_fallback = null;
     public $version = PHP_VERSION;
 }
 
@@ -574,14 +575,25 @@ function m($parent, $key)
 /*
 ** Deval run method, assert provided symbols match required ones and throw
 ** exception otherwise.
-** $required:	required symbols list
-** $provided:	provided symbols map
+** $provided: provided symbols map
+** $required: required symbols list
+** $fallback: undefined variable fallback function or `null` to throw on undefined variables
 */
-function r($required, &$provided)
+function r($provided, $required, $fallback)
 {
-    $undefined = array_diff($required, array_keys($provided));
+    $names = array_diff($required, array_keys($provided));
 
-    if (count($undefined) > 0) {
-        throw new RenderException('undefined symbol(s) ' . implode(', ', $undefined));
+    if (count($names) > 0) {
+        if ($fallback === null) {
+            throw new RenderException('undefined symbol(s) ' . implode(', ', $names));
+        } else if (!is_callable($fallback)) {
+            throw new RenderException('configured undefined variable fallback is not a callable function');
+        }
+
+        foreach ($names as $name) {
+            $provided[$name] = $fallback($name);
+        }
     }
+
+    return $provided;
 }

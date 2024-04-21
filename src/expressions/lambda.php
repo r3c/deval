@@ -25,8 +25,8 @@ class LambdaExpression implements Expression
         $provides = array_merge($this->names, $captures);
 
         // Generate lambda code from captures, parameters and body expression
-        $callback = function ($name) {
-            return Generator::emit_symbol($name);
+        $callback = function ($name) use ($generator) {
+            return $generator->emit_symbol($name);
         };
 
         return

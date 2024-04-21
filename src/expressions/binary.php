@@ -28,7 +28,7 @@ class BinaryExpression implements Expression
                 ),
                 '&&' => array(
                     function ($lhs, $rhs, $generator, $preserves) {
-                        $symbol = Generator::emit_symbol($generator->make_local($preserves));
+                        $symbol = $generator->emit_symbol($generator->make_local($preserves));
 
                         return '(' . $symbol . '=' . $lhs . ')?' . $rhs . ':' . $symbol;
                     },

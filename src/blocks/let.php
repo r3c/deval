@@ -24,7 +24,7 @@ class LetBlock implements Block
             list($name, $expression) = $assignment;
 
             // Generate evaluation code for current variable
-            $assignments->append_code(Generator::emit_symbol($name) . '=' . $expression->generate($generator, $preserves) . ';');
+            $assignments->append_code($generator->emit_symbol($name) . '=' . $expression->generate($generator, $preserves) . ';');
 
             // Variable must be saved and restored if present in the preserve list
             if (isset($preserves[$name])) {
@@ -38,7 +38,7 @@ class LetBlock implements Block
         // Backup conflicting variables if any
         if (count($backups) > 0) {
             $store = $generator->make_local($preserves);
-            $output->append_code(Generator::emit_backup($store, $backups));
+            $output->append_code($generator->emit_backup($store, $backups));
         }
 
         // Output assignments and body evaluation
@@ -47,7 +47,7 @@ class LetBlock implements Block
 
         // Restore backup variables if any
         if (count($backups) > 0) {
-            $output->append_code(Generator::emit_restore($store, $backups));
+            $output->append_code($generator->emit_restore($store, $backups));
         }
 
         return $output;
