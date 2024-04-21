@@ -324,18 +324,18 @@ Deval configuration can be modified through an optional :php:class:`Deval\\Setup
 	require 'lib/deval/deval.php';
 
 	$setup = Deval\Setup();
-	$setup->style = 'deindent'; // Change some option
+	$setup->plain_text_processor = 'deindent'; // Change some option
 
 	$renderer = new Deval\CacheRenderer('template/users.deval', 'cache/', $setup);
 
 Following sections list available options.
 
-.. _whitespace:
+.. _plain_text_processor:
 
 Whitespace control
 ------------------
 
-The way Deval handles whitespaces in the literal text parts of your templates can be modified through property :php:attr:`Deval\\Setup::$style`. You can use some of Deval predefined styles or pass a PHP function to define your own. Use ',' as a separator between names if you want to apply more than one Deval predefined style:
+The way Deval handles whitespaces in the literal text parts of your templates can be modified through property :php:attr:`Deval\\Setup::$plain_text_processor`. You can use some of Deval predefined processors or pass a PHP function to define your own. Use ',' as a separator between names if you want to apply more than one Deval predefined processor:
 
 .. code-block:: php
 
@@ -343,24 +343,27 @@ The way Deval handles whitespaces in the literal text parts of your templates ca
 
 	[ ... ]
 
-	$setup->style = 'deindent'; // Use predefined style 'deindent'
+	// Use predefined processor 'deindent' (default value)
+	$setup->plain_text_processor = 'deindent';
 	// or
-	$setup->style = 'deindent,collapse'; // Use 'deindent' then 'collapse' ; good choice when generating HTML
+	// Use 'deindent' then 'collapse' (good choice for HTML generation)
+	$setup->plain_text_processor = 'deindent,collapse';
 	// or
-	$setup->style = function ($s) { return trim ($s); }; // Use custom function
+	// Use custom function as plain text processor
+	$setup->plain_text_processor = function ($s) { return trim ($s); };
 
-Predefined styles are:
+Predefined processors are:
 
-- deindent: remove a line break character (\\n) followed by whitespaces at the beginning and end of each literal text block. This style allows you to indent your template code without adding unwanted blank characters into generated code. As a side-effect you may experience blocks being collapsed when you want to preserve some whitespaces ; this can be fixed by either adding additional line breaks or inserting spaces through Deval statements e.g. ``{{ $ " " }}`` that won't be removed.
+- deindent: remove a line break character (\\n) followed by whitespaces at the beginning and end of each literal text block. This processor allows you to indent your template code without adding unwanted blank characters into generated code. As a side-effect you may experience blocks being collapsed when you want to preserve some whitespaces ; this can be fixed by either adding additional line breaks or inserting spaces through Deval statements e.g. ``{{ $ " " }}`` that won't be removed.
 - collapse: replace any sequence of one or more whitespaces by a single one. This setting is useful to generate a more compact output when targeting a language that ignores repeated whitespaces such as HTML.
 - preserve: do not remove nor replace any whitespace from template literals.
 
-Default value of style option is 'deindent'.
+.. _undefined_variable_behavior:
 
 Undefined variable behavior
 ---------------------------
 
-By default Deval will raise an exception for any variable referenced in a template but not injected as a compile-time constant nor a render-time variable. While this behavior provides a strict verification of template instantiation you may want to relax this rule, especially when switching to Deval from another template engine with loose validation.
+By default Deval will raise an exception for any variable referenced in a template but not injected as a compile-time constant nor a render-time variable. While this behavior provides a strict verification of template instantiation, you may want to relax this rule, especially when switching to Deval from another template engine with loose validation.
 
 Assign a callable function to property :php:attr:`Deval\\Setup::$undefined_variable_fallback` to have it called for any missing variable at render-time. This function will receive the variable name as an argument and its return value will be used as the value for this variable, as a replacement for default exception-throwing behavior.
 
@@ -372,7 +375,7 @@ Setup:
 
 	function my_undefined_variable_handler($name)
 	{
-		return '<undefined "' . $name . '">';
+	    return '<undefined "' . $name . '">';
 	}
 
 	[ ... ]

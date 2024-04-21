@@ -99,9 +99,13 @@ Setup
 
 	Configuration class for :php:class:`Deval\\Renderer`.
 
-	.. php:attr:: style
+	.. php:attr:: plain_text_processor
 
-		Whitespace handling option, see :ref:`whitespace` for details.
+		Defines how plain text is processed (most useful for whitespace control), see :ref:`plain_text_processor` for details.
+
+	.. php:attr:: undefined_variable_fallback
+
+		Defines how undefined variables are handled, see :ref:`undefined_variable_behavior` for details.
 
 	.. php:attr:: version
 

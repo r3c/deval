@@ -46,8 +46,8 @@ raise_render('{{ $ a }}{{ let a = 1, b = 2 }}{{ end }}{{ $ b }}', array(), array
 raise_render('{{ $ _deval_input }}', array(), array('_deval_input' => 0), 'invalid or reserved symbol name');
 
 // Setup exceptions
-raise_setup(setup('style', 'invalid'), 'unknown style "invalid"');
-raise_setup(setup('style', 42), 'builtin style or callable');
+raise_setup(setup('plain_text_processor', 'invalid'), 'unknown plain text processor "invalid"');
+raise_setup(setup('plain_text_processor', 42), 'builtin name or callable');
 
 // Code generation assertions
 source_code('{{ $ a }}', array(), array('/\\\\Deval\\\\r\\(\\$_deval_input,array\\(\'a\'\\),\'fallback\'\\)/' => 1), setup('undefined_variable_fallback', 'fallback'));
@@ -70,8 +70,8 @@ render_code('{{ $ /* one */ 1 }}', make_empty(), '1');
 render_code('{{ $ 2 /* two */ }}', make_empty(), '2');
 
 // Render interleaved blocks
-render_code("A {{ $ \"B\" }} C", make_empty(), "A B C", setup('style', 'preserve'));
-render_code("A\n{{ $ \"B\" }}\nC", make_empty(), "A\nB\nC", setup('style', 'preserve'));
+render_code("A {{ $ \"B\" }} C", make_empty(), "A B C", setup('plain_text_processor', 'preserve'));
+render_code("A\n{{ $ \"B\" }}\nC", make_empty(), "A\nB\nC", setup('plain_text_processor', 'preserve'));
 
 // Render constants
 render_code('{{ $ null }}', make_empty(), '');
@@ -95,7 +95,6 @@ render_code('{{ $ bool }}', make_combinations(array('bool' => true)), '1');
 render_code('{{ $ float }}', make_combinations(array('float' => 5.3)), '5.3');
 render_code('{{ $ int }}', make_combinations(array('int' => 3)), '3');
 render_code('{{ $ str }}', make_combinations(array('str' => 'value')), 'value');
-render_code('{{ $ undefined }}', array(array(array(), array(), true)), '17', setup('undefined_variable_fallback', array('TestClass', 'static_method')));
 render_code('{{ $ _0 }}', make_combinations(array('_0' => 12)), '12');
 
 // Render binary expressions
@@ -241,17 +240,24 @@ render_code('{{ wrap php ("strtoupper") }}{{ $ "World" }}{{ end }}', make_builti
 render_file(__DIR__ . '/template/member.deval', __DIR__ . '/template', make_combinations(array('x' => 0)), '1337');
 render_file(__DIR__ . '/template/symbol.deval', __DIR__ . '/template', make_combinations(array('x' => 1, 'y' => 2, 'z' => 3)), "123");
 
-// Setup style
-$tests = array(
+// Setup plain text processor
+$plain_text_processor_cases = array(
     'collapse' => '1 X2 3Y 4 5',
     'deindent' => '1X2  3Y45',
     'preserve' => "1\n  X2  3Y\n  4\n5",
     'deindent,collapse' => '1X2 3Y45'
 );
 
-foreach ($tests as $style => $expect) {
-    render_code("{{ $ 1 }}\n  X{{ $ 2 }}  {{ $ 3 }}Y\n  {{ $ 4 }}\n{{ $ 5 }}", make_empty(), $expect, setup('style', $style));
+$plain_text_processor_source = "{{ $ 1 }}\n  X{{ $ 2 }}  {{ $ 3 }}Y\n  {{ $ 4 }}\n{{ $ 5 }}";
+
+foreach ($plain_text_processor_cases as $value => $expect) {
+    render_code($plain_text_processor_source, make_empty(), $expect, setup('plain_text_processor', $value));
+    render_code($plain_text_processor_source, make_empty(), $expect, setup('style', $value));
 }
+
+// Setup undefined variable fallback
+render_code('{{ $ undefined }}', array(array(array(), array(), true)), '', setup('undefined_variable_fallback', array('\\Deval\\Builtin', '_void')));
+render_code('{{ $ undefined }}', array(array(array(), array(), true)), '17', setup('undefined_variable_fallback', array('TestClass', 'static_method')));
 
 // Invoke builtins
 render_code('{{ $ join(array(true, false, true), ",") }}', make_builtins('array', 'join'), '1,,1');
