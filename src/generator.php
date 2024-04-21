@@ -2,8 +2,6 @@
 
 namespace Deval;
 
-use Exception;
-
 class Generator
 {
     private static $input_name = '_deval_input';
@@ -17,17 +15,17 @@ class Generator
         return $symbols;
     }
 
-    private $trimmer;
+    private $plain_text_processor;
     private $undefined_variable_fallback;
     private $unique;
     private $version;
 
     public function __construct($setup)
     {
-        static $named_trimmers;
+        static $named_processors;
 
-        if (!isset($named_trimmers)) {
-            $named_trimmers = array(
+        if (!isset($named_processors)) {
+            $named_processors = array(
                 'collapse' => function ($s) {
                     return preg_replace('/\\s+/mu', ' ', $s);
                 },
@@ -40,32 +38,34 @@ class Generator
             );
         }
 
-        if (is_string($setup->style)) {
-            $trimmers = array();
+        $plain_text_processor = isset($setup->style) ? $setup->style : $setup->plain_text_processor;
 
-            foreach (explode(',', $setup->style) as $style) {
-                if (!isset($named_trimmers[$style])) {
-                    throw new SetupException('unknown style "' . $style . '"');
+        if (is_string($plain_text_processor)) {
+            $processors = array();
+
+            foreach (explode(',', $plain_text_processor) as $name) {
+                if (!isset($named_processors[$name])) {
+                    throw new SetupException('unknown plain text processor "' . $name . '"');
                 }
 
-                $trimmers[] = $named_trimmers[$style];
+                $processors[] = $named_processors[$name];
             }
 
-            if (count($trimmers) === 1) {
-                $this->trimmer = $trimmers[0];
+            if (count($processors) === 1) {
+                $this->plain_text_processor = $processors[0];
             } else {
-                $this->trimmer = function ($s) use ($trimmers) {
-                    foreach ($trimmers as $trimmer) {
+                $this->plain_text_processor = function ($s) use ($processors) {
+                    foreach ($processors as $trimmer) {
                         $s = $trimmer($s);
                     }
 
                     return $s;
                 };
             }
-        } elseif (is_callable($setup->style)) {
-            $this->trimmer = $setup->style;
+        } elseif (is_callable($plain_text_processor)) {
+            $this->plain_text_processor = $plain_text_processor;
         } else {
-            throw new SetupException('invalid style, must be either builtin style or callable');
+            throw new SetupException('invalid plain text processor, must be either builtin name or callable');
         }
 
         $this->undefined_variable_fallback = $setup->undefined_variable_fallback;
@@ -161,9 +161,9 @@ class Generator
 
     public function make_plain($text)
     {
-        $trimer = $this->trimmer;
+        $processor = $this->plain_text_processor;
 
-        return $trimer($text);
+        return $processor($text);
     }
 
     public function support($required)

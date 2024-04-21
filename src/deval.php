@@ -544,7 +544,7 @@ class StringRenderer extends DirectRenderer
 
 class Setup
 {
-    public $style = 'deindent';
+    public $plain_text_processor = 'deindent';
     public $undefined_variable_fallback = null;
     public $version = PHP_VERSION;
 }
