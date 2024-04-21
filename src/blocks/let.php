@@ -4,6 +4,9 @@ namespace Deval;
 
 class LetBlock implements Block
 {
+    private $assignments;
+    private $body;
+
     public function __construct($assignments, $body)
     {
         $this->assignments = $assignments;

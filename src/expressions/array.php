@@ -4,6 +4,8 @@ namespace Deval;
 
 class ArrayExpression implements Expression
 {
+    private $elements;
+
     public function __construct($elements)
     {
         $this->elements = $elements;

@@ -12,6 +12,8 @@ class CompileException extends \Exception
 
 class ParseException extends \Exception
 {
+    public $location;
+
     public function __construct($location, $message)
     {
         parent::__construct('parse error in ' . $location->context . ' at line ' . $location->line . ' column ' . $location->column . ': ' . $message);

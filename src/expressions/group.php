@@ -4,6 +4,8 @@ namespace Deval;
 
 class GroupExpression implements Expression
 {
+    private $expression;
+
     public function __construct($expression)
     {
         $this->expression = $expression;

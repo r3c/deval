@@ -4,22 +4,26 @@ namespace Deval;
 
 class UnaryExpression implements Expression
 {
+    private $callback;
+    private $operand;
+    private $operator;
+
     public function __construct($operator, $operand)
     {
         static $callbacks;
 
         if (!isset($callbacks)) {
             $callbacks = array(
-                '!'	=> function ($value) {
+                '!' => function ($value) {
                     return !$value;
                 },
-                '+'	=> function ($value) {
+                '+' => function ($value) {
                     return $value;
                 },
-                '-'	=> function ($value) {
+                '-' => function ($value) {
                     return -$value;
                 },
-                '~'	=> function ($value) {
+                '~' => function ($value) {
                     return ~$value;
                 }
             );

@@ -4,6 +4,8 @@ namespace Deval;
 
 class UnwrapBlock implements Block
 {
+    private $body;
+
     public function __construct($body)
     {
         $this->body = $body;

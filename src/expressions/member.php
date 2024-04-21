@@ -4,6 +4,9 @@ namespace Deval;
 
 class MemberExpression implements Expression
 {
+    private $offset;
+    private $source;
+
     public function __construct($source, $offset)
     {
         $this->offset = $offset;

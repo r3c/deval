@@ -4,6 +4,8 @@ namespace Deval;
 
 class ConstantExpression implements Expression
 {
+    private $value;
+
     public function __construct($value)
     {
         $this->value = $value;

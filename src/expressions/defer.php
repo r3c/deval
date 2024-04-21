@@ -4,6 +4,9 @@ namespace Deval;
 
 class DeferExpression implements Expression
 {
+    private $operand;
+    private $moment;
+
     public function __construct($moment, $operand)
     {
         $this->operand = $operand;

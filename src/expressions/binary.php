@@ -4,13 +4,20 @@ namespace Deval;
 
 class BinaryExpression implements Expression
 {
+    private $early;
+    private $emit;
+    private $lazy;
+    private $lhs;
+    private $operator;
+    private $rhs;
+
     public function __construct($operator, $lhs, $rhs)
     {
         static $callbacks;
 
         if (!isset($callbacks)) {
             $callbacks = array(
-                '%'		=> array(
+                '%' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '%' . $rhs;
                     },
@@ -19,7 +26,7 @@ class BinaryExpression implements Expression
                         return $lhs % $rhs;
                     }
                 ),
-                '&&'	=> array(
+                '&&' => array(
                     function ($lhs, $rhs, $generator, $preserves) {
                         $symbol = Generator::emit_symbol($generator->make_local($preserves));
 
@@ -32,7 +39,7 @@ class BinaryExpression implements Expression
                         return $lhs ? $rhs : $lhs;
                     }
                 ),
-                '=='	=> array(
+                '==' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '===' . $rhs;
                     },
@@ -41,7 +48,7 @@ class BinaryExpression implements Expression
                         return $lhs === $rhs;
                     }
                 ),
-                '!='	=> array(
+                '!=' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '!==' . $rhs;
                     },
@@ -50,7 +57,7 @@ class BinaryExpression implements Expression
                         return $lhs !== $rhs;
                     }
                 ),
-                '>'		=> array(
+                '>' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '>' . $rhs;
                     },
@@ -59,7 +66,7 @@ class BinaryExpression implements Expression
                         return $lhs > $rhs;
                     }
                 ),
-                '>='	=> array(
+                '>=' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '>=' . $rhs;
                     },
@@ -68,7 +75,7 @@ class BinaryExpression implements Expression
                         return $lhs >= $rhs;
                     }
                 ),
-                '<'		=> array(
+                '<' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '<' . $rhs;
                     },
@@ -77,7 +84,7 @@ class BinaryExpression implements Expression
                         return $lhs < $rhs;
                     }
                 ),
-                '<='	=> array(
+                '<=' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '<=' . $rhs;
                     },
@@ -86,7 +93,7 @@ class BinaryExpression implements Expression
                         return $lhs <= $rhs;
                     }
                 ),
-                '*'		=> array(
+                '*' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '*' . $rhs;
                     },
@@ -95,7 +102,7 @@ class BinaryExpression implements Expression
                         return $lhs * $rhs;
                     }
                 ),
-                '+'		=> array(
+                '+' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '+' . $rhs;
                     },
@@ -104,7 +111,7 @@ class BinaryExpression implements Expression
                         return $lhs + $rhs;
                     }
                 ),
-                '-'		=> array(
+                '-' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '-' . $rhs;
                     },
@@ -113,7 +120,7 @@ class BinaryExpression implements Expression
                         return $lhs - $rhs;
                     }
                 ),
-                '/'		=> array(
+                '/' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '/' . $rhs;
                     },
@@ -122,7 +129,7 @@ class BinaryExpression implements Expression
                         return $lhs / $rhs;
                     }
                 ),
-                '||'	=> array(
+                '||' => array(
                     function ($lhs, $rhs) {
                         return $lhs . '?:' . $rhs;
                     },

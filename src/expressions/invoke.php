@@ -4,6 +4,9 @@ namespace Deval;
 
 class InvokeExpression implements Expression
 {
+    private $arguments;
+    private $caller;
+
     public function __construct($caller, $arguments)
     {
         $this->arguments = $arguments;
