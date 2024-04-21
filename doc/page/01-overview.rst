@@ -38,7 +38,7 @@ Template rendering workflow with Deval looks like this:
 
 Deval will maintain a pre-evaluated version of each template file you use for every combination of constants you specify. For example if you chose to inject a ``$language`` constant into your template and use it to build localized strings Deval will cache a specialized version of your template for each language you support where strings have been pre-resolved.
 
-Passing a value at compilation or rendering is a decision you'll take based on how many different values it can take and by how much pre-evaluating it improves performance. Deval offers a unified template syntax for all variables regardless of whether they've been specified at compilation or rendering, so you can change your mind without touching tour template code.
+Passing a value at compilation or rendering is a decision you'll take based on how many different values it can take and by how much pre-evaluating it improves performance. Deval offers a unified template syntax for all variables regardless of whether they've been specified at compilation or rendering, so you can change your mind without touching your template code.
 
 
 A simple template example
