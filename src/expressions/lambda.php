@@ -4,6 +4,9 @@ namespace Deval;
 
 class LambdaExpression implements Expression
 {
+    private $body;
+    private $names;
+
     public function __construct($names, $body)
     {
         $this->body = $body;

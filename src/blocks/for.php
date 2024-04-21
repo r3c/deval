@@ -4,6 +4,12 @@ namespace Deval;
 
 class ForBlock implements Block
 {
+    private $empty;
+    private $key_name;
+    private $loop;
+    private $source;
+    private $value_name;
+
     public function __construct($source, $key_name, $value_name, $loop, $empty)
     {
         $this->empty = $empty;

@@ -4,6 +4,9 @@ namespace Deval;
 
 class IfBlock implements Block
 {
+    private $branches;
+    private $fallback;
+
     public function __construct($branches, $fallback)
     {
         $this->branches = $branches;

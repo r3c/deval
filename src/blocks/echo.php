@@ -4,6 +4,8 @@ namespace Deval;
 
 class EchoBlock implements Block
 {
+    private $expression;
+
     public function __construct($expression)
     {
         $this->expression = $expression;

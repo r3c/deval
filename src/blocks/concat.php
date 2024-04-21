@@ -4,6 +4,8 @@ namespace Deval;
 
 class ConcatBlock implements Block
 {
+    private $blocks;
+
     public function __construct($blocks)
     {
         $this->blocks = $blocks;

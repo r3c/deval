@@ -4,6 +4,8 @@ namespace Deval;
 
 class LabelBlock implements Block
 {
+    private $name;
+
     public function __construct($name)
     {
         $this->name = $name;
