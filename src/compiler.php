@@ -43,7 +43,6 @@ class Compiler
     private static function parse($context, $source, $blocks)
     {
         $parser = new \PhpPegJs\Parser();
-        $parser->context = $context;
 
         try {
             return $parser->parse($source)->resolve($blocks);

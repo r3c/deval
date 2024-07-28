@@ -46,11 +46,11 @@ raise_render('{{ $ a }}{{ let a = 1, b = 2 }}{{ end }}{{ $ b }}', array(), array
 raise_render('{{ $ _deval_input }}', array(), array('_deval_input' => 0), 'invalid or reserved symbol name');
 
 // Setup exceptions
-raise_setup(setup('plain_text_processor', 'invalid'), 'unknown plain text processor "invalid"');
-raise_setup(setup('plain_text_processor', 42), 'builtin name or callable');
+raise_setup(setup('invalid', null), 'unknown plain text processor "invalid"');
+raise_setup(setup(42, null), 'builtin name or callable');
 
 // Code generation assertions
-source_code('{{ $ a }}', array(), array('/\\\\Deval\\\\r\\(\\$_deval_input,array\\(\'a\'\\),\'fallback\'\\)/' => 1), setup('undefined_variable_fallback', 'fallback'));
+source_code('{{ $ a }}', array(), array('/\\\\Deval\\\\r\\(\\$_deval_input,array\\(\'a\'\\),\'fallback\'\\)/' => 1), setup(null, 'fallback'));
 source_code('{{ $ a }}', array('a' => 0), array('/\\\\Deval\\\\r\\(.*\\)/' => 0));
 
 // Render plain texts
@@ -70,8 +70,8 @@ render_code('{{ $ /* one */ 1 }}', make_empty(), '1');
 render_code('{{ $ 2 /* two */ }}', make_empty(), '2');
 
 // Render interleaved blocks
-render_code("A {{ $ \"B\" }} C", make_empty(), "A B C", setup('plain_text_processor', 'preserve'));
-render_code("A\n{{ $ \"B\" }}\nC", make_empty(), "A\nB\nC", setup('plain_text_processor', 'preserve'));
+render_code("A {{ $ \"B\" }} C", make_empty(), "A B C", setup('preserve', null));
+render_code("A\n{{ $ \"B\" }}\nC", make_empty(), "A\nB\nC", setup('preserve', null));
 
 // Render constants
 render_code('{{ $ null }}', make_empty(), '');
@@ -251,13 +251,12 @@ $plain_text_processor_cases = array(
 $plain_text_processor_source = "{{ $ 1 }}\n  X{{ $ 2 }}  {{ $ 3 }}Y\n  {{ $ 4 }}\n{{ $ 5 }}";
 
 foreach ($plain_text_processor_cases as $value => $expect) {
-    render_code($plain_text_processor_source, make_empty(), $expect, setup('plain_text_processor', $value));
-    render_code($plain_text_processor_source, make_empty(), $expect, setup('style', $value));
+    render_code($plain_text_processor_source, make_empty(), $expect, setup($value, null));
 }
 
 // Setup undefined variable fallback
-render_code('{{ $ undefined }}', array(array(array(), array(), true)), '', setup('undefined_variable_fallback', array('\\Deval\\Builtin', '_void')));
-render_code('{{ $ undefined }}', array(array(array(), array(), true)), '17', setup('undefined_variable_fallback', array('TestClass', 'static_method')));
+render_code('{{ $ undefined }}', array(array(array(), array(), true)), '', setup(null, array('\\Deval\\Builtin', '_void')));
+render_code('{{ $ undefined }}', array(array(array(), array(), true)), '17', setup(null, array('TestClass', 'static_method')));
 
 // Invoke builtins
 render_code('{{ $ join(array(true, false, true), ",") }}', make_builtins('array', 'join'), '1,,1');

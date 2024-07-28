@@ -324,7 +324,7 @@ class Builtin
 
     public static function deval()
     {
-        $class = '\\' . get_class();
+        $class = '\\' . get_called_class();
         $names = array(
             'array',
             'bool',
