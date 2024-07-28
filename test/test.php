@@ -248,7 +248,7 @@ function render_file($path, $directory, $pairs, $expect, $setup = null)
 function setup($plain_text_processor, $undefined_variable_fallback)
 {
     $setup = new Deval\Setup();
-    $setup->plain_text_processor = $plain_text_processor ?? 'deindent';
+    $setup->plain_text_processor = $plain_text_processor ?: 'deindent';
     $setup->undefined_variable_fallback = $undefined_variable_fallback;
 
     return $setup;
