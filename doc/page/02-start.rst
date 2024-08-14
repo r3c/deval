@@ -8,14 +8,7 @@ Install the library
 
 You can choose to download lastest Deval release or build it from source.
 
-Option 1: download latest release
----------------------------------
-
-Download `latest Deval release`_, unzip it somewhere inside your project directory and skip to next section to see how to import Deval into your project.
-
-.. _`latest Deval release`: https://github.com/r3c/deval/releases/latest
-
-Option 2: install from Composer
+Option 1: install from Composer
 -------------------------------
 
 Require Deval from `Composer`_ and install it before you can autoload Deval into your project:
@@ -25,7 +18,13 @@ Require Deval from `Composer`_ and install it before you can autoload Deval into
 .. code-block:: sh
 
 	$ composer require r3c/deval
-	$ ( cd vendor/r3c/deval && npm install )
+
+Option 2: download latest release
+---------------------------------
+
+Download `latest Deval release`_, unzip it somewhere inside your project directory and skip to next section to see how to import Deval into your project.
+
+.. _`latest Deval release`: https://github.com/r3c/deval/releases/latest
 
 Option 3: build from source
 ---------------------------
