@@ -45,12 +45,17 @@ value when rendering the template (and will raise an error if you don’t).
 
 ## Instructions
 
-Either download [latest release](https://github.com/r3c/deval/releases/latest)
-from GitHub and unpack manually or install with
-[Composer](https://getcomposer.org/):
+Either install Deval with [Composer](https://getcomposer.org/) and autoload it:
 
 ```
 composer require r3c/deval
+```
+
+Or download [latest release](https://github.com/r3c/deval/releases/latest) from
+GitHub then unpack & require manually:
+
+```
+require 'path/to/deval/deval.php';
 ```
 
 Full documentation is available
