@@ -15,7 +15,19 @@ Download `latest Deval release`_, unzip it somewhere inside your project directo
 
 .. _`latest Deval release`: https://github.com/r3c/deval/releases/latest
 
-Option 2: build from source
+Option 2: install from Composer
+-------------------------------
+
+Require Deval from `Composer`_ and install it before you can autoload Deval into your project:
+
+.. _`Composer`: https://getcomposer.org/
+
+.. code-block:: sh
+
+	$ composer require r3c/deval
+	$ ( cd vendor/r3c/deval && npm install )
+
+Option 3: build from source
 ---------------------------
 
 You'll need following requirements to build Deval from source:
@@ -46,7 +58,10 @@ Require file ``deval.php`` file to start using the library ; here is a minimal c
 
 	<?php
 
-	require 'lib/deval/deval.php';
+	// If you installed from Composer:
+	require 'vendor/autoload.php';
+	// Or if you installed from latest release:
+	require 'path/to/deval/deval.php';
 
 	// Create a new renderer for template file 'template/users.deval' and use
 	// directory 'cache' to store pre-evaluated intermediate results (your web

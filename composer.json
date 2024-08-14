@@ -4,20 +4,15 @@
   "type": "library",
   "license": "MIT",
   "autoload": {
-    "psr-4": {
-      "Deval\\": "src/"
-    }
+    "classmap": [
+      "src/",
+      "src/*/"
+    ]
   },
   "authors": [
     {
       "name": "Rémi Caput",
       "email": "v.github.com+deval@mirari.fr"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "vsc",
-      "url": "https://github.com/r3c/deval"
     }
   ],
   "require": {}
