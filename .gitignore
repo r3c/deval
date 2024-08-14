@@ -1,5 +1,7 @@
 /node_modules/
 /src/parser.php
 /test/template/*.php
+/vendor/
+/composer.lock
 /deval.zip
 /package-lock.json

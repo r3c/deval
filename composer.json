@@ -1,0 +1,24 @@
+{
+  "name": "r3c/deval",
+  "description": "Template engine with support for partial evaluation at compilation",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Deval\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Rémi Caput",
+      "email": "v.github.com+deval@mirari.fr"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vsc",
+      "url": "https://github.com/r3c/deval"
+    }
+  ],
+  "require": {}
+}
