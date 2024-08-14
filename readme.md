@@ -17,26 +17,26 @@ invariants have been evaluated.
 
 This sample template:
 
-<pre>
+```
 {{ $ locale(language, "users.list") }}
 {{ for user in users }}
     - {{ $ user.login }}
 {{ empty }}
     {{ $ locale(language, "no.users") }}
 {{ end }}
-</pre>
+```
 
 Will compile a PHP snippet similar to this one after injecting a `locale`
 function and a `language` variable:
 
-<pre>
+```
 Registered user:
-&lt;?php $_counter = 0; foreach ($users as $user) { ?&gt;
-    - &lt;?php echo $user-&gt;login; ?&gt;
-&lt;?php ++$_counter; } if ($_counter === 0) { ?&gt;
+<?php $_counter = 0; foreach ($users as $user) { ?>
+    - <?php echo $user->login; ?>
+<?php ++$_counter; } if ($_counter === 0) { ?>
     No users registered.
-&lt;?php } ?&gt;
-</pre>    
+<?php } ?>
+```
 
 As you can see all statements depending on variables locale and language have
 been evaluated in generated code, as their value was known at compile time.
@@ -45,8 +45,13 @@ value when rendering the template (and will raise an error if you don’t).
 
 ## Instructions
 
-Download latest release
-[from GitHub](https://github.com/r3c/deval/releases/latest).
+Either download [latest release](https://github.com/r3c/deval/releases/latest)
+from GitHub and unpack manually or install with
+[Composer](https://getcomposer.org/):
+
+```
+composer require r3c/deval
+```
 
 Full documentation is available
 [on Read the Docs](http://deval.readthedocs.io/).
